@@ -2,15 +2,15 @@
 
 from unittest import TestCase
 
-from restnuage.restlogincontroller import RESTLoginController
+from restnuage.nurest_login_controller import NURESTLoginController
 
 
 class LoginControllerSingleton(TestCase):
 
     def test_login_controller_is_singleton(self):
         """ login controller is singleton """
-        ctrl_a = RESTLoginController(user=u'Christophe')
-        ctrl_b = RESTLoginController(user=u'Toto')
+        ctrl_a = NURESTLoginController(user=u'Christophe')
+        ctrl_b = NURESTLoginController(user=u'Toto')
 
         self.assertEquals(ctrl_a, ctrl_b)
 
@@ -20,7 +20,7 @@ class GetAuthenticationHeader(TestCase):
     def test_get_authentication_header_without_api_key(self):
         """ Get authentication header without api key """
 
-        controller = RESTLoginController(user=u'christophe', password=u'tuCr0IsKoi?', api_key=None)
+        controller = NURESTLoginController(user=u'christophe', password=u'tuCr0IsKoi?', api_key=None)
 
         header = controller.get_authentication_header()
         self.assertEquals(header, 'XREST Y2hyaXN0b3BoZTp0dUNyMElzS29pPw==')
@@ -28,7 +28,7 @@ class GetAuthenticationHeader(TestCase):
     def test_get_authentication_header_with_api_key(self):
         """ Get authentication header with api key """
 
-        controller = RESTLoginController(user=u'christophe', password=None, api_key=u'12345ABCD')
+        controller = NURESTLoginController(user=u'christophe', password=None, api_key=u'12345ABCD')
 
         header = controller.get_authentication_header()
         self.assertEquals(header, 'XREST Y2hyaXN0b3BoZTpOb25l')
@@ -39,7 +39,7 @@ class ResetLoginController(TestCase):
     def test_reset_login_controller(self):
         """ Reset login controller """
 
-        controller = RESTLoginController(user=u'christophe', password=u'password', url=u'http://www.google.fr', api_key=u'12345', company=u'Alcatel')
+        controller = NURESTLoginController(user=u'christophe', password=u'password', url=u'http://www.google.fr', api_key=u'12345', company=u'Alcatel')
         controller.reset()
 
         self.assertEquals(controller.user, None)
@@ -53,18 +53,18 @@ class ImpersonateLoginController(TestCase):
 
     def setUp(self):
         """ Set up the context """
-        RESTLoginController(user=u'christophe', password=u'password', url=u'http://www.google.fr', api_key=u'12345', company=u'Alcatel')
+        NURESTLoginController(user=u'christophe', password=u'password', url=u'http://www.google.fr', api_key=u'12345', company=u'Alcatel')
 
     def tearDown(self):
         """ Cleaning context """
-        ctrl = RESTLoginController()
+        ctrl = NURESTLoginController()
         ctrl.reset()
 
 
     def test_impersonate(self):
         """ Start impersonate """
 
-        controller = RESTLoginController()
+        controller = NURESTLoginController()
         controller.impersonate(user=u'Alex', company=u'Google')
 
         self.assertEquals(controller.is_impersonating, True)
@@ -73,7 +73,7 @@ class ImpersonateLoginController(TestCase):
 
     def test_stop_impersonate(self):
         """ Stop impersonate """
-        controller = RESTLoginController()
+        controller = NURESTLoginController()
         controller.impersonate(user=u'Alex', company=u'Google')
         self.assertEquals(controller.is_impersonating, True)
 

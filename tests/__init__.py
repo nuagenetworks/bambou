@@ -1,10 +1,10 @@
 # -*- coding:utf-8 -*-
 
-from restnuage.restobject import RESTObject
-from restnuage.restuser import RESTBasicUser
+from restnuage.nurest_object import NURESTObject
+from restnuage.nurest_user import NURESTBasicUser
 
 
-class User(RESTBasicUser):
+class User(NURESTBasicUser):
     """ Creates a user object for tests """
 
     @classmethod
@@ -20,7 +20,7 @@ class User(RESTBasicUser):
         return True
 
 
-class Company(RESTObject):
+class Company(NURESTObject):
     """ Creates a company object for tests """
 
     def __init__(self, id=None, name='Alcatel-Lucent'):

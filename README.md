@@ -30,10 +30,10 @@ Follow these 3 steps to use your python environment.
 
 ### Usage
 
-__#1 Create your object models to extends RESTObject or RESTBasicUser__
+__#1 Create your object models to extends NURESTObject or NURESTBasicUser__
 
-    from restnuage.restuser import RESTBasicUser
-    class User(RESTBasicUser):
+    from restnuage.nurest_user import NURESTBasicUser
+    class User(NURESTBasicUser):
 
         @classmethod
         def get_rest_name(cls):
@@ -41,9 +41,9 @@ __#1 Create your object models to extends RESTObject or RESTBasicUser__
 
             return "user"
 
-__#2 Start a new RESTLoginController__
+__#2 Start a new NURESTLoginController__
 
-    ctrl = RESTLoginController()
+    ctrl = NURESTLoginController()
     ctrl.user = u"your_user"
     ctrl.password = u"your_password"
     ctrl.company = u"your_company"
