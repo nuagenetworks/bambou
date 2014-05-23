@@ -414,6 +414,12 @@ class NURESTObject(object):
     def _did_receive_response(self, connection):
         """ Receive a response from the connection """
 
+
+        if connection.has_timeouted:
+            print "NURESTConnection has timeout."
+            # TODO : Should send a notification error message here
+            return
+
         has_callbacks = connection.has_callbacks()
         should_post = not has_callbacks
 
@@ -434,17 +440,17 @@ class NURESTObject(object):
 
     # Advanced REST Operations
 
-    def add_child_entity(self, nurest_object, callback=None):
+    def add_child_entity(self, entity, callback=None):
         """ Add given NURESTObject into resource of current object
             for example, to add a NUGroup into a NUEnterprise, you can call
             enterprise.add_child_entity(nurest_object=my_group)
 
-            :param nurest_object: the NURESTObject object to add
+            :param entity: the NURESTObject object to add
             :param callback: callback containing the object and the connection
         """
 
-        self._manage_child_entity(nurest_object=nurest_object,
-                                  resource_url=nurest_object.get_resource_url(),
+        self._manage_child_entity(nurest_object=entity,
+                                  resource_url=entity.get_resource_url(),
                                   method='POST',
                                   callback=callback,
                                   handler=self._did_add_child_entity)
@@ -460,16 +466,22 @@ class NURESTObject(object):
 
         self._did_perform_standard_operation(connection)
 
-    def remove_child_entity(self, nurest_object, callback=None):
+    def remove_child_entity(self, entity, callback=None, response_choice=None):
         """ Removes given NURESTObject into resource from current object
             for example, to remove a NUGroup from a NUEnterprise, you can call
             enterprise.remove_child_entity(nurest_object=my_group)
 
-            :param nurest_object: the NURESTObject object to remove
+            :param entity: the NURESTObject object to remove
+            :param choice: if a choice has to be made
             :param callback: callback containing the object and the connection
         """
 
-        self._manage_child_entity(nurest_object=nurest_object,
-                                  resource_url=nurest_object.get_resource_url(),
+        resource_url = entity.get_resource_url()
+
+        if response_choice:
+            resource_url = '%s?responseChoice=%s' % (resource_url, response_choice)
+
+        self._manage_child_entity(nurest_object=entity,
+                                  resource_url=resource_url,
                                   method='DELETE',
                                   callback=callback)

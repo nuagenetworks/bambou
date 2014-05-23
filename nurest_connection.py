@@ -2,16 +2,14 @@
 
 import json
 
-from requests.exceptions import Timeout
+from requests.exceptions import SSLError, Timeout
 from requests_futures.sessions import FuturesSession
 
-from restnuage.http_exceptions import HTTPTimeoutException
 from restnuage.nurest_login_controller import NURESTLoginController
 from restnuage.nurest_response import NURESTResponse
 
 
 HTTP_CODE_ZERO = 0
-HTTP_CODE_CONNECTION_TIMEOUT = 43
 HTTP_CODE_SUCCESS = 200
 HTTP_CODE_CREATED = 201
 HTTP_CODE_EMPTY = 204
@@ -21,6 +19,7 @@ HTTP_CODE_UNAUTHORIZED = 401
 HTTP_CODE_PERMISSION_DENIED = 403
 HTTP_CODE_NOT_FOUND = 404
 HTTP_CODE_METHOD_NOT_ALLOWED = 405
+HTTP_CODE_CONNECTION_TIMEOUT = 408
 HTTP_CODE_CONFLICT = 409
 HTTP_CODE_PRECONDITION_FAILED = 412
 HTTP_CODE_INTERNAL_SERVER_ERROR = 500
@@ -39,9 +38,9 @@ class NURESTConnection(object):
 
         self._uses_authentication = True
         self._has_timeouted = False
-        self._is_cancelled = False
+        #self._is_cancelled = False
         self._ignore_request_idle = False
-        self._xhr_timeout = 300000
+        self._xhr_timeout = 30000
         self._response = None
         self._error_message = None
 
@@ -95,6 +94,12 @@ class NURESTConnection(object):
 
     ignore_request_idle = property(_get_ignore_request_idle, _set_ignore_request_idle)
 
+    def _has_timeouted(self):
+        """ Get has timouted """
+        return self._has_timeouted
+
+    has_timeouted = property(_has_timeouted, None)
+
     # Methods
 
     def has_callbacks(self):
@@ -109,7 +114,7 @@ class NURESTConnection(object):
         # TODO : Get errors in response data after bug fix : http://mvjira.mv.usa.alcatel.com/browse/VSD-2735
 
         data = self._response.data
-        if 'errors' in data:
+        if data and 'errors' in data:
             error_name = data['errors'][0]['descriptions'][0]['title']
             error_description = data['errors'][0]['descriptions'][0]['description']
 
@@ -181,10 +186,17 @@ class NURESTConnection(object):
         """ Called when a resquest has timeout """
 
         self._has_timeouted = True
-        raise HTTPTimeoutException()
+
+        if self._callback:
+            self._callback(self)
+
+        # TODO : Translate this line:
+        #[[CPRunLoop currentRunLoop] limitDateForMode:CPDefaultRunLoopMode];
 
     def start(self):  # TODO : Use Timeout here and _ignore_request_idle
         """ Make an HTTP request with a specific method """
+
+        self._has_timeouted = False
 
         # Add specific headers
         controller = NURESTLoginController()
@@ -200,10 +212,8 @@ class NURESTConnection(object):
 
         url = "%s%s" % (controller.url, self._request.url)
 
-        # Prepare callback
-        self._has_timeouted = False
-        print "** Launch %s %s" % (self._request.method, url)
 
+        print "** Launch %s %s" % (self._request.method, url)
         print "** DATA SENT\n%s" % self._request.data
 
         # HTTP Call
@@ -219,16 +229,12 @@ class NURESTConnection(object):
 
         print "[%s] Waiting for response..." % self._request.method
 
+        # TODO : Manage canceled request ?
+        # TODO : Launch exception if an error occurs
 
-        promise.result()
-        # try:
-        #     promise.result()
-        # except KeyError as exc:  # TODO : Find a better way to retrieve response when call failed
-        #     response = NURESTResponse(status_code=0, reason=exc.message, headers=[])
-        #     response.text = exc
-        #     self._did_receive_response(None, response)
-        # except Timeout:
-        #     self._did_timeout()
-
-        # TODO : Manage following exceptions
-        # [401] Unauthorized
+        try:
+            promise.result()
+        except SSLError:
+            self._did_timeout()
+        except Timeout:
+            self._did_timeout()
