@@ -10,7 +10,7 @@ class GetResourceTests(TestCase):
         """ Get object name """
 
         user = User()
-        self.assertEquals(user.get_class_rest_name(), 'me')
+        self.assertEquals(user.get_class_remote_name(), 'me')
 
     def test_get_resource_name(self):
         """ Get object resource name """

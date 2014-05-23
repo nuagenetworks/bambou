@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import json
+
 from restnuage.nurest_connection import NURESTConnection
+from restnuage.nurest_request import NURESTRequest
 
 
 class NURESTObject(object):
@@ -27,113 +30,113 @@ class NURESTObject(object):
         self._owner = owner
         self._parent_id = parent_id
         self._parent_type = parent_type
-        self.parent = None
+        self._parent = None
 
         self._childrens = dict()
         self._attributes = dict()
 
-        self.expose_attribute(attribute_name='id', rest_name='ID')
-        self.expose_attribute(attribute_name='external_id', rest_name='externalID')
-        self.expose_attribute(attribute_name='local_id', rest_name='localID')
-        self.expose_attribute(attribute_name='parent_id', rest_name='parentID')
-        self.expose_attribute(attribute_name='parent_type', rest_name='parentType')
-        self.expose_attribute(attribute_name='creation_date', rest_name='creationDate')
-        self.expose_attribute(attribute_name='owner')
+        self.expose_attribute(local_name='id', remote_name='ID')
+        self.expose_attribute(local_name='external_id', remote_name='externalID')
+        self.expose_attribute(local_name='local_id', remote_name='localID')
+        self.expose_attribute(local_name='parent_id', remote_name='parentID')
+        self.expose_attribute(local_name='parent_type', remote_name='parentType')
+        self.expose_attribute(local_name='creation_date', remote_name='creationDate')
+        self.expose_attribute(local_name='owner')
 
     # Properties
 
-    def get_creation_date(self):
+    def _get_creation_date(self):
         """ Get creation date """
         return self._creation_date
 
-    def set_creation_date(self, creation_date):
+    def _set_creation_date(self, creation_date):
         """ Set creation date """
         self._creation_date = creation_date
 
-    creation_date = property(get_creation_date, set_creation_date)
+    creation_date = property(_get_creation_date, _set_creation_date)
 
-    def get_external_id(self):
+    def _get_external_id(self):
         """ Get external id """
         return self._external_id
 
-    def set_external_id(self, external_id):
+    def _set_external_id(self, external_id):
         """ Set external id """
         self._external_id = external_id
 
-    external_id = property(get_external_id, set_external_id)
+    external_id = property(_get_external_id, _set_external_id)
 
-    def get_id(self):
+    def _get_id(self):
         """ Get object id """
         return self._id
 
-    def set_id(self, id):
+    def _set_id(self, id):
         """ Set object id """
         self._id = id
 
-    id = property(get_id, set_id)
+    id = property(_get_id, _set_id)
 
-    def get_local_id(self):
+    def _get_local_id(self):
         """ Get local id """
         return self._local_id
 
-    def set_local_id(self, local_id):
+    def _set_local_id(self, local_id):
         """ Set local id """
         self._local_id = local_id
 
-    local_id = property(get_local_id, set_local_id)
+    local_id = property(_get_local_id, _set_local_id)
 
-    def get_owner(self):
+    def _get_owner(self):
         """ Get owner """
         return self._owner
 
-    def set_owner(self, owner):
+    def _set_owner(self, owner):
         """ Set owner """
         self._owner = owner
 
-    owner = property(get_owner, set_owner)
+    owner = property(_get_owner, _set_owner)
 
-    def get_parent_id(self):
+    def _get_parent_id(self):
         """ Get parent id """
         return self._parent_id
 
-    def set_parent_id(self, parent_id):
+    def _set_parent_id(self, parent_id):
         """ Set parent id """
         self._parent_id = parent_id
 
-    parent_id = property(get_parent_id, set_parent_id)
+    parent_id = property(_get_parent_id, _set_parent_id)
 
-    def get_parent_type(self):
+    def _get_parent_type(self):
         """ Get parent type """
         return self._parent_type
 
-    def set_parent_type(self, parent_type):
+    def _set_parent_type(self, parent_type):
         """ Set parent id """
         self._parent_type = parent_type
 
-    parent_type = property(get_parent_type, set_parent_type)
+    parent_type = property(_get_parent_type, _set_parent_type)
 
-    def get_parent(self):
+    def _get_parent(self):
         """ Get parent """
         return self._parent
 
-    def set_parent(self, parent):
+    def _set_parent(self, parent):
         """ Set parent id """
         self._parent = parent
 
-    parent = property(get_parent, set_parent)
+    parent = property(_get_parent, _set_parent)
 
     # Methods
 
     @classmethod
-    def get_rest_name(cls):
+    def get_remote_name(cls):
         """ Provides the class name used for resource  """
 
-        raise NotImplementedError('%s has no defined name. Implements get_rest_name method first.' % cls)
+        raise NotImplementedError('%s has no defined name. Implements get_remote_name method first.' % cls)
 
-    def get_class_rest_name(self):
+    def get_class_remote_name(self):
         """ Provides the resource name of the instance """
 
-        return self.__class__.get_rest_name()
+        return self.__class__.get_remote_name()
 
     @classmethod
     def is_resource_name_fixed(cls):
@@ -145,7 +148,7 @@ class NURESTObject(object):
     def get_resource_name(cls):
         """ Provides the REST query name based on object's name """
 
-        query_name = cls.get_rest_name()
+        query_name = cls.get_remote_name()
 
         if cls.is_resource_name_fixed():
             return query_name
@@ -154,10 +157,12 @@ class NURESTObject(object):
 
         if last_letter == "y":
 
-            length = len(query_name)
-            #if query_name[length - 2:] == "ry" or query_name[length - 2:] == "cy":
-            query_name = query_name[:length - 1]
-            query_name += "ies"
+            vowels = ['a', 'e', 'i', 'o', 'u', 'y']
+
+            if query_name[-2].lower() not in vowels:
+            #if query_name[length - 2:] == "ry" or query_name[length - 2:] == "cy" or query_name[length - 2:] == "cy":
+                query_name = query_name[:len(query_name) - 1]
+                query_name += "ies"
 
         elif last_letter != "s":
             query_name += "s"
@@ -169,7 +174,8 @@ class NURESTObject(object):
 
         name = self.__class__.get_resource_name()
 
-        if self.id:
+        if self.id is not None:
+            print self.id
             return "/%s/%s" % (name, self.id)
 
         return "/%s" % name
@@ -177,10 +183,10 @@ class NURESTObject(object):
     def __cmp__(self, rest_object):
         """ Compare with another object """
 
-        if type(rest_object) is not NURESTObject:
+        if not isinstance(rest_object, NURESTObject):
             raise TypeError('The object is not a NURESTObject %s' % rest_object)
 
-        if self.get_rest_name() != rest_object.get_rest_name():
+        if self.get_remote_name() != rest_object.get_remote_name():
             return False
 
         if self.id != rest_object.id:
@@ -194,7 +200,7 @@ class NURESTObject(object):
         return "%s (ID=%s)" % (self.__class__, self.id)
 
     def expose_attribute(self, local_name, remote_name=None):
-        """ Expose attribute_name as rest_name """
+        """ Expose local_name as remote_name """
 
         if remote_name is None:
             remote_name = local_name
@@ -204,21 +210,32 @@ class NURESTObject(object):
     def is_owned_by_current_user(self):
         """ Check if the current user owns the object """
 
-        #return self._owner ==
-        raise NotImplementedError('Not implemented yet')
+        from restnuage.nurest_user import NURESTBasicUser
+        current_user = NURESTBasicUser()
+        return self._owner == current_user.id
 
-    def is_parents_owned_by_current_user(self, parents):
+
+    def is_parents_owned_by_current_user(self, remote_names):
         """ Check if the current user owns one of the parents """
-
-        raise NotImplementedError('Not implemented yet')
-
-    def parent_with_rest_name_matching(self, restnames):
-        """ Return parent that matches a restnames """
 
         parent = self
 
         while parent:
-            if parent.name in restnames:
+
+            if self.get_class_remote_name() in remote_names and parent.is_owned_by_current_user():
+                return True
+
+            parent = parent.parent
+
+        return False
+
+    def parent_with_remote_name_matching(self, remote_names):
+        """ Return parent that matches a remote name """
+
+        parent = self
+
+        while parent:
+            if parent.get_class_remote_name() in remote_names:
                 return parent
 
             parent = parent.parent
@@ -262,70 +279,197 @@ class NURESTObject(object):
             else:
                 print 'Attribute %s could not be added to object %s' % (remote_name, self)
 
-    # Childrens' management
-
-    def add_child(self, rest_object):
-        """ Add rest_object as a child """
-
-        if type(rest_object) is not NURESTObject:
-            raise TypeError('The object is not a NURESTObject %s' % rest_object)
-
-        if rest_object.__class__ not in self._childrens:
-            self._childrens[rest_object.__class__] = []
-
-        self._childrens[rest_object.__class__].append(rest_object)
-
-    def remove_child(self, rest_object):
-        """ Removes rest_object from childrens """
-
-        if type(rest_object) is not NURESTObject:
-            raise TypeError('The object is not a NURESTObject %s' % rest_object)
-
-        if rest_object.__class__ in self._childrens:
-            self._childrens[rest_object.__class__].remove(rest_object)
-
-    def update_child(self, rest_object):
-        """ Updates rest_object """
-
-        if type(rest_object) is not NURESTObject:
-            raise TypeError('The object is not a NURESTObject %s' % rest_object)
-
-        if rest_object.__class__ in self._childrens:
-            index = self._childrens[rest_object.__class__].index(rest_object)
-            self.remove_child(rest_object)
-            self._childrens[rest_object.__class__].insert(index, rest_object)
-
-    #def register_children(self, )
+    # # Childrens' management
+    # # TODO : Should remove this because it is linked to Cappuccino memory management ?
+    #     def add_child(self, rest_object):
+    #         """ Add rest_object as a child """
+    #
+    #         if type(rest_object) is not NURESTObject:
+    #             raise TypeError('The object is not a NURESTObject %s' % rest_object)
+    #
+    #         if rest_object.__class__ not in self._childrens:
+    #             self._childrens[rest_object.__class__] = []
+    #
+    #         self._childrens[rest_object.__class__].append(rest_object)
+    #
+    #     def remove_child(self, rest_object):
+    #         """ Removes rest_object from childrens """
+    #
+    #         if type(rest_object) is not NURESTObject:
+    #             raise TypeError('The object is not a NURESTObject %s' % rest_object)
+    #
+    #         if rest_object.__class__ in self._childrens:
+    #             self._childrens[rest_object.__class__].remove(rest_object)
+    #
+    #     def update_child(self, rest_object):
+    #         """ Updates rest_object """
+    #
+    #         if type(rest_object) is not NURESTObject:
+    #             raise TypeError('The object is not a NURESTObject %s' % rest_object)
+    #
+    #         if rest_object.__class__ in self._childrens:
+    #             index = self._childrens[rest_object.__class__].index(rest_object)
+    #             self.remove_child(rest_object)
+    #             self._childrens[rest_object.__class__].insert(index, rest_object)
+    #
+    #     def register_children(self, childrens, remote_name):
+    #         """ Link childrens to the remote name """
+    #
+    #         self._childrens[remote_name] = childrens
 
     # HTTP Calls
+
+    def delete(self, callback=None):
+        """ Delete object and call given callback """
+
+        self._manage_child_entity(nurest_object=self, method='DELETE', callback=callback)
+
+    def save(self, callback=None):
+        """ Update object and call given callback """
+
+        self._manage_child_entity(nurest_object=self, method='PUT', callback=callback)
 
     def fetch(self, callback):
         """ Fetch all information about the current object """
 
-        print "** Call fetch"
-        self._callback = callback
-        connection = NURESTConnection()
-        connection.get(resource_url=self.get_resource_url(), params=self.to_dict(), callback=self._did_fetch)
+        request = NURESTRequest(method='GET', url=self.get_resource_url())
+        self.send_request(request=request, local_callback=self._did_fetch, remote_callback=callback)
 
-    def _did_fetch(self, response):
+    # REST HTTP Calls
+
+    def send_request(self, request, local_callback, remote_callback, user_info=None):
+        """ Sends the request, calls the local callback, then the remote callback """
+
+        callbacks = dict()
+
+        if local_callback:
+            callbacks['local'] = local_callback
+
+        if remote_callback:
+            callbacks['remote'] = remote_callback
+
+        connection = NURESTConnection(request=request, callback=self._did_receive_response, callbacks=callbacks)
+        connection.user_info = user_info
+
+        connection.start()
+
+    def _manage_child_entity(self, nurest_object, resource_url='', method='GET', callback=None, handler=None):
+        """ Low level child management. Send given HTTP method with given entity to given ressource of current object
+
+            :param nurest_object: the NURESTObject object to manage
+            :param resource_url: the resource url of the object to manage
+            :param method: the HTTP method to use (GET, POST, PUT, DELETE)
+            :param callback: the callback to call at the end
+            :param handler: a custom handler to call when complete, before calling the callback
+        """
+
+        request = None
+
+        # If we are adding stuff under a NURESTBasicUser, then consider this as root
+        # TODO : Clean this case
+        from restnuage.nurest_user import NURESTBasicUser
+        if isinstance(self, NURESTBasicUser):
+            # Creates a url relative to the server base url
+            request = NURESTRequest(method=method, url=resource_url, data=nurest_object.to_dict())
+
+        else:
+            url = self.get_resource_url() + resource_url  # Creates a url relative to the current object url
+            request = NURESTRequest(method=method, url=url, data=nurest_object.to_dict())
+
+        if not handler:
+            handler = self._did_perform_standard_operation
+
+        self.send_request(request=request, local_callback=handler, remote_callback=callback, user_info=nurest_object)
+
+    def set_entities(self, nurest_objects, object_type, callback=None):
+        """ Reference a list of NURESTObject into the current resource
+            :param nurest_objects: list of NURESTObject to link
+            :param object_class: Type of the object to link
+            :param callback: Callback method that should be fired at the end
+        """
+
+        ids = list()
+
+        for nurest_object in nurest_objects:
+            ids.push(nurest_object.id)
+
+        data = json.loads(ids)
+        url = self.get_resource_url() + object_type.get_remote_name()
+        request = NURESTRequest(method="PUT", url=url, data=data)
+
+        self.send_request(request=request,
+                           local_callback=self._did_perform_standard_operation,
+                           remote_callback=callback,
+                           user_info=nurest_objects)
+
+    # REST Operation handlers
+
+    def _did_fetch(self, connection):
         """ Callback called after fetching the object """
 
-        print "** Fetch callback"
-        dictionary = response.json()[0]
-        self.from_dict(dictionary)
+        response = connection.response
+        self.from_dict(response.data[0])
+        self._did_perform_standard_operation(connection)
 
-        if self._callback:
-            self._callback()
-            self._callback = None
+    def _did_receive_response(self, connection):
+        """ Receive a response from the connection """
 
-    def delete(self, callback=None):
-        """ Deletes object and perform the callback method """
+        has_callbacks = connection.has_callbacks()
+        should_post = not has_callbacks
 
-        connection = NURESTConnection()
-        connection.delete(resource_url=self.get_resource_url(), data=self.to_dict(), callback=callback)
+        if has_callbacks and connection.has_response_success(should_post=should_post):
+            callback = connection.callbacks['local']
+            callback(connection)
 
-    def save(self, callback=None):
-        """ Updates the object and perform the callback method """
+    def _did_perform_standard_operation(self, connection):
+        """ Performs standard opertions """
 
-        connection = NURESTConnection()
-        connection.update(resource_url=self.get_resource_url(), data=self.to_dict(), callback=callback)
+        callback = connection.callbacks['remote']
+
+        if callback:
+            if connection.user_info:
+                callback(connection.user_info, connection)
+            else:
+                callback(self, connection)
+
+    # Advanced REST Operations
+
+    def add_child_entity(self, nurest_object, callback=None):
+        """ Add given NURESTObject into resource of current object
+            for example, to add a NUGroup into a NUEnterprise, you can call
+            enterprise.add_child_entity(nurest_object=my_group)
+
+            :param nurest_object: the NURESTObject object to add
+            :param callback: callback containing the object and the connection
+        """
+
+        self._manage_child_entity(nurest_object=nurest_object,
+                                  resource_url=nurest_object.get_resource_url(),
+                                  method='POST',
+                                  callback=callback,
+                                  handler=self._did_add_child_entity)
+
+    def _did_add_child_entity(self, connection):
+        """ Callback called after adding a new child entity """
+
+        response = connection.response
+        try:
+            connection.user_info.from_dict(response.data[0])
+        except Exception:
+            pass
+
+        self._did_perform_standard_operation(connection)
+
+    def remove_child_entity(self, nurest_object, callback=None):
+        """ Removes given NURESTObject into resource from current object
+            for example, to remove a NUGroup from a NUEnterprise, you can call
+            enterprise.remove_child_entity(nurest_object=my_group)
+
+            :param nurest_object: the NURESTObject object to remove
+            :param callback: callback containing the object and the connection
+        """
+
+        self._manage_child_entity(nurest_object=nurest_object,
+                                  resource_url=nurest_object.get_resource_url(),
+                                  method='DELETE',
+                                  callback=callback)

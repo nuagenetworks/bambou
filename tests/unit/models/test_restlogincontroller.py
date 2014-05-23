@@ -9,9 +9,12 @@ class LoginControllerSingleton(TestCase):
 
     def test_login_controller_is_singleton(self):
         """ login controller is singleton """
-        ctrl_a = NURESTLoginController(user=u'Christophe')
-        ctrl_b = NURESTLoginController(user=u'Toto')
+        ctrl_a = NURESTLoginController()
+        ctrl_a.user = u'Christophe'
+        ctrl_b = NURESTLoginController()
+        ctrl_b.user = u'Toto'
 
+        self.assertEquals(ctrl_b.user, u'Toto')
         self.assertEquals(ctrl_a, ctrl_b)
 
 
@@ -20,7 +23,10 @@ class GetAuthenticationHeader(TestCase):
     def test_get_authentication_header_without_api_key(self):
         """ Get authentication header without api key """
 
-        controller = NURESTLoginController(user=u'christophe', password=u'tuCr0IsKoi?', api_key=None)
+        controller = NURESTLoginController()
+        controller.user = u'christophe'
+        controller.password=u'tuCr0IsKoi?'
+        controller.api_key = None
 
         header = controller.get_authentication_header()
         self.assertEquals(header, 'XREST Y2hyaXN0b3BoZTp0dUNyMElzS29pPw==')
@@ -28,10 +34,13 @@ class GetAuthenticationHeader(TestCase):
     def test_get_authentication_header_with_api_key(self):
         """ Get authentication header with api key """
 
-        controller = NURESTLoginController(user=u'christophe', password=None, api_key=u'12345ABCD')
+        controller = NURESTLoginController()
+        controller.user = u'christophe'
+        controller.password = None
+        controller.api_key = u'12345ABCD'
 
         header = controller.get_authentication_header()
-        self.assertEquals(header, 'XREST Y2hyaXN0b3BoZTpOb25l')
+        self.assertEquals(header, 'XREST Y2hyaXN0b3BoZToxMjM0NUFCQ0Q=')
 
 
 class ResetLoginController(TestCase):
@@ -39,7 +48,13 @@ class ResetLoginController(TestCase):
     def test_reset_login_controller(self):
         """ Reset login controller """
 
-        controller = NURESTLoginController(user=u'christophe', password=u'password', url=u'http://www.google.fr', api_key=u'12345', company=u'Alcatel')
+        controller = NURESTLoginController()
+        controller.user = u'christophe'
+        controller.password = u'password'
+        controller.url = u'http://www.google.fr'
+        controller.api_key = u'12345'
+        controller.company = u'Alcatel'
+
         controller.reset()
 
         self.assertEquals(controller.user, None)
@@ -53,13 +68,17 @@ class ImpersonateLoginController(TestCase):
 
     def setUp(self):
         """ Set up the context """
-        NURESTLoginController(user=u'christophe', password=u'password', url=u'http://www.google.fr', api_key=u'12345', company=u'Alcatel')
+        controller = NURESTLoginController()
+        controller.user = u'christophe'
+        controller.password = u'password'
+        controller.url = u'http://www.google.fr'
+        controller.api_key = u'12345'
+        controller.company = u'Alcatel'
 
     def tearDown(self):
         """ Cleaning context """
         ctrl = NURESTLoginController()
         ctrl.reset()
-
 
     def test_impersonate(self):
         """ Start impersonate """
