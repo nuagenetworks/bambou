@@ -42,7 +42,7 @@ class NURESTPushCenter(Singleton):
             return
 
         self._is_running = True
-        self._thread = threading.Thread(target=self._listen)
+        self._thread = threading.Thread(target=self._listen, name='push-center')
         self._thread.start()
 
     def stop(self):
@@ -59,7 +59,7 @@ class NURESTPushCenter(Singleton):
         """ Retrieve events that has been  """
         events = self._last_events
         self._last_events = list()
-        print "%s Events " %  len(events)
+        print "%s last events " % len(events)
         return events
 
     # Private methods
@@ -70,6 +70,7 @@ class NURESTPushCenter(Singleton):
         if not self._is_running:
             return
 
+        print "** NURESTPushCenter received data"
         response = connection.response
 
         if response.status_code != 200:
@@ -82,12 +83,11 @@ class NURESTPushCenter(Singleton):
             self._debug_number_of_received_events += len(data['events'])
             self._debug_number_of_received_push += 1
 
-            print "** NURESTPushCenter\nReceived Push=%s\nTotal Received events=%s" % (self._debug_number_of_received_push, self._debug_number_of_received_events   )
+            print "** NURESTPushCenter\nReceived Push=%s\nTotal Received events=%s" % (self._debug_number_of_received_push, self._debug_number_of_received_events)
 
             self._last_events.extend(data['events'])
 
         if self._is_running:
-
             uuid = None
             if 'uuid' in data:
                 uuid = data['uuid']
@@ -97,14 +97,17 @@ class NURESTPushCenter(Singleton):
     def _listen(self, uuid=None):
         """ Listen a connection uuid """
 
+        print "** NURESTPushCenter listening in %s" % threading.current_thread()
+
         events_url = "%s/events" % self.url
         if uuid:
             events_url = "%s?%s" % (events_url, uuid)
 
         request = NURESTRequest(method='GET', url=events_url)
 
-        connection = NURESTConnection(request=request, callback=self._did_receive_event)
-        connection.async = False # Force async to False so the push center will have only 1 thread running
+        # Force async to False so the push center will have only 1 thread running
+        connection = NURESTConnection(request=request, callback=self._did_receive_event, async=False)
+
         #connection.timeout = 0
         #connection.ignore_request_idle = True
         connection.start()

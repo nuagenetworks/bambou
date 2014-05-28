@@ -3,6 +3,7 @@
 import json
 import requests
 import threading
+import thread
 
 #from requests.exceptions import SSLError, Timeout
 #from requests_futures.sessions import FuturesSession
@@ -31,7 +32,7 @@ HTTP_CODE_SERVICE_UNAVAILABLE = 503
 class NURESTConnection(object):
     """ Enhances requests """
 
-    def __init__(self, request, callback=None, callbacks=dict()):
+    def __init__(self, request, async, callback=None, callbacks=dict()):
         """ Intializes a new connection for a request
             :param request: the NURESTRequest to send
             :param callback: the method that will be fired after sending
@@ -47,14 +48,12 @@ class NURESTConnection(object):
         self._error_message = None
 
         self._request = request
+        self._async = async
         self._response = None
         self._callback = callback
         self._callbacks = callbacks
         self._user_info = None
         self._object_last_action_timer = None
-
-        controller = NURESTLoginController()
-        self._async = controller.async
 
     # Properties
 
@@ -114,7 +113,7 @@ class NURESTConnection(object):
         """ Set async """
         self._async = async
 
-    async = property(_get_async, _set_async)
+    async = property(_get_async, None)
 
     # Methods
 
@@ -182,7 +181,7 @@ class NURESTConnection(object):
 
     # HTTP Calls
 
-    def _did_receive_response(self, session, response):
+    def _did_receive_response(self, response):
         """ Called when a response is received """
 
         try:
@@ -192,22 +191,24 @@ class NURESTConnection(object):
             data = None
 
         self._response = NURESTResponse(status_code=response.status_code, headers=response.headers, data=data, reason=response.reason)
+        self._callback(self)
 
-        if self._callback:
-            self._callback(self)
+        return self
 
     def _did_timeout(self):
         """ Called when a resquest has timeout """
         print "TIMEOUT"
         self._has_timeouted = True
 
-        if self._callback:
+        if self._async and self._callback:
             self._callback(self)
+        else:
+            return self
 
         # TODO : Translate this line:
         #[[CPRunLoop currentRunLoop] limitDateForMode:CPDefaultRunLoopMode];
 
-    def _make_request(self, callback):
+    def _make_request(self):
         """ make an asyn request """
 
         self._has_timeouted = False
@@ -227,26 +228,24 @@ class NURESTConnection(object):
         url = "%s%s" % (controller.url, self._request.url)
 
         print "** Launch %s %s" % (self._request.method, url)
-        #print "** DATA SENT\n%s" % self._request.data
 
         response = requests.request(method=self._request.method,
                                   url=url,
-                                  #params=self._request.params,
                                   data=json.dumps(self._request.data),
                                   headers=headers,
                                   verify=False,
-                                  #background_callback=self._did_receive_response,
                                   timeout=self.timeout)
 
-        callback(session=None, response=response)
+        return self._did_receive_response(response)
 
     def start(self):  # TODO : Use Timeout here and _ignore_request_idle
         """ Make an HTTP request with a specific method """
 
         if self._async:
-
-            thread = threading.Thread(target=self._make_request, args=(self._did_receive_response,))
+            thread = threading.Thread(target=self._make_request)
+            thread.is_daemon = False
             thread.start()
-            return thread
 
-        self._make_request(callback=self._did_receive_response)
+            return
+
+        return self._make_request()

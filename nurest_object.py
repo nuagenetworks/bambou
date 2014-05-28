@@ -213,7 +213,6 @@ class NURESTObject(object):
         current_user = NURESTBasicUser()
         return self._owner == current_user.id
 
-
     def is_parents_owned_by_current_user(self, remote_names):
         """ Check if the current user owns one of the parents """
 
@@ -280,65 +279,32 @@ class NURESTObject(object):
                 #print 'Attribute %s could not be added to object %s' % (remote_name, self)
                 pass
 
-    # # Childrens' management
-    # # TODO : Should remove this because it is linked to Cappuccino memory management ?
-    #     def add_child(self, rest_object):
-    #         """ Add rest_object as a child """
-    #
-    #         if type(rest_object) is not NURESTObject:
-    #             raise TypeError('The object is not a NURESTObject %s' % rest_object)
-    #
-    #         if rest_object.__class__ not in self._childrens:
-    #             self._childrens[rest_object.__class__] = []
-    #
-    #         self._childrens[rest_object.__class__].append(rest_object)
-    #
-    #     def remove_child(self, rest_object):
-    #         """ Removes rest_object from childrens """
-    #
-    #         if type(rest_object) is not NURESTObject:
-    #             raise TypeError('The object is not a NURESTObject %s' % rest_object)
-    #
-    #         if rest_object.__class__ in self._childrens:
-    #             self._childrens[rest_object.__class__].remove(rest_object)
-    #
-    #     def update_child(self, rest_object):
-    #         """ Updates rest_object """
-    #
-    #         if type(rest_object) is not NURESTObject:
-    #             raise TypeError('The object is not a NURESTObject %s' % rest_object)
-    #
-    #         if rest_object.__class__ in self._childrens:
-    #             index = self._childrens[rest_object.__class__].index(rest_object)
-    #             self.remove_child(rest_object)
-    #             self._childrens[rest_object.__class__].insert(index, rest_object)
-    #
-    #     def register_children(self, childrens, remote_name):
-    #         """ Link childrens to the remote name """
-    #
-    #         self._childrens[remote_name] = childrens
-
     # HTTP Calls
 
-    def delete(self, callback=None):
+    def delete(self, callback=None, async=False):
         """ Delete object and call given callback """
 
-        self._manage_child_entity(nurest_object=self, method='DELETE', callback=callback)
+        self._manage_child_entity(nurest_object=self, method='DELETE', async=async, callback=callback)
 
-    def save(self, callback=None):
+    def save(self, callback=None, async=False):
         """ Update object and call given callback """
 
-        self._manage_child_entity(nurest_object=self, method='PUT', callback=callback)
+        self._manage_child_entity(nurest_object=self, method='PUT', async=async, callback=callback)
 
-    def fetch(self, callback):
+    def fetch(self, callback=None, async=False):
         """ Fetch all information about the current object """
 
         request = NURESTRequest(method='GET', url=self.get_resource_url())
-        self.send_request(request=request, local_callback=self._did_fetch, remote_callback=callback)
+
+        if async:
+            self.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback)
+        else:
+            connection = self.send_request(request=request, async=async)
+            return self._did_fetch(connection)
 
     # REST HTTP Calls
 
-    def send_request(self, request, local_callback, remote_callback, user_info=None):
+    def send_request(self, request, async, local_callback=None, remote_callback=None, user_info=None):
         """ Sends the request, calls the local callback, then the remote callback """
 
         callbacks = dict()
@@ -349,12 +315,12 @@ class NURESTObject(object):
         if remote_callback:
             callbacks['remote'] = remote_callback
 
-        connection = NURESTConnection(request=request, callback=self._did_receive_response, callbacks=callbacks)
+        connection = NURESTConnection(request=request, callback=self._did_receive_response, callbacks=callbacks, async=async)
         connection.user_info = user_info
 
-        connection.start()
+        return connection.start()
 
-    def _manage_child_entity(self, nurest_object, resource_url='', method='GET', callback=None, handler=None):
+    def _manage_child_entity(self, nurest_object, resource_url='', method='GET', async=False, callback=None, handler=None):
         """ Low level child management. Send given HTTP method with given entity to given ressource of current object
 
             :param nurest_object: the NURESTObject object to manage
@@ -366,8 +332,6 @@ class NURESTObject(object):
 
         request = None
 
-        # If we are adding stuff under a NURESTBasicUser, then consider this as root
-        # TODO : Clean this case
         from restnuage.nurest_user import NURESTBasicUser
         if isinstance(self, NURESTBasicUser):
             # Creates a url relative to the server base url
@@ -380,7 +344,11 @@ class NURESTObject(object):
         if not handler:
             handler = self._did_perform_standard_operation
 
-        self.send_request(request=request, local_callback=handler, remote_callback=callback, user_info=nurest_object)
+        if async:
+            self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=nurest_object)
+        else:
+            connection = self.send_request(request=request, async=async, user_info=nurest_object)
+            return handler(connection)
 
     def set_entities(self, nurest_objects, object_type, callback=None):
         """ Reference a list of NURESTObject into the current resource
@@ -406,16 +374,8 @@ class NURESTObject(object):
 
     # REST Operation handlers
 
-    def _did_fetch(self, connection):
-        """ Callback called after fetching the object """
-
-        response = connection.response
-        self.from_dict(response.data[0])
-        self._did_perform_standard_operation(connection)
-
     def _did_receive_response(self, connection):
         """ Receive a response from the connection """
-
 
         if connection.has_timeouted:
             print "NURESTConnection has timeout."
@@ -425,35 +385,51 @@ class NURESTObject(object):
         has_callbacks = connection.has_callbacks()
         should_post = not has_callbacks
 
-        if has_callbacks and connection.has_response_success(should_post=should_post):
+        if  connection.has_response_success(should_post=should_post) and has_callbacks:
             callback = connection.callbacks['local']
             callback(connection)
+
+    def _did_fetch(self, connection):
+        """ Callback called after fetching the object """
+
+        response = connection.response
+        self.from_dict(response.data[0])
+
+        return self._did_perform_standard_operation(connection)
 
     def _did_perform_standard_operation(self, connection):
         """ Performs standard opertions """
 
-        callback = connection.callbacks['remote']
+        if connection.async:
+            callback = connection.callbacks['remote']
 
-        if callback:
             if connection.user_info:
                 callback(connection.user_info, connection)
             else:
                 callback(self, connection)
+        else:
+
+            if connection.user_info:
+                return (connection.user_info, connection)
+
+            return (self, connection)
 
     # Advanced REST Operations
 
-    def add_child_entity(self, entity, callback=None):
+    def add_child_entity(self, entity, async=False, callback=None):
         """ Add given NURESTObject into resource of current object
             for example, to add a NUGroup into a NUEnterprise, you can call
             enterprise.add_child_entity(nurest_object=my_group)
 
             :param entity: the NURESTObject object to add
             :param callback: callback containing the object and the connection
+            :param async: should the request be done asynchronously or not
         """
 
-        self._manage_child_entity(nurest_object=entity,
+        return self._manage_child_entity(nurest_object=entity,
                                   resource_url=entity.get_resource_url(),
                                   method='POST',
+                                  async=async,
                                   callback=callback,
                                   handler=self._did_add_child_entity)
 
@@ -466,9 +442,9 @@ class NURESTObject(object):
         except Exception:
             pass
 
-        self._did_perform_standard_operation(connection)
+        return self._did_perform_standard_operation(connection)
 
-    def remove_child_entity(self, entity, callback=None, response_choice=None):
+    def remove_child_entity(self, entity, async=False, callback=None, response_choice=None):
         """ Removes given NURESTObject into resource from current object
             for example, to remove a NUGroup from a NUEnterprise, you can call
             enterprise.remove_child_entity(nurest_object=my_group)
@@ -486,4 +462,5 @@ class NURESTObject(object):
         self._manage_child_entity(nurest_object=entity,
                                   resource_url=resource_url,
                                   method='DELETE',
+                                  async=async,
                                   callback=callback)
