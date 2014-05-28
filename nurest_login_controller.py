@@ -20,6 +20,7 @@ class NURESTLoginController(Singleton):
             self._api_key = None
             self._company = u"csp"
             self._url = u"https://135.227.220.152:8443/nuage/api/v1_0"
+            self._async = True
 
     def __str__(self):
         """ Prints NURESTLoginController information """
@@ -42,11 +43,12 @@ class NURESTLoginController(Singleton):
 
     def _get_user(self):
         """ Get user """
+
         return self._user
 
     def _set_user(self, user):
         """ Set user """
-        print "Setting user to %s " % user
+
         self._user = user
 
     user = property(_get_user, _set_user)
@@ -91,6 +93,16 @@ class NURESTLoginController(Singleton):
 
     url = property(_get_url, _set_url)
 
+    def _get_async(self):
+        """ Get async """
+        return self._async
+
+    def _set_async(self, async):
+        """ Set async """
+        self._async = async
+
+    async = property(_get_async, _set_async)
+
     # Methods
 
     def get_authentication_header(self):
@@ -101,10 +113,10 @@ class NURESTLoginController(Singleton):
         """
 
         if self.api_key:
-            print "Authentication for user %s with api_key %s" % (self.user, self.api_key)
+            #print "Authentication for user %s with api_key %s" % (self.user, self.api_key)
             return "XREST %s" % urlsafe_b64encode("%s:%s" % (self.user, self.api_key))
 
-        print "Authentication for user %s with password %s" % (self.user, self.password)
+        #print "Authentication for user %s with password %s" % (self.user, self.password)
         return "XREST %s" % urlsafe_b64encode("%s:%s" % (self.user, self.password))
 
     def reset(self):

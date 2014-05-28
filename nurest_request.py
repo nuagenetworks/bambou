@@ -77,13 +77,9 @@ class NURESTRequest(object):
     def get_headers(self):
         """ Prepare headers to send """
 
-        print "**HEADERS"
-        print self._headers
-
         return self._headers
 
     def set_header(self, header, value):
         """ Set header value """
 
         self._headers[header] = value
-

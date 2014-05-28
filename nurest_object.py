@@ -175,7 +175,6 @@ class NURESTObject(object):
         name = self.__class__.get_resource_name()
 
         if self.id is not None:
-            print self.id
             return "/%s/%s" % (name, self.id)
 
         return "/%s" % name
@@ -262,7 +261,8 @@ class NURESTObject(object):
             if hasattr(self, local_name):
                 dictionary[remote_name] = getattr(self, local_name)
             else:
-                print 'Attribute %s could not be found for object %s' % (local_name, self)
+                #print 'Attribute %s could not be found for object %s' % (local_name, self)
+                pass
 
         return dictionary
 
@@ -277,7 +277,8 @@ class NURESTObject(object):
             if local_name:
                 setattr(self, local_name, remote_value)
             else:
-                print 'Attribute %s could not be added to object %s' % (remote_name, self)
+                #print 'Attribute %s could not be added to object %s' % (remote_name, self)
+                pass
 
     # # Childrens' management
     # # TODO : Should remove this because it is linked to Cappuccino memory management ?
@@ -395,6 +396,7 @@ class NURESTObject(object):
 
         data = json.loads(ids)
         url = self.get_resource_url() + object_type.get_remote_name()
+
         request = NURESTRequest(method="PUT", url=url, data=data)
 
         self.send_request(request=request,

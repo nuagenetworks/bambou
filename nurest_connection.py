@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import json
+import requests
+import threading
 
-from requests.exceptions import SSLError, Timeout
-from requests_futures.sessions import FuturesSession
+#from requests.exceptions import SSLError, Timeout
+#from requests_futures.sessions import FuturesSession
 
 from restnuage.nurest_login_controller import NURESTLoginController
 from restnuage.nurest_response import NURESTResponse
@@ -40,7 +42,7 @@ class NURESTConnection(object):
         self._has_timeouted = False
         #self._is_cancelled = False
         self._ignore_request_idle = False
-        self._xhr_timeout = 30000
+        self._xhr_timeout = 3000
         self._response = None
         self._error_message = None
 
@@ -49,6 +51,10 @@ class NURESTConnection(object):
         self._callback = callback
         self._callbacks = callbacks
         self._user_info = None
+        self._object_last_action_timer = None
+
+        controller = NURESTLoginController()
+        self._async = controller.async
 
     # Properties
 
@@ -99,6 +105,16 @@ class NURESTConnection(object):
         return self._has_timeouted
 
     has_timeouted = property(_has_timeouted, None)
+
+    def _get_async(self):
+        """ Get async """
+        return self._async
+
+    def _set_async(self, async):
+        """ Set async """
+        self._async = async
+
+    async = property(_get_async, _set_async)
 
     # Methods
 
@@ -169,12 +185,10 @@ class NURESTConnection(object):
     def _did_receive_response(self, session, response):
         """ Called when a response is received """
 
-        print "NURESTConnection receive response [%s] %s" % (response.status_code, response.reason)
-
         try:
             data = response.json()
         except:
-            print "** Reponse could not be decoded\n%s\n** End response\n" % response.text
+            #print "** Reponse could not be decoded\n%s\n** End response\n" % response.text
             data = None
 
         self._response = NURESTResponse(status_code=response.status_code, headers=response.headers, data=data, reason=response.reason)
@@ -184,7 +198,7 @@ class NURESTConnection(object):
 
     def _did_timeout(self):
         """ Called when a resquest has timeout """
-
+        print "TIMEOUT"
         self._has_timeouted = True
 
         if self._callback:
@@ -193,8 +207,8 @@ class NURESTConnection(object):
         # TODO : Translate this line:
         #[[CPRunLoop currentRunLoop] limitDateForMode:CPDefaultRunLoopMode];
 
-    def start(self):  # TODO : Use Timeout here and _ignore_request_idle
-        """ Make an HTTP request with a specific method """
+    def _make_request(self, callback):
+        """ make an asyn request """
 
         self._has_timeouted = False
 
@@ -212,29 +226,27 @@ class NURESTConnection(object):
 
         url = "%s%s" % (controller.url, self._request.url)
 
-
         print "** Launch %s %s" % (self._request.method, url)
-        print "** DATA SENT\n%s" % self._request.data
+        #print "** DATA SENT\n%s" % self._request.data
 
-        # HTTP Call
-        session = FuturesSession()
-        promise = session.request(method=self._request.method,
+        response = requests.request(method=self._request.method,
                                   url=url,
                                   #params=self._request.params,
                                   data=json.dumps(self._request.data),
                                   headers=headers,
                                   verify=False,
-                                  background_callback=self._did_receive_response,
+                                  #background_callback=self._did_receive_response,
                                   timeout=self.timeout)
 
-        print "[%s] Waiting for response..." % self._request.method
+        callback(session=None, response=response)
 
-        # TODO : Manage canceled request ?
-        # TODO : Launch exception if an error occurs
+    def start(self):  # TODO : Use Timeout here and _ignore_request_idle
+        """ Make an HTTP request with a specific method """
 
-        try:
-            promise.result()
-        except SSLError:
-            self._did_timeout()
-        except Timeout:
-            self._did_timeout()
+        if self._async:
+
+            thread = threading.Thread(target=self._make_request, args=(self._did_receive_response,))
+            thread.start()
+            return thread
+
+        self._make_request(callback=self._did_receive_response)
