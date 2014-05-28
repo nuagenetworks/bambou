@@ -23,11 +23,6 @@ Follow these 3 steps to use your python environment.
     (restnuage-env) $ cd restnuage
     (restnuage-env) $ pip install -r requirements.txt
 
-
-### Launch tests
-
-
-
 ### Usage
 
 __#1 Create your object models to extends NURESTObject or NURESTBasicUser__
@@ -48,6 +43,7 @@ __#2 Start a new NURESTLoginController__
     ctrl.password = u"your_password"
     ctrl.company = u"your_company"
     ctrl.url = u"your_url"
+    #ctrl.async = False  # Default is True
 
 __#3 Instanciate your model and fetch, save, create or delete it__
 
@@ -55,3 +51,10 @@ __#3 Instanciate your model and fetch, save, create or delete it__
     user.fetch(callback=your_callback)
     user.firstname = u'John'
     user.save(callback=another_callback)
+
+__#4 Using push center notifications__
+
+    push_center = NURESTPushCenter()
+    push_center.start()  # Start listening events
+    push_center.get_last_events()  # Retrieve last events
+    push_center.stop()  # Stop listening events
