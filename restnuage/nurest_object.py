@@ -2,8 +2,8 @@
 
 import json
 
-from restnuage.nurest_connection import NURESTConnection
-from restnuage.nurest_request import NURESTRequest
+from .nurest_connection import NURESTConnection
+from .nurest_request import NURESTRequest
 
 
 class NURESTObject(object):

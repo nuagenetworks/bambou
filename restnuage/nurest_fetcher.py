@@ -2,11 +2,11 @@
 
 import uuid
 
-from restnuage.nurest_user import NURESTBasicUser
-from restnuage.nurest_request import NURESTRequest
+from .nurest_user import NURESTBasicUser
+from .nurest_request import NURESTRequest
 
 
-class RESTFetcher(object):
+class NURESTFetcher(object):
     """ Object fetcher for childrens """
 
     def __init__(self):
@@ -58,7 +58,7 @@ class RESTFetcher(object):
     def fetcher_with_entity(cls, nurest_object, local_name):
         """ Fetch an attribute of the object """
 
-        fetcher = RESTFetcher()
+        fetcher = NURESTFetcher()
         fetcher.nurest_object = nurest_object
         fetcher.local_name = local_name
 

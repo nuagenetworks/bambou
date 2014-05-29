@@ -2,7 +2,7 @@
 
 from base64 import urlsafe_b64encode
 
-from restnuage.utils.singleton import Singleton
+from .utils.singleton import Singleton
 
 
 class NURESTLoginController(Singleton):

@@ -1,10 +1,14 @@
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 
-from restnuage.nurest_object import NURESTObject
-from restnuage.nurest_user import NURESTBasicUser
+from restnuage import NURESTBasicUser
+from restnuage import NURESTObject
+
+
+__all__ = ['Company', 'User']
 
 
 class User(NURESTBasicUser):
+    """ Defines a User """
 
     def __init__(self, id=None,
                        email=None,
@@ -77,16 +81,19 @@ class User(NURESTBasicUser):
 class Company(NURESTObject):
     """ Creates a company object for tests """
 
-    def __init__(self, id=None, name='Alcatel-Lucent'):
+    def __init__(self):
         """ Creates a new Company """
-        super(Company, self).__init__(id=id)
-        self.name = name
-        self.invisible = True
 
-        self.expose_attribute(local_name='name', remote_name='companyName')
+        super(Company, self).__init__()
+
+        self.name = ''
+        self.description = ''
+
+        self.expose_attribute(local_name='name', remote_name='name')
+        self.expose_attribute(local_name='description', remote_name='description')
 
     @classmethod
     def get_remote_name(cls):
         """ Provides company classname  """
 
-        return u"company"
+        return u"enterprise"

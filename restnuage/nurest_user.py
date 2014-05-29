@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from restnuage.nurest_connection import NURESTConnection
-from restnuage.nurest_login_controller import NURESTLoginController
-from restnuage.nurest_object import NURESTObject
+from .nurest_connection import NURESTConnection
+from .nurest_login_controller import NURESTLoginController
+from .nurest_object import NURESTObject
 
-from restnuage.utils.singleton import Singleton
+from .utils.singleton import Singleton
 
 
 class NURESTBasicUser(Singleton, NURESTObject):

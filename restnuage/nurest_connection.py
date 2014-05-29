@@ -3,13 +3,9 @@
 import json
 import requests
 import threading
-import thread
 
-#from requests.exceptions import SSLError, Timeout
-#from requests_futures.sessions import FuturesSession
-
-from restnuage.nurest_login_controller import NURESTLoginController
-from restnuage.nurest_response import NURESTResponse
+from .nurest_login_controller import NURESTLoginController
+from .nurest_response import NURESTResponse
 
 
 HTTP_CODE_ZERO = 0

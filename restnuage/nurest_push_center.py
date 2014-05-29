@@ -2,9 +2,9 @@
 
 import threading
 
-from restnuage.nurest_connection import NURESTConnection
-from restnuage.nurest_request import NURESTRequest
-from utils.singleton import Singleton
+from .nurest_connection import NURESTConnection
+from .nurest_request import NURESTRequest
+from .utils.singleton import Singleton
 
 
 class NURESTPushCenter(Singleton):

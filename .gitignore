@@ -36,3 +36,6 @@ nosetests.xml
 
 # Tests
 .noseids
+
+# Distribution
+MANIFEST
