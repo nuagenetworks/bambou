@@ -23,6 +23,7 @@ Follow these 3 steps to use your python environment.
     (restnuage-env) $ cd restnuage
     (restnuage-env) $ pip install -r requirements.txt
 
+
 ### Usage
 
 __#1 Create your object models to extends NURESTObject or NURESTBasicUser__
@@ -58,3 +59,9 @@ __#4 Using push center notifications__
     push_center.start()  # Start listening events
     push_center.get_last_events()  # Retrieve last events
     push_center.stop()  # Stop listening events
+
+### Examples
+
+    $ cd examples
+    $ python sync_example.py  # To launch the synchronized example
+    $ python async_example.py # To launch the async version
