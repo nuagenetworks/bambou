@@ -8,7 +8,6 @@ from restnuage import NURESTLoginController
 from models import Company, User
 
 
-
 def main():
     """ Main method """
 
@@ -39,6 +38,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-#try:    from restnuage.nurest_login_controller import NURESTLoginController except:   import sys   sys.path.append(...)   from restnuage.nurest_login_controller import NURESTLoginController
