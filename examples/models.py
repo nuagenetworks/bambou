@@ -4,7 +4,7 @@ from restnuage import NURESTBasicUser
 from restnuage import NURESTObject
 
 
-__all__ = ['Company', 'User']
+__all__ = ['Enterprise', 'User']
 
 
 class User(NURESTBasicUser):
@@ -78,13 +78,13 @@ class User(NURESTBasicUser):
         return True
 
 
-class Company(NURESTObject):
-    """ Creates a company object for tests """
+class Enterprise(NURESTObject):
+    """ Creates a enterprise object for tests """
 
     def __init__(self):
-        """ Creates a new Company """
+        """ Creates a new Enterprise """
 
-        super(Company, self).__init__()
+        super(Enterprise, self).__init__()
 
         self.name = ''
         self.description = ''
@@ -94,6 +94,6 @@ class Company(NURESTObject):
 
     @classmethod
     def get_remote_name(cls):
-        """ Provides company classname  """
+        """ Provides enterprise classname  """
 
         return u"enterprise"

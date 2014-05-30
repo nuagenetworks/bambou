@@ -2,7 +2,8 @@
 
 from unittest import TestCase
 
-from restnuage.tests import Company, User
+from restnuage.tests.models import User
+
 
 class GetResourceTests(TestCase):
 
@@ -28,7 +29,6 @@ class CompressionTests(TestCase):
 
     def setUp(self):
         """ Set up the context """
-
 
     def test_to_dict(self):
         """ Get object as dictionary """
@@ -63,9 +63,3 @@ class CompressionTests(TestCase):
         self.assertEquals(user.api_key, u'12453')
         self.assertEquals(user.parent_id, None)
         self.assertEquals(user.parent_type, None)
-
-
-
-
-
-

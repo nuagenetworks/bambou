@@ -122,9 +122,13 @@ class NURESTConnection(object):
         """ Return True if the response has succeed, False otherwise """
 
         status_code = self._response.status_code
-        # TODO : Get errors in response data after bug fix : http://mvjira.mv.usa.alcatel.com/browse/VSD-2735
 
         data = self._response.data
+
+        error_name = None
+        error_description = None
+
+        # TODO : Get errors in response data after bug fix : http://mvjira.mv.usa.alcatel.com/browse/VSD-2735
         if data and 'errors' in data:
             error_name = data['errors'][0]['descriptions'][0]['title']
             error_description = data['errors'][0]['descriptions'][0]['description']
@@ -173,7 +177,7 @@ class NURESTConnection(object):
     def _print_information(self, error_name, error_description):
         """ Prints information instead of sending a confirmation """
 
-        print "NURESTConnection: Print error Name=%s with Description=%s" % (error_name, error_description)
+        print "NURESTConnection: Print error Name=%s , Description=%s" % (error_name, error_description)
 
     # HTTP Calls
 
@@ -183,7 +187,7 @@ class NURESTConnection(object):
         try:
             data = response.json()
         except:
-            #print "** Reponse could not be decoded\n%s\n** End response\n" % response.text
+            print "** Reponse could not be decoded\n%s\n** End response\n" % response.text
             data = None
 
         self._response = NURESTResponse(status_code=response.status_code, headers=response.headers, data=data, reason=response.reason)
@@ -213,7 +217,7 @@ class NURESTConnection(object):
         controller = NURESTLoginController()
 
         if self._uses_authentication:
-            self._request.set_header('X-Nuage-Organization', controller.company)
+            self._request.set_header('X-Nuage-Organization', controller.enterprise)
             self._request.set_header('Authorization', controller.get_authentication_header())
 
         if controller.is_impersonating:

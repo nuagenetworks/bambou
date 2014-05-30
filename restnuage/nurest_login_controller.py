@@ -18,14 +18,14 @@ class NURESTLoginController(Singleton):
             self._user = u"csproot"
             self._password = u"csproot"
             self._api_key = None
-            self._company = u"csp"
+            self._enterprise = u"csp"
             self._url = u"https://135.227.220.152:8443/nuage/api/v1_0"
             self._async = True
 
     def __str__(self):
         """ Prints NURESTLoginController information """
 
-        return "%s user=%s company=%s url=%s " % (self.__class__, self._user, self._company, self._url)
+        return "%s user=%s enterprise=%s url=%s " % (self.__class__, self._user, self._enterprise, self._url)
 
     # Properties
 
@@ -73,22 +73,22 @@ class NURESTLoginController(Singleton):
 
     api_key = property(_get_api_key, _set_api_key)
 
-    def _get_company(self):
-        """ Get company """
-        return self._company
+    def _get_enterprise(self):
+        """ Get enterprise """
+        return self._enterprise
 
-    def _set_company(self, company):
-        """ Set company """
-        self._company = company
+    def _set_enterprise(self, enterprise):
+        """ Set enterprise """
+        self._enterprise = enterprise
 
-    company = property(_get_company, _set_company)
+    enterprise = property(_get_enterprise, _set_enterprise)
 
     def _get_url(self):
         """ Get url """
         return self._url
 
     def _set_url(self, url):
-        """ Set company """
+        """ Set enterprise """
         self._url = url
 
     url = property(_get_url, _set_url)
@@ -128,17 +128,17 @@ class NURESTLoginController(Singleton):
         self.user = None
         self.password = None
         self.api_key = None
-        self.company = None
+        self.enterprise = None
         self.url = None
 
-    def impersonate(self, user, company):
-        """ Impersonate a user in a company """
+    def impersonate(self, user, enterprise):
+        """ Impersonate a user in a enterprise """
 
-        if not user or not company:
+        if not user or not enterprise:
             raise ValueError('You must set a user name and an enterprise name to begin impersonification')
 
         self._is_impersonating = True
-        self._impersonation = "%s@%s" % (user, company)
+        self._impersonation = "%s@%s" % (user, enterprise)
 
         # TODO : Restart Push Notification
 

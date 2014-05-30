@@ -8,7 +8,7 @@ from time import sleep
 from restnuage import NURESTLoginController
 from restnuage import NURESTPushCenter
 
-from models import Company, User
+from models import Enterprise, User
 
 
 user = User()
@@ -24,7 +24,7 @@ def _did_add_enterprise(enterprise, connection):
 
         sleep(6)
 
-        # Remove company
+        # Remove enterprise
         user.remove_child_entity(entity=enterprise, callback=_did_remove_enterprise, async=True, response_choice=1)
 
     else:
@@ -51,10 +51,10 @@ def _did_user_fetch(user, connection):
     # Start the push center listening to events
     push_center.start()
 
-    # Add a new company and process callback named `_did_add_enterprise`
-    enterprise = Company()
+    # Add a new enterprise and process callback named `_did_add_enterprise`
+    enterprise = Enterprise()
     enterprise.name = 'Test'
-    enterprise.description = 'Description of test company'
+    enterprise.description = 'Description of test enterprise'
     user.add_child_entity(entity=enterprise, callback=_did_add_enterprise, async=True)
 
 
@@ -64,7 +64,7 @@ def main():
     # Initializes login controller
     ctrl.user = u"csproot"
     ctrl.password = u"csproot"
-    ctrl.company = u"csp"
+    ctrl.enterprise = u"csp"
     ctrl.url = u"https://135.227.220.152:8443/nuage/api/v1_0"
 
     # Logs in and process callback named `_did_user_fetch`

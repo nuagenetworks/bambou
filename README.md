@@ -42,7 +42,7 @@ __#2 Start a new NURESTLoginController__
     ctrl = NURESTLoginController()
     ctrl.user = u"your_user"
     ctrl.password = u"your_password"
-    ctrl.company = u"your_company"
+    ctrl.enterprise = u"your_enterprise"
     ctrl.url = u"your_url"
     #ctrl.async = False  # Default is True
 

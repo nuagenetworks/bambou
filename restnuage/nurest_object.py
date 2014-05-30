@@ -281,15 +281,20 @@ class NURESTObject(object):
 
     # HTTP Calls
 
-    def delete(self, callback=None, async=False):
+    def delete(self, callback=None, async=False, response_choice=1):
         """ Delete object and call given callback """
 
-        self._manage_child_entity(nurest_object=self, method='DELETE', async=async, callback=callback)
+        resource_url = self.get_resource_url()
+
+        if response_choice:
+            resource_url = '%s?responseChoice=%s' % (resource_url, response_choice)
+
+        return self._manage_child_entity(nurest_object=self, resource_url=resource_url, method='DELETE', async=async, callback=callback)
 
     def save(self, callback=None, async=False):
         """ Update object and call given callback """
 
-        self._manage_child_entity(nurest_object=self, method='PUT', async=async, callback=callback)
+        return self._manage_child_entity(nurest_object=self, method='PUT', async=async, callback=callback)
 
     def fetch(self, callback=None, async=False):
         """ Fetch all information about the current object """
@@ -393,7 +398,11 @@ class NURESTObject(object):
         """ Callback called after fetching the object """
 
         response = connection.response
-        self.from_dict(response.data[0])
+
+        try:
+            self.from_dict(response.data[0])
+        except:
+            pass
 
         return self._did_perform_standard_operation(connection)
 

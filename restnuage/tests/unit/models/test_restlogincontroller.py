@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from restnuage.nurest_login_controller import NURESTLoginController
+from restnuage import NURESTLoginController
 
 
 class LoginControllerSingleton(TestCase):
@@ -25,7 +25,7 @@ class GetAuthenticationHeader(TestCase):
 
         controller = NURESTLoginController()
         controller.user = u'christophe'
-        controller.password=u'tuCr0IsKoi?'
+        controller.password = u'tuCr0IsKoi?'
         controller.api_key = None
 
         header = controller.get_authentication_header()
@@ -53,14 +53,14 @@ class ResetLoginController(TestCase):
         controller.password = u'password'
         controller.url = u'http://www.google.fr'
         controller.api_key = u'12345'
-        controller.company = u'Alcatel'
+        controller.enterprise = u'Alcatel'
 
         controller.reset()
 
         self.assertEquals(controller.user, None)
         self.assertEquals(controller.password, None)
         self.assertEquals(controller.url, None)
-        self.assertEquals(controller.company, None)
+        self.assertEquals(controller.enterprise, None)
         self.assertEquals(controller.api_key, None)
 
 
@@ -73,7 +73,7 @@ class ImpersonateLoginController(TestCase):
         controller.password = u'password'
         controller.url = u'http://www.google.fr'
         controller.api_key = u'12345'
-        controller.company = u'Alcatel'
+        controller.enterprise = u'Alcatel'
 
     def tearDown(self):
         """ Cleaning context """
@@ -84,7 +84,7 @@ class ImpersonateLoginController(TestCase):
         """ Start impersonate """
 
         controller = NURESTLoginController()
-        controller.impersonate(user=u'Alex', company=u'Google')
+        controller.impersonate(user=u'Alex', enterprise=u'Google')
 
         self.assertEquals(controller.is_impersonating, True)
         self.assertEquals(controller.impersonation, 'Alex@Google')
@@ -93,7 +93,7 @@ class ImpersonateLoginController(TestCase):
     def test_stop_impersonate(self):
         """ Stop impersonate """
         controller = NURESTLoginController()
-        controller.impersonate(user=u'Alex', company=u'Google')
+        controller.impersonate(user=u'Alex', enterprise=u'Google')
         self.assertEquals(controller.is_impersonating, True)
 
         controller.stop_impersonate()
