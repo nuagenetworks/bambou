@@ -12,7 +12,7 @@ class NURESTFetcher(object):
     def __init__(self):
         """ Initliazes the fetcher """
 
-        self._remote_name = self.__class__.managed_class.get_resource_name()
+        self._remote_name = "/%s" % self.__class__.managed_class().get_resource_name()
         self._nurest_object = None
         self._local_name = None
         self._master_filter = False
@@ -23,6 +23,7 @@ class NURESTFetcher(object):
         self._page_size = 0
         self._latest_loaded_page = 0
         self._ordered_by = ''
+        self._group_by = []
 
     # Properties
 
@@ -55,15 +56,15 @@ class NURESTFetcher(object):
         raise NotImplementedError('%s has no managed class. Implements managed_class method first.' % cls)
 
     @classmethod
-    def fetcher_with_entity(cls, nurest_object, local_name):
+    def fetcher_with_entity(cls, entity, local_name):
         """ Fetch an attribute of the object """
 
-        fetcher = NURESTFetcher()
-        fetcher.nurest_object = nurest_object
+        fetcher = cls()
+        fetcher.nurest_object = entity
         fetcher.local_name = local_name
 
-        #setattr(nurest_object, local_name, [])
-        #nurest_object.register_children(getattr(nurest_object, local_name), cls.managed_class.get_resource_name())
+        setattr(entity, local_name, [])
+        entity.register_children(getattr(entity, local_name), cls.managed_class().get_resource_name())
 
         return fetcher
 
@@ -103,12 +104,12 @@ class NURESTFetcher(object):
             request.set_header('X-Nuage-GroupBy', 'true')
             request.set_header('X-Nuage-Attributes', header)
 
-    def fetch_entities(self, callback=None):
+    def fetch_entities(self, async=False, callback=None):
         """ Fetch entities and call the callback method """
 
-        return self.fetch_matching_entities(callback=callback)
+        return self.fetch_matching_entities(async=async, callback=callback)
 
-    def fetch_matching_entities(self, filter=None, page=None, callback=None):
+    def fetch_matching_entities(self, filter=None, page=None, async=False, callback=None):
         """ Fetch entities that matches filter and page"""
 
         request = None
@@ -122,11 +123,15 @@ class NURESTFetcher(object):
         self._prepare_headers(request=request, filter=filter, page=page)
         self._transaction_id = uuid.uuid4().hex
 
-        self._nurest_object.send_request(request=request, local_callback=self._did_fetch_entities, remote_callback=callback)
+        if async:
+            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_fetch_entities, remote_callback=callback)
+            return self._transaction_id
 
-        return self._transaction_id
+        connection = self._nurest_object.send_request(request=request, async=async)
+        return self._did_fetch_entities(connection=connection)
 
-    def _did_fetch_entities(self, result, connection):
+
+    def _did_fetch_entities(self, connection):
         """ Fetching entities has been done """
 
         self._last_connnection = connection
@@ -137,17 +142,24 @@ class NURESTFetcher(object):
             self._page_size = 0
             self._latest_loaded_page = 0
             self._ordered_by = ''
-            self._send_content(objects=None, connection=connection)
+            self._send_content(content=None, connection=connection)
             return
 
         results = response.data
         destination = getattr(self.nurest_object, self._local_name)
         fetched_objects = list()
 
-        self._total_count = int(response.headers['X-Nuage-Count'])
-        self._page_size = int(response.headers['X-Nuage-PageSize'])
-        self._latest_loaded_page = int(response.headers['X-Nuage-Page'])
-        self._ordered_by = response.headers['X-Nuage-OrderBy']
+        if 'X-Nuage-Count' in response.headers and response.headers['X-Nuage-Count']:
+            self._total_count = int(response.headers['X-Nuage-Count'])
+
+        if 'X-Nuage-PageSize' in response.headers and response.headers['X-Nuage-PageSize']:
+            self._page_size = int(response.headers['X-Nuage-PageSize'])
+
+        if 'X-Nuage-Page' in response.headers and response.headers['X-Nuage-Page']:
+            self._latest_loaded_page = int(response.headers['X-Nuage-Page'])
+
+        if 'X-Nuage-OrderBy' in response.headers and response.headers['X-Nuage-OrderBy']:
+            self._ordered_by = response.headers['X-Nuage-OrderBy']
 
         for result in results:
 
@@ -160,14 +172,14 @@ class NURESTFetcher(object):
 
             fetched_objects.append(nurest_object)
 
-        self._send_content(objects=fetched_objects, connection=connection)
+        return self._send_content(content=fetched_objects, connection=connection)
 
     def count(self, callback=None):
         """ Retrieve count of entities and call callback method  """
 
         self.count_matching(callback=callback)
 
-    def count_matching(self, filter=None, callback=None):
+    def count_matching(self, filter=None, async=False, callback=None):
         """ Retrieve count of entities that matches filter and call callback method """
 
         request = None
@@ -180,7 +192,12 @@ class NURESTFetcher(object):
 
         self._prepare_headers(request=request, filter=filter, page=None)
 
-        self._nurest_object.send_request(request=request, local_callback=self._did_count, remote_callback=callback)
+        if async:
+            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_count, remote_callback=callback)
+
+        else:
+            self._nurest_object.send_request(request=request, async=async)
+            return self._did_count()
 
     def _did_count(self, result, connection):
         """ Called when count if finished """
@@ -189,18 +206,24 @@ class NURESTFetcher(object):
         count = int(response.headers['X-Nuage-Count'])
         callback = connection.callbacks['remote']
 
-        if callback:
-            callback(self, self._nurest_object, count)
+        if connection.async:
+            if callback:
+                callback(self, self._nurest_object, count)
+        else:
+            return (self, self._nurest_object, count)
 
     def _send_content(self, content, connection):
         """ Send a content array from the connection """
 
         if connection:
 
-            callback = connection.callbacks['remote']
+            if connection.async:
+                callback = connection.callbacks['remote']
 
-            if callback:
-                callback(self, self._nurest_object, content)
+                if callback:
+                    callback(self, self._nurest_object, content)
+            else:
+                return (self, self._nurest_object, content)
 
     def latests_sort_descriptors(self):
         """ Returns an array of descriptors """

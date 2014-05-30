@@ -32,7 +32,7 @@ class NURESTObject(object):
         self._parent_type = parent_type
         self._parent = None
 
-        self._childrens = dict()
+        self._children = dict()
         self._attributes = dict()
 
         self.expose_attribute(local_name='id', remote_name='ID')
@@ -179,8 +179,11 @@ class NURESTObject(object):
 
         return "/%s" % name
 
-    def __cmp__(self, rest_object):
+    def __eq__(self, rest_object):
         """ Compare with another object """
+
+        if rest_object is None:
+            return False
 
         if not isinstance(rest_object, NURESTObject):
             raise TypeError('The object is not a NURESTObject %s' % rest_object)
@@ -244,6 +247,43 @@ class NURESTObject(object):
         """ Return creation date with a given format. Default is 'mmm dd yyyy HH:MM:ss' """
 
         return self._creation_date.strftime('mmm dd yyyy HH:MM:ss')
+
+    # Children management
+
+    def register_children(self, children, local_name):
+        """ Register a list of children to the local name """
+
+        self._children[local_name] = children
+
+    def get_children(self, local_name):
+        """ Retrieve children according to local name """
+
+        if local_name in self._children:
+            return self._children[local_name]
+
+        return []
+
+    def add_child(self, child):
+        """ Add a child """
+
+        local_name = child.get_remote_name()
+        children = self.get_children(local_name)
+        children.append(child)
+
+    def remove_child(self, child):
+        """ Remove a child """
+
+        local_name = child.get_remote_name()
+        children = self.get_children(local_name)
+        children.remove(child)
+
+    def update_child(self, child):
+        """ Update child """
+
+        local_name = child.get_remote_name()
+        children = self.get_children(local_name)
+        index = children.index(child)
+        children[index] = child
 
     # Compression / Decompression
 

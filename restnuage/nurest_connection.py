@@ -125,11 +125,13 @@ class NURESTConnection(object):
 
         data = self._response.data
 
+        error_property = None
         error_name = None
         error_description = None
 
         # TODO : Get errors in response data after bug fix : http://mvjira.mv.usa.alcatel.com/browse/VSD-2735
         if data and 'errors' in data:
+            error_property = data['errors'][0]['property']
             error_name = data['errors'][0]['descriptions'][0]['title']
             error_description = data['errors'][0]['descriptions'][0]['description']
 
@@ -137,7 +139,7 @@ class NURESTConnection(object):
             return True
 
         if status_code == HTTP_CODE_MULTIPLE_CHOICES:
-            self._print_information(error_name, error_description)
+            self._print_information(error_property, error_name, error_description)
             return False
 
         if status_code in [HTTP_CODE_PERMISSION_DENIED, HTTP_CODE_UNAUTHORIZED]:
@@ -148,14 +150,14 @@ class NURESTConnection(object):
             error_name = "Permission denied"
             error_description = "You are not allowed to access this resource."
 
-            self._print_information(error_name, error_description)
+            self._print_information(error_property, error_name, error_description)
             return False
 
         if status_code in [HTTP_CODE_CONFLICT, HTTP_CODE_NOT_FOUND, HTTP_CODE_BAD_REQUEST, HTTP_CODE_METHOD_NOT_ALLOWED, HTTP_CODE_PRECONDITION_FAILED, HTTP_CODE_SERVICE_UNAVAILABLE]:
             if not should_post:
                 return True
 
-            self._print_information(error_name, error_description)
+            self._print_information(error_property, error_name, error_description)
             return False
 
         if status_code == HTTP_CODE_INTERNAL_SERVER_ERROR:
@@ -163,21 +165,21 @@ class NURESTConnection(object):
             error_name = "[CRITICAL] Internal Server Error"
             error_description = "Please check the log and report this error to the server team"
 
-            self._print_information(error_name, error_description)
+            self._print_information(error_property, error_name, error_description)
             return False
 
         if status_code == HTTP_CODE_ZERO:
             print "NURESTConnection: Connection error with code 0. Sending NUNURESTConnectionFailureNotification notification and exiting."
-            self._print_information(error_name, error_description)
+            self._print_information(error_property, error_name, error_description)
             return False
 
         print "NURESTConnection: Report this error, because this should not happen: %s" % self._response
         return False
 
-    def _print_information(self, error_name, error_description):
+    def _print_information(self, error_property, error_name, error_description):
         """ Prints information instead of sending a confirmation """
 
-        print "NURESTConnection: Print error Name=%s , Description=%s" % (error_name, error_description)
+        print "NURESTConnection ERROR on [%s] %s, %s" % (error_property, error_name, error_description)
 
     # HTTP Calls
 
