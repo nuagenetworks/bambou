@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from restnuage.tests.models import User
+from restnuage.tests import User
 
 
 class GetResourceTests(TestCase):
