@@ -39,3 +39,5 @@ nosetests.xml
 
 # Distribution
 MANIFEST
+
+.DS_Store
