@@ -5,13 +5,14 @@ class NURESTResponse(object):
 
     """ Response that will be received in NURESTConnection """
 
-    def __init__(self, status_code, headers=None, data=None, reason=None):
+    def __init__(self, status_code, headers=None, data=None, reason=None, errors=None):
         """ Initializes a request """
 
         self._status_code = status_code
         self._data = data
         self._reason = reason
         self._headers = headers
+        self.errors = dict()
 
     def __str__(self):
         """ Print request """
