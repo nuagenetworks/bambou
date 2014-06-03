@@ -36,9 +36,9 @@ class NURESTBasicUser(Singleton, NURESTObject):
 
         self._new_password = None
 
-        self.expose_attribute(local_name='username', remote_name='userName')
-        self.expose_attribute(local_name='password')
-        self.expose_attribute(local_name='api_key', remote_name='APIKey')
+        self.expose_attribute(local_name='username', remote_name='userName', attribute_type=str)
+        self.expose_attribute(local_name='password', attribute_type=str)
+        self.expose_attribute(local_name='api_key', remote_name='APIKey', attribute_type=str)
 
     # Properties
 

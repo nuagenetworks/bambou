@@ -4,6 +4,7 @@ import json
 
 from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
+from .utils import NURemoteAttribute
 
 
 class NURESTObject(object):
@@ -33,15 +34,15 @@ class NURESTObject(object):
         self._parent = None
 
         self._children = dict()
-        self._attributes = dict()
+        self._attributes = dict()  # Dictionary of attribute name => NURemoteAttribute
 
-        self.expose_attribute(local_name='id', remote_name='ID')
-        self.expose_attribute(local_name='external_id', remote_name='externalID')
-        self.expose_attribute(local_name='local_id', remote_name='localID')
-        self.expose_attribute(local_name='parent_id', remote_name='parentID')
-        self.expose_attribute(local_name='parent_type', remote_name='parentType')
-        self.expose_attribute(local_name='creation_date', remote_name='creationDate')
-        self.expose_attribute(local_name='owner')
+        self.expose_attribute(local_name='id', remote_name='ID', attribute_type=str)
+        self.expose_attribute(local_name='external_id', remote_name='externalID', attribute_type=str)
+        self.expose_attribute(local_name='local_id', remote_name='localID', attribute_type=str)
+        self.expose_attribute(local_name='parent_id', remote_name='parentID', attribute_type=str)
+        self.expose_attribute(local_name='parent_type', remote_name='parentType', attribute_type=str)
+        self.expose_attribute(local_name='creation_date', remote_name='creationDate', attribute_type=str)
+        self.expose_attribute(local_name='owner', attribute_type=str)
 
     # Properties
 
@@ -127,6 +128,16 @@ class NURESTObject(object):
 
     # Methods
 
+    def get_required_attributes(self):
+        """ Get required attributes """
+
+        return [attribute for local_name, attribute in self._attributes.iteritems() if attribute.is_required]
+
+    def get_readonly_attributes(self):
+        """ Get readonly attributes """
+
+        return [attribute for local_name, attribute in self._attributes.iteritems() if attribute.is_readonly]
+
     @classmethod
     def get_remote_name(cls):
         """ Provides the class name used for resource  """
@@ -201,13 +212,19 @@ class NURESTObject(object):
 
         return "%s (ID=%s)" % (self.__class__, self.id)
 
-    def expose_attribute(self, local_name, remote_name=None):
+    def expose_attribute(self, local_name, attribute_type, remote_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None):
         """ Expose local_name as remote_name """
 
         if remote_name is None:
             remote_name = local_name
 
-        self._attributes[local_name] = remote_name
+        attribute = NURemoteAttribute(local_name=local_name, remote_name=remote_name, attribute_type=attribute_type)
+        attribute.is_required = is_required
+        attribute.is_readonly = is_readonly
+        attribute.min_length = min_length
+        attribute.max_length = max_length
+
+        self._attributes[local_name] = attribute
 
     def is_owned_by_current_user(self):
         """ Check if the current user owns the object """
@@ -294,8 +311,8 @@ class NURESTObject(object):
 
         dictionary = dict()
 
-        for local_name, remote_name in self._attributes.iteritems():
-            #print "%s -> %s" % (local_name, remote_name)
+        for local_name, attribute in self._attributes.iteritems():
+            remote_name = attribute.remote_name
 
             if hasattr(self, local_name):
                 dictionary[remote_name] = getattr(self, local_name)
@@ -311,7 +328,7 @@ class NURESTObject(object):
         for remote_name, remote_value in dictionary.iteritems():
             # Check if a local attribute is exposed with th remote_name
             # if no attribute is exposed, return None
-            local_name = next((key for key, value in self._attributes.iteritems() if value == remote_name), None)
+            local_name = next((name for name, attribute in self._attributes.iteritems() if attribute.remote_name == remote_name), None)
 
             if local_name:
                 setattr(self, local_name, remote_value)
