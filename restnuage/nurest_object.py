@@ -131,7 +131,7 @@ class NURESTObject(object):
     def get_attributes(self):
         """ Get required attributes """
 
-        return self._attributes
+        return self._attributes.values()
 
     @classmethod
     def get_remote_name(cls):
@@ -407,7 +407,7 @@ class NURESTObject(object):
             connection = self.send_request(request=request, async=async, user_info=nurest_object)
             return handler(connection)
 
-    def set_entities(self, nurest_objects, object_type, callback=None):
+    def set_entities(self, entities, entity_type, async=False, callback=None):
         """ Reference a list of NURESTObject into the current resource
             :param nurest_objects: list of NURESTObject to link
             :param object_class: Type of the object to link
@@ -416,18 +416,26 @@ class NURESTObject(object):
 
         ids = list()
 
-        for nurest_object in nurest_objects:
-            ids.push(nurest_object.id)
+        for entity in entities:
+            ids.push(entity.id)
 
         data = json.loads(ids)
-        url = self.get_resource_url() + object_type.get_remote_name()
+        url = self.get_resource_url() + entity_type.get_remote_name()
 
         request = NURESTRequest(method="PUT", url=url, data=data)
 
-        self.send_request(request=request,
-                           local_callback=self._did_perform_standard_operation,
-                           remote_callback=callback,
-                           user_info=nurest_objects)
+        if async:
+            self.send_request(request=request,
+                              local_callback=self._did_perform_standard_operation,
+                              async=async,
+                              remote_callback=callback,
+                              user_info=entities)
+        else:
+            connection = self.send_request(request=request,
+                                           async=async,
+                                           user_info=entities)
+
+            return self._did_perform_standard_operation(connection)
 
     # REST Operation handlers
 

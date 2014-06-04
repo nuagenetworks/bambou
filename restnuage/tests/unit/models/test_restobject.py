@@ -84,7 +84,3 @@ class AttributeTests(TestCase):
         attributes = enterprise.get_attributes()
 
         self.assertEqual(len(attributes), 9)
-        self.assertEqual(attributes['name'].local_name, u'name')
-        self.assertEqual(attributes['name'].is_required, True)
-        self.assertEqual(attributes['description'].local_name, u'description')
-        self.assertEqual(attributes['description'].is_required, False)

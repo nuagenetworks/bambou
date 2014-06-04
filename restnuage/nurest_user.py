@@ -4,7 +4,7 @@ from .nurest_connection import NURESTConnection
 from .nurest_login_controller import NURESTLoginController
 from .nurest_object import NURESTObject
 
-from .utils.singleton import Singleton
+from .utils import Sha1, Singleton
 
 
 class NURESTBasicUser(Singleton, NURESTObject):
@@ -83,7 +83,7 @@ class NURESTBasicUser(Singleton, NURESTObject):
         """ Updates the user and perform the callback method """
 
         if self._new_password:
-            self.password = self._new_password
+            self.password = Sha1.encrypt(self._new_password)
 
         controller = NURESTLoginController()
         controller.password = self._new_password
