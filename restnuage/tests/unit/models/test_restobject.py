@@ -74,15 +74,17 @@ class CompressionTests(TestCase):
         self.assertEquals(enterprise.name, u'AnotherEnterprise')
 
 
-class RequiredAttribute(TestCase):
+class AttributeTests(TestCase):
 
-    def test_get_required_attributes(self):
+    def test_get_attributes(self):
         """ Get required attributes """
 
         enterprise = Enterprise()
 
-        attributes = enterprise.get_required_attributes()
+        attributes = enterprise.get_attributes()
 
-        self.assertEqual(len(attributes), 1)
-        self.assertEqual(attributes[0].local_name, u'name')
-        self.assertEqual(attributes[0].is_required, True)
+        self.assertEqual(len(attributes), 9)
+        self.assertEqual(attributes['name'].local_name, u'name')
+        self.assertEqual(attributes['name'].is_required, True)
+        self.assertEqual(attributes['description'].local_name, u'description')
+        self.assertEqual(attributes['description'].is_required, False)

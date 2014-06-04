@@ -128,15 +128,10 @@ class NURESTObject(object):
 
     # Methods
 
-    def get_required_attributes(self):
+    def get_attributes(self):
         """ Get required attributes """
 
-        return [attribute for local_name, attribute in self._attributes.iteritems() if attribute.is_required]
-
-    def get_readonly_attributes(self):
-        """ Get readonly attributes """
-
-        return [attribute for local_name, attribute in self._attributes.iteritems() if attribute.is_readonly]
+        return self._attributes
 
     @classmethod
     def get_remote_name(cls):
