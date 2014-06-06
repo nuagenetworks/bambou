@@ -36,7 +36,7 @@ class NURESTObject(object):
         self._children = dict()
         self._attributes = dict()  # Dictionary of attribute name => NURemoteAttribute
 
-        self.expose_attribute(local_name='id', remote_name='ID', attribute_type=str)
+        self.expose_attribute(local_name='id', remote_name='ID', attribute_type=str, is_identifier=True)
         self.expose_attribute(local_name='external_id', remote_name='externalID', attribute_type=str)
         self.expose_attribute(local_name='local_id', remote_name='localID', attribute_type=str)
         self.expose_attribute(local_name='parent_id', remote_name='parentID', attribute_type=str)
@@ -207,7 +207,7 @@ class NURESTObject(object):
 
         return "%s (ID=%s)" % (self.__class__, self.id)
 
-    def expose_attribute(self, local_name, attribute_type, remote_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None):
+    def expose_attribute(self, local_name, attribute_type, remote_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_editable=True):
         """ Expose local_name as remote_name """
 
         if remote_name is None:
@@ -218,6 +218,11 @@ class NURESTObject(object):
         attribute.is_readonly = is_readonly
         attribute.min_length = min_length
         attribute.max_length = max_length
+        attribute.is_editable = is_editable
+        attribute.is_identifier = is_identifier
+        attribute.choices = choices
+        attribute.is_unique = is_unique
+        attribute.is_email = is_email
 
         self._attributes[local_name] = attribute
 
@@ -333,7 +338,7 @@ class NURESTObject(object):
 
     # HTTP Calls
 
-    def delete(self, callback=None, async=False, response_choice=1):
+    def delete(self, callback=None, async=False, response_choice=None):
         """ Delete object and call given callback """
 
         resource_url = self.get_resource_url()
@@ -341,7 +346,7 @@ class NURESTObject(object):
         if response_choice:
             resource_url = '%s?responseChoice=%s' % (resource_url, response_choice)
 
-        return self._manage_child_entity(nurest_object=self, resource_url=resource_url, method='DELETE', async=async, callback=callback)
+        return self._manage_child_entity(nurest_object=self, method='DELETE', async=async, callback=callback)
 
     def save(self, callback=None, async=False):
         """ Update object and call given callback """
@@ -409,20 +414,20 @@ class NURESTObject(object):
 
     def set_entities(self, entities, entity_type, async=False, callback=None):
         """ Reference a list of NURESTObject into the current resource
-            :param nurest_objects: list of NURESTObject to link
-            :param object_class: Type of the object to link
+            :param entities: list of NURESTObject to link
+            :param entity_type: Type of the object to link
             :param callback: Callback method that should be fired at the end
         """
 
         ids = list()
 
         for entity in entities:
-            ids.push(entity.id)
+            ids.append(entity.id)
 
-        data = json.loads(ids)
-        url = self.get_resource_url() + entity_type.get_remote_name()
+        #data = json.dumps(ids)
+        url = "%s/%s" % (self.get_resource_url(), entity_type.get_resource_name())
 
-        request = NURESTRequest(method="PUT", url=url, data=data)
+        request = NURESTRequest(method="PUT", url=url, data=ids)
 
         if async:
             self.send_request(request=request,

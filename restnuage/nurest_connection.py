@@ -234,8 +234,6 @@ class NURESTConnection(object):
 
         url = "%s%s" % (controller.url, self._request.url)
 
-        print "** Launch %s %s" % (self._request.method, url)
-
         response = requests.request(method=self._request.method,
                                   url=url,
                                   data=json.dumps(self._request.data),
