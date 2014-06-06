@@ -194,7 +194,7 @@ class NURESTConnection(object):
         try:
             data = response.json()
         except:
-            print "** Reponse could not be decoded\n%s\n** End response\n" % response.text
+            #print "** Reponse could not be decoded\n%s\n** End response\n" % response.text
             data = None
 
         self._response = NURESTResponse(status_code=response.status_code, headers=response.headers, data=data, reason=response.reason)
