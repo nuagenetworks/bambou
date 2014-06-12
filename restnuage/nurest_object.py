@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import json
+from time import time
 
 from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
@@ -41,7 +41,7 @@ class NURESTObject(object):
         self.expose_attribute(local_name='local_id', remote_name='localID', attribute_type=str)
         self.expose_attribute(local_name='parent_id', remote_name='parentID', attribute_type=str)
         self.expose_attribute(local_name='parent_type', remote_name='parentType', attribute_type=str)
-        self.expose_attribute(local_name='creation_date', remote_name='creationDate', attribute_type=str)
+        self.expose_attribute(local_name='creation_date', remote_name='creationDate', attribute_type=time, is_editable=False)
         self.expose_attribute(local_name='owner', attribute_type=str)
 
     # Properties
@@ -207,7 +207,7 @@ class NURESTObject(object):
 
         return "%s (ID=%s)" % (self.__class__, self.id)
 
-    def expose_attribute(self, local_name, attribute_type, remote_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_editable=True):
+    def expose_attribute(self, local_name, attribute_type, remote_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True):
         """ Expose local_name as remote_name """
 
         if remote_name is None:
@@ -223,6 +223,7 @@ class NURESTObject(object):
         attribute.choices = choices
         attribute.is_unique = is_unique
         attribute.is_email = is_email
+        attribute.is_login = is_login
 
         self._attributes[local_name] = attribute
 
@@ -424,7 +425,6 @@ class NURESTObject(object):
         for entity in entities:
             ids.append(entity.id)
 
-        #data = json.dumps(ids)
         url = "%s/%s" % (self.get_resource_url(), entity_type.get_resource_name())
 
         request = NURESTRequest(method="PUT", url=url, data=ids)

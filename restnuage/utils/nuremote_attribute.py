@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from time import time
+
 
 class NURemoteAttribute(object):
     """
@@ -22,12 +24,12 @@ class NURemoteAttribute(object):
         self.is_readonly = False
         self.is_email = False
         self.is_unique = False
+        self.is_editable = True
+        self.is_login = False
+        self._is_identifier = False
         self.min_length = None
         self.max_length = None
         self.choices = None
-        self.is_editable = True
-
-        self._is_identifier = False
 
     def _get_is_identifier(self):
         """ Getter for is_identifier """
@@ -51,6 +53,9 @@ class NURemoteAttribute(object):
             return self.choices[0]
 
         value = self.attribute_type()
+
+        if self.attribute_type is time:
+            value = int(value)
 
         if self.min_length:
             if self.attribute_type is str:

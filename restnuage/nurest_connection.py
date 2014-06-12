@@ -127,11 +127,7 @@ class NURESTConnection(object):
 
         # TODO : Get errors in response data after bug fix : http://mvjira.mv.usa.alcatel.com/browse/VSD-2735
         if data and 'errors' in data:
-            errors = dict()
-            errors['error_property'] = data['errors'][0]['property']
-            errors['error_name'] = data['errors'][0]['descriptions'][0]['title']
-            errors['error_description'] = data['errors'][0]['descriptions'][0]['description']
-            self._response.errors = errors
+            self._response.errors = data['errors']
 
         if status_code in [HTTP_CODE_SUCCESS, HTTP_CODE_CREATED, HTTP_CODE_EMPTY]:
             return True
@@ -180,11 +176,7 @@ class NURESTConnection(object):
         if len(self._response.errors) == 0:
             print "NURESTConnection ERROR without error message [%s] %s" % (self._response.status_code, self._response.reason)
 
-        elif 'error_property' in self._response.errors:
-            print "NURESTConnection ERROR on [%s] %s, %s" % (self._response.errors['error_property'], self._response.errors['error_name'], self._response.errors['error_description'])
-
-        else:
-            print "NURESTConnection ERROR %s, %s" % (self._response.errors['error_name'], self._response.errors['error_description'])
+        print "NURESTConnection ERROR %s:\n%s" % (self._response.status_code, self._response.errors)
 
     # HTTP Calls
 
@@ -234,12 +226,20 @@ class NURESTConnection(object):
 
         url = "%s%s" % (controller.url, self._request.url)
 
-        response = requests.request(method=self._request.method,
-                                  url=url,
-                                  data=json.dumps(self._request.data),
-                                  headers=headers,
-                                  verify=False,
-                                  timeout=self.timeout)
+        try:  # TODO : Remove this ugly try/except after http://mvjira.mv.usa.alcatel.com/browse/VSD-546
+            response = requests.request(method=self._request.method,
+                                      url=url,
+                                      data=json.dumps(self._request.data),
+                                      headers=headers,
+                                      verify=False,
+                                      timeout=self.timeout)
+        except requests.exceptions.SSLError:
+            response = requests.request(method=self._request.method,
+                                      url=url,
+                                      data=json.dumps(self._request.data),
+                                      headers=headers,
+                                      verify=False,
+                                      timeout=self.timeout)
 
         return self._did_receive_response(response)
 
