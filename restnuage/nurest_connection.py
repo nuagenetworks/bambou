@@ -141,8 +141,11 @@ class NURESTConnection(object):
             if not should_post:
                 return True
 
-            self._response.errors['error_name'] = "Permission denied"
-            self._response.errors['error_description'] = "You are not allowed to access this resource."
+            # if not self._response.errors:
+            #     self._response.errors = dict()
+            #
+            # self._response.errors['error_description'] = "Permission denied"
+            # self._response.errors['error_description'] = "You are not allowed to access this resource."
 
             self._print_information()
             return False
@@ -156,8 +159,10 @@ class NURESTConnection(object):
 
         if status_code == HTTP_CODE_INTERNAL_SERVER_ERROR:
 
-            self._response.errors['error_name'] = "[CRITICAL] Internal Server Error"
-            self._response.errors['error_description'] = "Please check the log and report this error to the server team"
+            # if not self._response.errors:
+            #     self._response.errors = dict()
+            # self._response.errors['error_name'] = "[CRITICAL] Internal Server Error"
+            # self._response.errors['error_description'] = "Please check the log and report this error to the server team"
 
             self._print_information()
             return False

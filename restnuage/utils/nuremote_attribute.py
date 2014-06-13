@@ -30,6 +30,10 @@ class NURemoteAttribute(object):
         self.min_length = None
         self.max_length = None
         self.choices = None
+        self._is_password = False
+        self.is_forgetable = False
+
+    # Properties
 
     def _get_is_identifier(self):
         """ Getter for is_identifier """
@@ -46,7 +50,24 @@ class NURemoteAttribute(object):
 
     is_identifier = property(_get_is_identifier, _set_is_identifier)
 
-    def get_value(self):
+    def _get_is_password(self):
+        """ Getter for is_identifier """
+
+        return self._is_password
+
+    def _set_is_identifier(self, is_password):
+        """ Setter for is_identifier """
+
+        if is_password:
+            self.is_forgetable = True
+
+        self._is_password = is_password
+
+    is_password = property(_get_is_password, _set_is_identifier)
+
+    #Methods
+
+    def get_default_value(self):
         """ Get a default value of the attribute_type """
 
         if self.choices:
@@ -70,3 +91,35 @@ class NURemoteAttribute(object):
                 value = self.max_length
 
         return value
+
+    def get_min_value(self):
+        """ Get the minimum value """
+
+        value = self.get_default_value()
+
+        if self.attribute_type is str:
+            min_value = value[:self.min_length - 1]
+
+        elif self.attribute_type is int:
+            min_value = self.min_length - 1
+
+        else:
+            raise TypeError('Attribute %s can not have a minimum value' % self.local_name)
+
+        return min_value
+
+    def get_max_value(self):
+        """ Get the maximum value """
+
+        value = self.get_default_value()
+
+        if self.attribute_type is str:
+            max_value = value.ljust(self.max_length + 1, 'a')
+
+        elif self.attribute_type is int:
+            max_value = self.max_length + 1
+
+        else:
+            raise TypeError('Attribute %s can not have a maximum value' % self.local_name)
+
+        return max_value

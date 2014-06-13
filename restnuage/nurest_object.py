@@ -32,17 +32,21 @@ class NURESTObject(object):
         self._parent_id = parent_id
         self._parent_type = parent_type
         self._parent = None
+        self._last_updated_by = None
+        self._last_updated_date = None
 
         self._children = dict()
         self._attributes = dict()  # Dictionary of attribute name => NURemoteAttribute
 
-        self.expose_attribute(local_name='id', remote_name='ID', attribute_type=str, is_identifier=True)
-        self.expose_attribute(local_name='external_id', remote_name='externalID', attribute_type=str)
-        self.expose_attribute(local_name='local_id', remote_name='localID', attribute_type=str)
-        self.expose_attribute(local_name='parent_id', remote_name='parentID', attribute_type=str)
-        self.expose_attribute(local_name='parent_type', remote_name='parentType', attribute_type=str)
-        self.expose_attribute(local_name='creation_date', remote_name='creationDate', attribute_type=time, is_editable=False)
-        self.expose_attribute(local_name='owner', attribute_type=str)
+        self.expose_attribute(local_name=u'id', remote_name=u'ID', attribute_type=str, is_identifier=True)
+        self.expose_attribute(local_name=u'external_id', remote_name=u'externalID', attribute_type=str)
+        self.expose_attribute(local_name=u'local_id', remote_name=u'localID', attribute_type=str)
+        self.expose_attribute(local_name=u'parent_id', remote_name=u'parentID', attribute_type=str)
+        self.expose_attribute(local_name=u'parent_type', remote_name=u'parentType', attribute_type=str)
+        self.expose_attribute(local_name=u'creation_date', remote_name=u'creationDate', attribute_type=time, is_editable=False)
+        self.expose_attribute(local_name=u'owner', attribute_type=str, is_readonly=True)
+        self.expose_attribute(local_name=u'last_updated_date', remote_name=u'lastUpdatedDate', attribute_type=time, is_readonly=True)
+        self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
     # Properties
 
@@ -126,6 +130,26 @@ class NURESTObject(object):
 
     parent = property(_get_parent, _set_parent)
 
+    def _get_last_updated_by(self):
+        """ Get last updated by user id info """
+        return self._last_updated_by
+
+    def _set_last_updated_by(self, user_id):
+        """ Set last updated by user id info """
+        self._last_updated_by = user_id
+
+    last_updated_by = property(_get_last_updated_by, _set_last_updated_by)
+
+    def _get_last_updated_date(self):
+        """ Get last updated date """
+        return self._last_updated_date
+
+    def _set_last_updated_date(self, update_date):
+        """ Set last updated by user id info """
+        self._last_updated_date = update_date
+
+    last_updated_date = property(_get_last_updated_date, _set_last_updated_by)
+
     # Methods
 
     def get_attributes(self):
@@ -207,7 +231,7 @@ class NURESTObject(object):
 
         return "%s (ID=%s)" % (self.__class__, self.id)
 
-    def expose_attribute(self, local_name, attribute_type, remote_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True):
+    def expose_attribute(self, local_name, attribute_type, remote_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False):
         """ Expose local_name as remote_name """
 
         if remote_name is None:
@@ -224,6 +248,7 @@ class NURESTObject(object):
         attribute.is_unique = is_unique
         attribute.is_email = is_email
         attribute.is_login = is_login
+        attribute.is_password = is_password
 
         self._attributes[local_name] = attribute
 
