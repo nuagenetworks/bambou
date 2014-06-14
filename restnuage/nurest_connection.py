@@ -6,7 +6,7 @@ import threading
 
 from .nurest_login_controller import NURESTLoginController
 from .nurest_response import NURESTResponse
-
+from restnuage import restnuage_log
 
 HTTP_CODE_ZERO = 0
 HTTP_CODE_SUCCESS = 200
@@ -230,6 +230,8 @@ class NURESTConnection(object):
         headers = self._request.get_headers()
 
         url = "%s%s" % (controller.url, self._request.url)
+
+        restnuage_log.info('RESTNuage send request %s on %s with DATA:\n%s ' % (self._request.method, self._request.url, self._request.data))
 
         try:  # TODO : Remove this ugly try/except after http://mvjira.mv.usa.alcatel.com/browse/VSD-546
             response = requests.request(method=self._request.method,

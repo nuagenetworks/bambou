@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import logging
+restnuage_log = logging.getLogger('restnuage')
+
 __all__ = ['NURESTBasicUser', 'NURESTConnection', 'NURESTFetcher', 'NURESTLoginController', 'NURESTObject', 'NURESTPushCenter', 'NURESTRequest', 'NURESTResponse']
 
 from restnuage.nurest_user import NURESTBasicUser

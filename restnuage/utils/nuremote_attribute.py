@@ -78,6 +78,9 @@ class NURemoteAttribute(object):
         if self.attribute_type is time:
             value = int(value)
 
+        elif self.attribute_type is str:
+            value = "A"
+
         if self.min_length:
             if self.attribute_type is str:
                 value = value.ljust(self.min_length, 'a')

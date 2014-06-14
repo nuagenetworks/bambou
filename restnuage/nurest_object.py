@@ -148,7 +148,7 @@ class NURESTObject(object):
         """ Set last updated by user id info """
         self._last_updated_date = update_date
 
-    last_updated_date = property(_get_last_updated_date, _set_last_updated_by)
+    last_updated_date = property(_get_last_updated_date, _set_last_updated_date)
 
     # Methods
 

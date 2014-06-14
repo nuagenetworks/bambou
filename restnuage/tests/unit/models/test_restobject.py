@@ -83,4 +83,4 @@ class AttributeTests(TestCase):
 
         attributes = enterprise.get_attributes()
 
-        self.assertEqual(len(attributes), 9)
+        self.assertEqual(len(attributes), 11)
