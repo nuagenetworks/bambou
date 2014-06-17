@@ -231,13 +231,17 @@ class NURESTObject(object):
 
         return "%s (ID=%s)" % (self.__class__, self.id)
 
-    def expose_attribute(self, local_name, attribute_type, remote_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False):
+    def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False):
         """ Expose local_name as remote_name """
 
         if remote_name is None:
             remote_name = local_name
 
+        if display_name is None:
+            display_name = local_name
+
         attribute = NURemoteAttribute(local_name=local_name, remote_name=remote_name, attribute_type=attribute_type)
+        attribute.display_name = display_name
         attribute.is_required = is_required
         attribute.is_readonly = is_readonly
         attribute.min_length = min_length

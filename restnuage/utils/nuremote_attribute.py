@@ -19,6 +19,7 @@ class NURemoteAttribute(object):
 
         self.local_name = local_name
         self.remote_name = remote_name
+        self.display_name = local_name
         self.attribute_type = attribute_type
         self.is_required = False
         self.is_readonly = False
@@ -65,7 +66,7 @@ class NURemoteAttribute(object):
 
     is_password = property(_get_is_password, _set_is_identifier)
 
-    #Methods
+    # Methods
 
     def get_default_value(self):
         """ Get a default value of the attribute_type """
