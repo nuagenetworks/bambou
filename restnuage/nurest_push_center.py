@@ -5,7 +5,7 @@ import threading
 from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
 from .utils.singleton import Singleton
-
+from restnuage import restnuage_log
 
 class NURESTPushCenter(Singleton):
     """
@@ -71,7 +71,7 @@ class NURESTPushCenter(Singleton):
 
         events = self._last_events
         self._last_events = list()
-        print "%s last events " % len(events)
+        restnuage_log.info("%s last events " % len(events))
         return events
 
     # Private methods
@@ -79,11 +79,10 @@ class NURESTPushCenter(Singleton):
     def _did_receive_event(self, connection):
         """ Receive an event from connection """
 
-        print "** NURESTPushCenter received data"
         response = connection.response
 
         if response.status_code != 200:
-            print "** NURESTPushCenter: Connection failure URL=%s Error: [%s] %s" % (self._url, response.status_code, response.reason)
+            restnuage_log.info("** NURESTPushCenter: Connection failure URL=%s Error: [%s] %s" % (self._url, response.status_code, response.reason))
             return
 
         data = response.data
@@ -92,10 +91,10 @@ class NURESTPushCenter(Singleton):
             self.nb_events_received += len(data['events'])
             self.nb_push_received += 1
 
-            print "** NURESTPushCenter\nReceived Push=%s\nTotal Received events=%s" % (self.nb_push_received, self.nb_events_received)
+            restnuage_log.info("** NURESTPushCenter\nReceived Push=%s\nTotal Received events=%s" % (self.nb_push_received, self.nb_events_received))
             self._last_events.extend(data['events'])
 
-        if self._is_running and (self._max_event_loop == 0 or self._max_event_loop > self.nb_push_received) :
+        if self._is_running and (self._max_event_loop == 0 or self._max_event_loop > self.nb_push_received):
             print "Another round !"
             uuid = None
             if 'uuid' in data:
@@ -106,7 +105,7 @@ class NURESTPushCenter(Singleton):
     def _listen(self, uuid=None):
         """ Listen a connection uuid """
 
-        print "** NURESTPushCenter listening in %s" % threading.current_thread()
+        restnuage_log.info("** NURESTPushCenter listening in %s" % threading.current_thread())
 
         events_url = "%s/events" % self.url
         if uuid:

@@ -40,7 +40,7 @@ class NURESTObject(object):
 
         self.expose_attribute(local_name=u'id', remote_name=u'ID', attribute_type=str, is_identifier=True)
         self.expose_attribute(local_name=u'external_id', remote_name=u'externalID', attribute_type=str)
-        self.expose_attribute(local_name=u'local_id', remote_name=u'localID', attribute_type=str)
+        #self.expose_attribute(local_name=u'local_id', remote_name=u'localID', attribute_type=str)
         self.expose_attribute(local_name=u'parent_id', remote_name=u'parentID', attribute_type=str)
         self.expose_attribute(local_name=u'parent_type', remote_name=u'parentType', attribute_type=str)
         self.expose_attribute(local_name=u'creation_date', remote_name=u'creationDate', attribute_type=time, is_editable=False)
