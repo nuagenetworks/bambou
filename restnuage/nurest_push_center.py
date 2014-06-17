@@ -18,8 +18,8 @@ class NURESTPushCenter(Singleton):
         self._is_running = False
         self._current_connection = None
         self._last_events = list()
-        self._debug_number_of_received_events = 0
-        self._debug_number_of_received_push = 0
+        self.nb_events_received = 0
+        self.nb_push_received = 0
         self._thread = None
 
     # Properties
@@ -36,11 +36,12 @@ class NURESTPushCenter(Singleton):
 
     # Control Methods
 
-    def start(self):
+    def start(self, max_event_loop=0):
         """ Start push center """
         if self._is_running:
             return
 
+        self._max_event_loop = max_event_loop
         self._is_running = True
         self._thread = threading.Thread(target=self._listen, name='push-center')
         self._thread.start()
@@ -50,13 +51,24 @@ class NURESTPushCenter(Singleton):
         if not self._is_running:
             return
 
-        print "** NURESTPushCenter is stopping after %s push received and %s events " % (self._debug_number_of_received_push, self._debug_number_of_received_events)
         self._is_running = False
         self._thread = None
         self._current_connection = None
 
+    def wait_until_exit(self):
+        """ Wait until thread exit """
+
+        if self._max_event_loop == 0:
+            raise Exception("Thread will never exit. Use stop or specify max_event_loop when starting it!")
+
+        self._thread.join()
+        self.stop()
+
+    # Events
+
     def get_last_events(self):
         """ Retrieve events that has been  """
+
         events = self._last_events
         self._last_events = list()
         print "%s last events " % len(events)
@@ -66,9 +78,6 @@ class NURESTPushCenter(Singleton):
 
     def _did_receive_event(self, connection):
         """ Receive an event from connection """
-
-        if not self._is_running:
-            return
 
         print "** NURESTPushCenter received data"
         response = connection.response
@@ -80,14 +89,14 @@ class NURESTPushCenter(Singleton):
         data = response.data
 
         if data:
-            self._debug_number_of_received_events += len(data['events'])
-            self._debug_number_of_received_push += 1
+            self.nb_events_received += len(data['events'])
+            self.nb_push_received += 1
 
-            print "** NURESTPushCenter\nReceived Push=%s\nTotal Received events=%s" % (self._debug_number_of_received_push, self._debug_number_of_received_events)
-
+            print "** NURESTPushCenter\nReceived Push=%s\nTotal Received events=%s" % (self.nb_push_received, self.nb_events_received)
             self._last_events.extend(data['events'])
 
-        if self._is_running:
+        if self._is_running and (self._max_event_loop == 0 or self._max_event_loop > self.nb_push_received) :
+            print "Another round !"
             uuid = None
             if 'uuid' in data:
                 uuid = data['uuid']
@@ -101,13 +110,12 @@ class NURESTPushCenter(Singleton):
 
         events_url = "%s/events" % self.url
         if uuid:
-            events_url = "%s?%s" % (events_url, uuid)
+            events_url = "%s?uuid=%s" % (events_url, uuid)
 
         request = NURESTRequest(method='GET', url=events_url)
 
         # Force async to False so the push center will have only 1 thread running
         connection = NURESTConnection(request=request, callback=self._did_receive_event, async=False)
-
         #connection.timeout = 0
         #connection.ignore_request_idle = True
         connection.start()
