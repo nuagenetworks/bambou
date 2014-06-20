@@ -36,13 +36,14 @@ class NURESTPushCenter(Singleton):
 
     # Control Methods
 
-    def start(self, max_event_loop=0):
+    def start(self, max_event_loop=0, user=None):
         """ Start push center """
         if self._is_running:
             return
 
         self._max_event_loop = max_event_loop
         self._is_running = True
+        self._user = user
         self._thread = threading.Thread(target=self._listen, name='push-center')
         self._thread.start()
 
@@ -54,7 +55,7 @@ class NURESTPushCenter(Singleton):
         self._is_running = False
         self._thread = None
         self._current_connection = None
-
+<
     def wait_until_exit(self):
         """ Wait until thread exit """
 
@@ -114,7 +115,7 @@ class NURESTPushCenter(Singleton):
         request = NURESTRequest(method='GET', url=events_url)
 
         # Force async to False so the push center will have only 1 thread running
-        connection = NURESTConnection(request=request, callback=self._did_receive_event, async=False)
+        connection = NURESTConnection(request=request, callback=self._did_receive_event, async=False, user=self._user)
         #connection.timeout = 0
         #connection.ignore_request_idle = True
         connection.start()

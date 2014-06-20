@@ -260,7 +260,7 @@ class NURESTObject(object):
         """ Check if the current user owns the object """
 
         from restnuage.nurest_user import NURESTBasicUser
-        current_user = NURESTBasicUser()
+        current_user = NURESTBasicUser.get_default_user()
         return self._owner == current_user.id
 
     def is_parents_owned_by_current_user(self, remote_names):

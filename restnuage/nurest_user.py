@@ -4,35 +4,22 @@ from .nurest_connection import NURESTConnection
 from .nurest_login_controller import NURESTLoginController
 from .nurest_object import NURESTObject
 
-from .utils import Sha1, Singleton
+from .utils import Sha1
 
 
-class NURESTBasicUser(Singleton, NURESTObject):
+class NURESTBasicUser(NURESTObject):
     """ Defines a basic user """
 
-    def __init__(self, id=None,
-                       username=None,
-                       password=None,
-                       api_key=None,
-                       creation_date=None,
-                       external_id=None,
-                       local_id=None,
-                       owner=None,
-                       parent_id=None,
-                       parent_type=None):
+    _DEFAULT_USER = None
+
+    def __init__(self):
         """ Initializes user """
 
-        super(NURESTBasicUser, self).__init__(creation_date=creation_date,
-                                         external_id=external_id,
-                                         id=id,
-                                         local_id=local_id,
-                                         owner=owner,
-                                         parent_id=parent_id,
-                                         parent_type=parent_type)
+        super(NURESTBasicUser, self).__init__()
 
-        self._username = username
-        self._password = password
-        self._api_key = api_key
+        self._username = None
+        self._password = None
+        self._api_key = None
 
         self._new_password = None
 
@@ -71,6 +58,14 @@ class NURESTBasicUser(Singleton, NURESTObject):
         self._api_key = api_key
 
     api_key = property(_get_api_key, _set_api_key)
+
+    @classmethod
+    def get_default_user(cls):
+        """ Get default user """
+        if not cls._DEFAULT_USER:
+            NURESTBasicUser._DEFAULT_USER = cls()
+
+        return NURESTBasicUser._DEFAULT_USER
 
     # Methods
 

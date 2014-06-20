@@ -28,7 +28,7 @@ HTTP_CODE_SERVICE_UNAVAILABLE = 503
 class NURESTConnection(object):
     """ Enhances requests """
 
-    def __init__(self, request, async, callback=None, callbacks=dict()):
+    def __init__(self, request, async, callback=None, callbacks=dict(), user=None):
         """ Intializes a new connection for a request
             :param request: the NURESTRequest to send
             :param callback: the method that will be fired after sending
@@ -50,6 +50,7 @@ class NURESTConnection(object):
         self._callbacks = callbacks
         self._user_info = None
         self._object_last_action_timer = None
+        self._user = user
 
     # Properties
 
@@ -181,7 +182,7 @@ class NURESTConnection(object):
         if len(self._response.errors) == 0:
             print "NURESTConnection ERROR without error message [%s] %s" % (self._response.status_code, self._response.reason)
 
-        print "NURESTConnection ERROR %s:\n%s" % (self._response.status_code, self._response.errors)
+        print "NURESTConnection (%s %s) ERROR %s:\n%s" % (self._request.method, self._request.url, self._response.status_code, self._response.errors)
 
     # HTTP Calls
 
@@ -220,9 +221,20 @@ class NURESTConnection(object):
         # Add specific headers
         controller = NURESTLoginController()
 
+        enterprise = None
+        username = None
+        api_key = None
+
+        if self._user:
+            enterprise = self._user.enterprise_name
+            username = self._user.username
+            api_key = self._user.api_key
+        else:
+            enterprise = controller.enterprise
+
         if self._uses_authentication:
-            self._request.set_header('X-Nuage-Organization', controller.enterprise)
-            self._request.set_header('Authorization', controller.get_authentication_header())
+            self._request.set_header('X-Nuage-Organization', enterprise)
+            self._request.set_header('Authorization', controller.get_authentication_header(username, api_key))
 
         if controller.is_impersonating:
             self._request.set_header('X-Nuage-Proxy', controller.impersonation)

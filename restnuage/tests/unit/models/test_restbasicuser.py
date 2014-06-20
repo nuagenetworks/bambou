@@ -33,7 +33,12 @@ class CompressionTests(TestCase):
     def test_to_dict(self):
         """ Get object as dictionary """
 
-        user = User(id=3, username=u"Christophe", password=u'sorry', api_key=u'ABCD')
+        user = User()
+        user.id = 3
+        user.username = u"Christophe"
+        user.password = u'sorry'
+        user.api_key = u'ABCD'
+
         to_dict = user.to_dict()
 
         self.assertEquals(to_dict['userName'], u'Christophe')

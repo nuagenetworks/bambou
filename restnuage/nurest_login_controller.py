@@ -105,18 +105,22 @@ class NURESTLoginController(Singleton):
 
     # Methods
 
-    def get_authentication_header(self):
+    def get_authentication_header(self, user=None, api_key=None):
         """ Return authenication string to place in Authorization Header
             If API Token is set, it'll be used. Otherwise, the clear
             text password will be sent. Users of NURESTLoginController are responsible to
             clean the password property.
         """
 
-        if self.api_key:
-            #print "Authentication for user %s with api_key %s" % (self.user, self.api_key)
+        if user is None:
+            user = self.user
+
+        if api_key is None:
+            api_key = self.api_key
+
+        if api_key:
             return "XREST %s" % urlsafe_b64encode("%s:%s" % (self.user, self.api_key))
 
-        #print "Authentication for user %s with password %s" % (self.user, self.password)
         return "XREST %s" % urlsafe_b64encode("%s:%s" % (self.user, self.password))
 
     def reset(self):
