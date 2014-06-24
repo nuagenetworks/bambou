@@ -3,6 +3,8 @@
 import json
 import threading
 
+from time import time
+
 from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
 from .utils.singleton import Singleton
@@ -39,14 +41,14 @@ class NURESTPushCenter(Singleton):
 
     # Control Methods
 
-    def start(self, max_events_loop=0, user=None, start_time=None):
+    def start(self, max_events_loop=0, user=None, capture_previous_events=True):
         """ Start push center """
 
         if self._is_running:
             return
 
-        if start_time:
-            self._start_time = start_time
+        if not capture_previous_events:
+            self._start_time = int(time() * 1000)  # TODO : Add latency here ?
 
         self._max_events_loop = max_events_loop
         self._is_running = True
