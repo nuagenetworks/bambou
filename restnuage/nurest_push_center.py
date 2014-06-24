@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import json
 import threading
 
 from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
 from .utils.singleton import Singleton
 from restnuage import restnuage_log
+
 
 class NURESTPushCenter(Singleton):
     """
@@ -21,6 +23,7 @@ class NURESTPushCenter(Singleton):
         self.nb_events_received = 0
         self.nb_push_received = 0
         self._thread = None
+        self._start_time = None
 
     # Properties
 
@@ -36,31 +39,36 @@ class NURESTPushCenter(Singleton):
 
     # Control Methods
 
-    def start(self, max_event_loop=0, user=None):
+    def start(self, max_events_loop=0, user=None, start_time=None):
         """ Start push center """
+
         if self._is_running:
             return
 
-        self._max_event_loop = max_event_loop
+        if start_time:
+            self._start_time = start_time
+
+        self._max_events_loop = max_events_loop
         self._is_running = True
         self._user = user
         self._thread = threading.Thread(target=self._listen, name='push-center')
         self._thread.start()
 
     def stop(self):
-        """ """
+        """ Stop the current thread """
+
         if not self._is_running:
             return
 
         self._is_running = False
         self._thread = None
         self._current_connection = None
-<
+
     def wait_until_exit(self):
         """ Wait until thread exit """
 
-        if self._max_event_loop == 0:
-            raise Exception("Thread will never exit. Use stop or specify max_event_loop when starting it!")
+        if self._max_events_loop == 0:
+            raise Exception("Thread will never exit. Use stop or specify max_events_loop when starting it!")
 
         self._thread.join()
         self.stop()
@@ -72,7 +80,6 @@ class NURESTPushCenter(Singleton):
 
         events = self._last_events
         self._last_events = list()
-        restnuage_log.info("%s last events " % len(events))
         return events
 
     # Private methods
@@ -83,20 +90,33 @@ class NURESTPushCenter(Singleton):
         response = connection.response
 
         if response.status_code != 200:
-            restnuage_log.info("** NURESTPushCenter: Connection failure URL=%s Error: [%s] %s" % (self._url, response.status_code, response.reason))
+            restnuage_log.info("NURESTPushCenter: Connection failure URL=%s Error: [%s] %s" % (self._url, response.status_code, response.reason))
             return
 
         data = response.data
+        events = []
 
-        if data:
-            self.nb_events_received += len(data['events'])
+        if data and self._start_time:
+            events = []
+
+            for event in data['events']:
+
+                if event['eventReceivedTime'] >= self._start_time:
+                    events.append(event)
+                else:
+                    restnuage_log.info("EVENTS REJECTED : %s >= %s  (%s %s)\n%s" % (event['eventReceivedTime'], self._start_time, event['type'], event['entityType'], json.dumps(event['entities'], indent=4)))
+
+        else:
+            events = data['events']
+
+        if events:
+            self.nb_events_received += len(events)
             self.nb_push_received += 1
 
-            restnuage_log.info("** NURESTPushCenter\nReceived Push=%s\nTotal Received events=%s" % (self.nb_push_received, self.nb_events_received))
-            self._last_events.extend(data['events'])
+            restnuage_log.info("NURESTPushCenter Received Push #%s (total=%s, latest=%s)\n%s" % (self.nb_push_received, self.nb_events_received, len(events), json.dumps(events, indent=4)))
+            self._last_events.extend(events)
 
-        if self._is_running and (self._max_event_loop == 0 or self._max_event_loop > self.nb_push_received):
-            print "Another round !"
+        if self._is_running and (self._max_events_loop == 0 or self._max_events_loop > self.nb_push_received):
             uuid = None
             if 'uuid' in data:
                 uuid = data['uuid']
@@ -105,8 +125,6 @@ class NURESTPushCenter(Singleton):
 
     def _listen(self, uuid=None):
         """ Listen a connection uuid """
-
-        restnuage_log.info("** NURESTPushCenter listening in %s" % threading.current_thread())
 
         events_url = "%s/events" % self.url
         if uuid:

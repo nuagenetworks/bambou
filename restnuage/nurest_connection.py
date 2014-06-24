@@ -169,20 +169,21 @@ class NURESTConnection(object):
             return False
 
         if status_code == HTTP_CODE_ZERO:
-            print "NURESTConnection: Connection error with code 0. Sending NUNURESTConnectionFailureNotification notification and exiting."
+            restnuage_log.error("NURESTConnection: Connection error with code 0. Sending NUNURESTConnectionFailureNotification notification and exiting.")
             self._print_information()
             return False
 
-        print "NURESTConnection: Report this error, because this should not happen: %s" % self._response
+        restnuage_log.error("NURESTConnection: Report this error, because this should not happen: %s" % self._response)
         return False
 
     def _print_information(self):
         """ Prints information instead of sending a confirmation """
 
         if len(self._response.errors) == 0:
-            print "NURESTConnection ERROR without error message [%s] %s" % (self._response.status_code, self._response.reason)
+            restnuage_log.error("NURESTConnection ERROR without error message [%s] %s" % (self._response.status_code, self._response.reason))
 
-        print "NURESTConnection (%s %s) ERROR %s:\n%s" % (self._request.method, self._request.url, self._response.status_code, self._response.errors)
+        else:
+            restnuage_log.error("NURESTConnection (%s %s) ERROR %s:\n%s" % (self._request.method, self._request.url, self._response.status_code, json.dumps(self._response.errors, indent=4)))
 
     # HTTP Calls
 
@@ -192,7 +193,6 @@ class NURESTConnection(object):
         try:
             data = response.json()
         except:
-            #print "** Reponse could not be decoded\n%s\n** End response\n" % response.text
             data = None
 
         self._response = NURESTResponse(status_code=response.status_code, headers=response.headers, data=data, reason=response.reason)
@@ -202,7 +202,7 @@ class NURESTConnection(object):
 
     def _did_timeout(self):
         """ Called when a resquest has timeout """
-        print "TIMEOUT"
+        restnuage_log.error('RESTNuage %s on %s has timeout.' % (self._request.method, self._request.url))
         self._has_timeouted = True
 
         if self._async and self._callback:
@@ -243,7 +243,7 @@ class NURESTConnection(object):
 
         url = "%s%s" % (controller.url, self._request.url)
 
-        restnuage_log.info('RESTNuage send request %s on %s with DATA:\n%s ' % (self._request.method, self._request.url, self._request.data))
+        restnuage_log.info('RESTNuage send request %s on %s with DATA:\n%s ' % (self._request.method, self._request.url, json.dumps(self._request.data, indent=4)))
 
         try:  # TODO : Remove this ugly try/except after http://mvjira.mv.usa.alcatel.com/browse/VSD-546
             response = requests.request(method=self._request.method,
