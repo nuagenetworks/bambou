@@ -192,6 +192,7 @@ class NURESTConnection(object):
 
         try:
             data = response.json()
+
         except:
             data = None
 
@@ -242,8 +243,6 @@ class NURESTConnection(object):
         headers = self._request.get_headers()
 
         url = "%s%s" % (controller.url, self._request.url)
-
-        restnuage_log.info('RESTNuage send request %s on %s with DATA:\n%s ' % (self._request.method, self._request.url, json.dumps(self._request.data, indent=4)))
 
         try:  # TODO : Remove this ugly try/except after http://mvjira.mv.usa.alcatel.com/browse/VSD-546
             response = requests.request(method=self._request.method,

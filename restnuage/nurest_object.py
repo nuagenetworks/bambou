@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import json
+
 from time import time
 
 from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
 from .utils import NURemoteAttribute
+
+from restnuage import restnuage_log
 
 
 class NURESTObject(object):
@@ -410,6 +414,8 @@ class NURESTObject(object):
         connection = NURESTConnection(request=request, callback=self._did_receive_response, callbacks=callbacks, async=async)
         connection.user_info = user_info
 
+        restnuage_log.info('RESTNuage Sending >>>>>>\n%s %s with following data:\n%s' % (request.method, request.url, json.dumps(request.data, indent=4)))
+
         return connection.start()
 
     def _manage_child_entity(self, nurest_object, resource_url='', method='GET', async=False, callback=None, handler=None):
@@ -483,6 +489,8 @@ class NURESTObject(object):
 
         has_callbacks = connection.has_callbacks()
         should_post = not has_callbacks
+
+        restnuage_log.info('RESTNuage <<<<< Response for\n%s %s\n%s' % (connection._request.method, connection._request.url, json.dumps(connection._request.data, indent=4)))
 
         if  connection.has_response_success(should_post=should_post) and has_callbacks:
             callback = connection.callbacks['local']
