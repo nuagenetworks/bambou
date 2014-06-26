@@ -213,6 +213,11 @@ class NURESTObject(object):
 
         return "/%s" % name
 
+    def __cmp__(self, rest_object):
+        """ Compare with another object """
+
+        return self.__eq__(rest_object)
+
     def __eq__(self, rest_object):
         """ Compare with another object """
 
@@ -235,7 +240,7 @@ class NURESTObject(object):
 
         return "%s (ID=%s)" % (self.__class__, self.id)
 
-    def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False):
+    def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False):
         """ Expose local_name as remote_name """
 
         if remote_name is None:
@@ -257,6 +262,8 @@ class NURESTObject(object):
         attribute.is_email = is_email
         attribute.is_login = is_login
         attribute.is_password = is_password
+        attribute.can_order = can_order
+        attribute.can_search = can_search
 
         self._attributes[local_name] = attribute
 

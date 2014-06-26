@@ -195,6 +195,7 @@ class NURESTConnection(object):
 
         except:
             data = None
+            # restnuage_log.error('RESTNuage JSON can not be decoded:\n%s' % response.text)
 
         self._response = NURESTResponse(status_code=response.status_code, headers=response.headers, data=data, reason=response.reason)
         self._callback(self)
@@ -222,16 +223,15 @@ class NURESTConnection(object):
         # Add specific headers
         controller = NURESTLoginController()
 
-        enterprise = None
-        username = None
-        api_key = None
+        enterprise = controller.enterprise
+        username = controller.user
+        api_key = controller.api_key
 
         if self._user:
             enterprise = self._user.enterprise_name
             username = self._user.username
             api_key = self._user.api_key
-        else:
-            enterprise = controller.enterprise
+            restnuage_log.info('RESTNuage request with user:%s within enterprise:%s' % (username, enterprise))
 
         if self._uses_authentication:
             self._request.set_header('X-Nuage-Organization', enterprise)
@@ -241,6 +241,8 @@ class NURESTConnection(object):
             self._request.set_header('X-Nuage-Proxy', controller.impersonation)
 
         headers = self._request.get_headers()
+
+        # restnuage_log.info('HEADERS = %s' % json.dumps(headers, indent=4))
 
         url = "%s%s" % (controller.url, self._request.url)
 

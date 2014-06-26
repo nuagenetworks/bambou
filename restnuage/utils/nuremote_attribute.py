@@ -34,6 +34,9 @@ class NURemoteAttribute(object):
         self._is_password = False
         self.is_forgetable = False
 
+        self.can_order = False
+        self.can_search = False
+
     # Properties
 
     def _get_is_identifier(self):

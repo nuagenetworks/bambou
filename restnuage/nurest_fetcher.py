@@ -16,13 +16,13 @@ class NURESTFetcher(object):
         self._nurest_object = None
         self._local_name = None
         self._master_filter = False
-        self._master_order_by = None
+        self.order_by = None
         self._transaction_id = None
         self._last_connnection = None
-        self._total_count = 0
-        self._page_size = 0
-        self._latest_loaded_page = 0
-        self._ordered_by = ''
+        self.total_count = 0
+        self.page_size = 0
+        self.latest_loaded_page = 0
+        self.ordered_by = ''
         self._group_by = []
 
     # Properties
@@ -83,11 +83,12 @@ class NURESTFetcher(object):
 
         if self._master_filter:
             request.set_header('X-Nuage-Filter', self._master_filter)
+
         elif filter:  # TODO: Cappuccino master filter is a CPPredicate
             request.set_header('X-Nuage-Filter', filter)
 
-        if self._master_order_by:
-            request.set_header('X-Nuage-OrderBy', self._master_order_by)
+        if self.order_by:
+            request.set_header('X-Nuage-OrderBy', self.order_by)
 
         if page:
             request.set_header('X-Nuage-Page', page)
@@ -130,7 +131,6 @@ class NURESTFetcher(object):
         connection = self._nurest_object.send_request(request=request, async=async)
         return self._did_fetch_entities(connection=connection)
 
-
     def _did_fetch_entities(self, connection):
         """ Fetching entities has been done """
 
@@ -138,39 +138,39 @@ class NURESTFetcher(object):
         response = connection.response
 
         if response.status_code != 200:
-            self._total_count = 0
-            self._page_size = 0
-            self._latest_loaded_page = 0
-            self._ordered_by = ''
-            self._send_content(content=None, connection=connection)
-            return
+            self.total_count = 0
+            self.page_size = 0
+            self.latest_loaded_page = 0
+            self.ordered_by = ''
+            return self._send_content(content=None, connection=connection)
 
         results = response.data
         destination = getattr(self.nurest_object, self._local_name)
         fetched_objects = list()
 
         if 'X-Nuage-Count' in response.headers and response.headers['X-Nuage-Count']:
-            self._total_count = int(response.headers['X-Nuage-Count'])
+            self.total_count = int(response.headers['X-Nuage-Count'])
 
         if 'X-Nuage-PageSize' in response.headers and response.headers['X-Nuage-PageSize']:
-            self._page_size = int(response.headers['X-Nuage-PageSize'])
+            self.page_size = int(response.headers['X-Nuage-PageSize'])
 
         if 'X-Nuage-Page' in response.headers and response.headers['X-Nuage-Page']:
-            self._latest_loaded_page = int(response.headers['X-Nuage-Page'])
+            self.latest_loaded_page = int(response.headers['X-Nuage-Page'])
 
         if 'X-Nuage-OrderBy' in response.headers and response.headers['X-Nuage-OrderBy']:
-            self._ordered_by = response.headers['X-Nuage-OrderBy']
+            self.ordered_by = response.headers['X-Nuage-OrderBy']
 
-        for result in results:
+        if results:
+            for result in results:
 
-            nurest_object = self.new()
-            nurest_object.from_dict(result)
-            nurest_object.parent = self._nurest_object
+                nurest_object = self.new()
+                nurest_object.from_dict(result)
+                nurest_object.parent = self._nurest_object
 
-            if nurest_object not in destination:
-                destination.append(nurest_object)
+                if nurest_object not in destination:
+                    destination.append(nurest_object)
 
-            fetched_objects.append(nurest_object)
+                fetched_objects.append(nurest_object)
 
         return self._send_content(content=fetched_objects, connection=connection)
 
@@ -221,9 +221,9 @@ class NURESTFetcher(object):
                 callback = connection.callbacks['remote']
 
                 if callback:
-                    callback(self, self._nurest_object, content)
+                    callback(self, self._nurest_object, content, connection)
             else:
-                return (self, self._nurest_object, content)
+                return (self, self._nurest_object, content, connection)
 
     def latests_sort_descriptors(self):
         """ Returns an array of descriptors """
