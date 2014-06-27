@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-restnuage_log = logging.getLogger('restnuage')
+logging.getLogger('restnuage').addHandler(logging.NullHandler())
 
 __all__ = ['NURESTBasicUser', 'NURESTConnection', 'NURESTFetcher', 'NURESTLoginController', 'NURESTObject', 'NURESTPushCenter', 'NURESTRequest', 'NURESTResponse']
 

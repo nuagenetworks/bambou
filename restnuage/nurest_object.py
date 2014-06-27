@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import json
 
 from time import time
@@ -8,7 +9,7 @@ from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
 from .utils import NURemoteAttribute
 
-from restnuage import restnuage_log
+restnuage_log = logging.getLogger('restnuage')
 
 
 class NURESTObject(object):
@@ -213,10 +214,10 @@ class NURESTObject(object):
 
         return "/%s" % name
 
-    def __cmp__(self, rest_object):
-        """ Compare with another object """
-
-        return self.__eq__(rest_object)
+    # def __cmp__(self, rest_object):
+    #     """ Compare with another object """
+    #
+    #     return self.__eq__(rest_object)
 
     def __eq__(self, rest_object):
         """ Compare with another object """

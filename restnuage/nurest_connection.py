@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import json
+import logging
 import requests
 import threading
 
 from .nurest_login_controller import NURESTLoginController
 from .nurest_response import NURESTResponse
-from restnuage import restnuage_log
+
+restnuage_log = logging.getLogger('restnuage')
+
 
 HTTP_CODE_ZERO = 0
 HTTP_CODE_SUCCESS = 200
@@ -142,12 +145,6 @@ class NURESTConnection(object):
             if not should_post:
                 return True
 
-            # if not self._response.errors:
-            #     self._response.errors = dict()
-            #
-            # self._response.errors['error_description'] = "Permission denied"
-            # self._response.errors['error_description'] = "You are not allowed to access this resource."
-
             self._print_information()
             return False
 
@@ -159,11 +156,6 @@ class NURESTConnection(object):
             return False
 
         if status_code == HTTP_CODE_INTERNAL_SERVER_ERROR:
-
-            # if not self._response.errors:
-            #     self._response.errors = dict()
-            # self._response.errors['error_name'] = "[CRITICAL] Internal Server Error"
-            # self._response.errors['error_description'] = "Please check the log and report this error to the server team"
 
             self._print_information()
             return False
@@ -195,7 +187,7 @@ class NURESTConnection(object):
 
         except:
             data = None
-            # restnuage_log.error('RESTNuage JSON can not be decoded:\n%s' % response.text)
+            restnuage_log.debug('RESTNuage JSON can not be decoded:\n%s' % response.text)
 
         self._response = NURESTResponse(status_code=response.status_code, headers=response.headers, data=data, reason=response.reason)
         self._callback(self)
@@ -204,7 +196,7 @@ class NURESTConnection(object):
 
     def _did_timeout(self):
         """ Called when a resquest has timeout """
-        restnuage_log.error('RESTNuage %s on %s has timeout.' % (self._request.method, self._request.url))
+        restnuage_log.debug('RESTNuage %s on %s has timeout (timeout=%ss)..' % (self._request.method, self._request.url, self.timeout))
         self._has_timeouted = True
 
         if self._async and self._callback:
@@ -231,7 +223,8 @@ class NURESTConnection(object):
             enterprise = self._user.enterprise_name
             username = self._user.username
             api_key = self._user.api_key
-            restnuage_log.info('RESTNuage request with user:%s within enterprise:%s' % (username, enterprise))
+
+        restnuage_log.debug('RESTNuage has been sent with user:%s within enterprise:%s (Key=%s)' % (username, enterprise, api_key))
 
         if self._uses_authentication:
             self._request.set_header('X-Nuage-Organization', enterprise)
@@ -242,7 +235,7 @@ class NURESTConnection(object):
 
         headers = self._request.get_headers()
 
-        # restnuage_log.info('HEADERS = %s' % json.dumps(headers, indent=4))
+        restnuage_log.debug('RESTNuage request headers\n %s' % json.dumps(headers, indent=4))
 
         url = "%s%s" % (controller.url, self._request.url)
 
@@ -254,12 +247,19 @@ class NURESTConnection(object):
                                       verify=False,
                                       timeout=self.timeout)
         except requests.exceptions.SSLError:
-            response = requests.request(method=self._request.method,
-                                      url=url,
-                                      data=json.dumps(self._request.data),
-                                      headers=headers,
-                                      verify=False,
-                                      timeout=self.timeout)
+            try:
+                response = requests.request(method=self._request.method,
+                                          url=url,
+                                          data=json.dumps(self._request.data),
+                                          headers=headers,
+                                          verify=False,
+                                          timeout=self.timeout)
+            except requests.exceptions.Timeout:
+                return self._did_timeout()
+
+        except requests.exceptions.Timeout:
+            return self._did_timeout()
+        # requests.exceptions.ConnectionError
 
         return self._did_receive_response(response)
 

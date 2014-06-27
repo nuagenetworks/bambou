@@ -105,7 +105,7 @@ class NURESTLoginController(Singleton):
 
     # Methods
 
-    def get_authentication_header(self, user=None, api_key=None):
+    def get_authentication_header(self, user=None, api_key=None, password=None):
         """ Return authenication string to place in Authorization Header
             If API Token is set, it'll be used. Otherwise, the clear
             text password will be sent. Users of NURESTLoginController are responsible to
@@ -118,10 +118,13 @@ class NURESTLoginController(Singleton):
         if api_key is None:
             api_key = self.api_key
 
-        if api_key:
-            return "XREST %s" % urlsafe_b64encode("%s:%s" % (self.user, self.api_key))
+        if password is None:
+            password = self.password
 
-        return "XREST %s" % urlsafe_b64encode("%s:%s" % (self.user, self.password))
+        if api_key:
+            return "XREST %s" % urlsafe_b64encode("%s:%s" % (user, api_key))
+
+        return "XREST %s" % urlsafe_b64encode("%s:%s" % (user, password))
 
     def reset(self):
         """ Reset all """
