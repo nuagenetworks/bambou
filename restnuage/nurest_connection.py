@@ -187,7 +187,6 @@ class NURESTConnection(object):
 
         except:
             data = None
-            restnuage_log.debug('RESTNuage JSON can not be decoded:\n%s' % response.text)
 
         self._response = NURESTResponse(status_code=response.status_code, headers=response.headers, data=data, reason=response.reason)
         self._callback(self)
@@ -234,8 +233,6 @@ class NURESTConnection(object):
             self._request.set_header('X-Nuage-Proxy', controller.impersonation)
 
         headers = self._request.get_headers()
-
-        restnuage_log.debug('RESTNuage request headers\n %s' % json.dumps(headers, indent=4))
 
         url = "%s%s" % (controller.url, self._request.url)
 
