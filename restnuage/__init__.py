@@ -3,6 +3,15 @@
 import logging
 logging.getLogger('restnuage').addHandler(logging.NullHandler())
 
+from ConfigParser import ConfigParser
+config = ConfigParser()
+config.read('settings.cfg')
+
+DEFAULT_USER = config.get('default', 'user')
+DEFAULT_PASSWORD = config.get('default', 'password')
+DEFAULT_ENTERPRISE = config.get('default', 'enterprise')
+DEFAULT_URL = config.get('default', 'url')
+
 __all__ = ['NURESTBasicUser', 'NURESTConnection', 'NURESTFetcher', 'NURESTLoginController', 'NURESTObject', 'NURESTPushCenter', 'NURESTRequest', 'NURESTResponse']
 
 from restnuage.nurest_user import NURESTBasicUser
