@@ -5,7 +5,7 @@ logging.getLogger('restnuage').addHandler(logging.NullHandler())
 
 from ConfigParser import ConfigParser
 config = ConfigParser()
-config.read('settings.cfg')
+config.read('./settings.cfg')
 
 DEFAULT_USER = config.get('default', 'user')
 DEFAULT_PASSWORD = config.get('default', 'password')
