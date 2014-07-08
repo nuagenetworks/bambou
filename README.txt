@@ -18,7 +18,11 @@ Follow these 3 steps to use your python environment.
     $ source bin/activate
     (restnuage-env) $ cd restnuage-env
 
-3) Install package dependencies listed in requirements.txt file
+3) Clone repository
+    
+    git clone http://github.mv.usa.alcatel.com/chserafi/restnuage.git
+    
+4) Install package dependencies listed in requirements.txt file
 
     (restnuage-env) $ cd restnuage
     (restnuage-env) $ pip install -r requirements.txt
