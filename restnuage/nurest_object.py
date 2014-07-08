@@ -357,7 +357,12 @@ class NURESTObject(object):
             remote_name = attribute.remote_name
 
             if hasattr(self, local_name):
-                dictionary[remote_name] = getattr(self, local_name)
+                value = getattr(self, local_name)
+
+                if isinstance(value, bool):
+                    value = int(value)
+
+                dictionary[remote_name] = value
             else:
                 #print 'Attribute %s could not be found for object %s' % (local_name, self)
                 pass
