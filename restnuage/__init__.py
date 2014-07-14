@@ -7,10 +7,13 @@ from ConfigParser import ConfigParser
 config = ConfigParser()
 config.read('./settings.cfg')
 
-DEFAULT_USER = config.get('default', 'user')
-DEFAULT_PASSWORD = config.get('default', 'password')
-DEFAULT_ENTERPRISE = config.get('default', 'enterprise')
-DEFAULT_URL = config.get('default', 'url')
+try:
+    DEFAULT_USER = config.get('default', 'user')
+    DEFAULT_PASSWORD = config.get('default', 'password')
+    DEFAULT_ENTERPRISE = config.get('default', 'enterprise')
+    DEFAULT_URL = config.get('default', 'url')
+except:
+    raise Exception('Configuration is missing. Please create your settings.cfg that determines your [default] section')
 
 __all__ = ['NURESTBasicUser', 'NURESTConnection', 'NURESTFetcher', 'NURESTLoginController', 'NURESTObject', 'NURESTPushCenter', 'NURESTRequest', 'NURESTResponse']
 
