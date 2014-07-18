@@ -32,7 +32,7 @@ class User(NURESTBasicUser):
         self.expose_attribute(local_name='api_key_expiry', remote_name='APIKeyExpiry', attribute_type=str)
 
         # Overides from parents because rest name changed
-        self.expose_attribute(local_name='username', remote_name='userName', attribute_type=str)  # TODO : Declare bug here
+        self.expose_attribute(local_name='user_name', remote_name='userName', attribute_type=str)  # TODO : Declare bug here
         self.expose_attribute(local_name='external_id', remote_name='externalId', attribute_type=str)  # TODO : Declare bug here
 
     @classmethod

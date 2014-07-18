@@ -49,7 +49,7 @@ class CompressionTests(TestCase):
 
         self.assertEquals(to_dict['name'], u'NewEnterprise')
         self.assertEquals(to_dict['ID'], 3)
-        self.assertEquals(to_dict['externalID'], None)
+        #self.assertEquals(to_dict['externalID'], None)
         #self.assertEquals(to_dict['localID'], None)
         self.assertEquals(to_dict['parentID'], None)
         self.assertEquals(to_dict['parentType'], None)
@@ -83,4 +83,4 @@ class AttributeTests(TestCase):
 
         attributes = enterprise.get_attributes()
 
-        self.assertEqual(len(attributes), 10)
+        self.assertEqual(len(attributes), 9)

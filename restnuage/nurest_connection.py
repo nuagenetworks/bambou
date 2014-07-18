@@ -215,19 +215,19 @@ class NURESTConnection(object):
         controller = NURESTLoginController()
 
         enterprise = controller.enterprise
-        username = controller.user
+        user_name = controller.user
         api_key = controller.api_key
 
         if self._user:
             enterprise = self._user.enterprise_name
-            username = self._user.username
+            user_name = self._user.user_name
             api_key = self._user.api_key
 
-        restnuage_log.debug('RESTNuage has been sent with user:%s within enterprise:%s (Key=%s)' % (username, enterprise, api_key))
+        restnuage_log.debug('RESTNuage has been sent with user:%s within enterprise:%s (Key=%s)' % (user_name, enterprise, api_key))
 
         if self._uses_authentication:
             self._request.set_header('X-Nuage-Organization', enterprise)
-            self._request.set_header('Authorization', controller.get_authentication_header(username, api_key))
+            self._request.set_header('Authorization', controller.get_authentication_header(user_name, api_key))
 
         if controller.is_impersonating:
             self._request.set_header('X-Nuage-Proxy', controller.impersonation)

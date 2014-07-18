@@ -35,7 +35,7 @@ class CompressionTests(TestCase):
 
         user = User()
         user.id = 3
-        user.username = u"Christophe"
+        user.user_name = u"Christophe"
         user.password = u'sorry'
         user.api_key = u'ABCD'
 
@@ -63,7 +63,7 @@ class CompressionTests(TestCase):
         user.from_dict(to_dict)
 
         self.assertEquals(user.id, 3)
-        self.assertEquals(user.username, u'Employee')
+        self.assertEquals(user.user_name, u'Employee')
         self.assertEquals(user.password, u'anotherPassword')
         self.assertEquals(user.api_key, u'12453')
         self.assertEquals(user.parent_id, None)

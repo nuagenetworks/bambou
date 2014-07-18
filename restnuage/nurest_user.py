@@ -17,27 +17,27 @@ class NURESTBasicUser(NURESTObject):
 
         super(NURESTBasicUser, self).__init__()
 
-        self._username = None
+        self._user_name = None
         self._password = None
         self._api_key = None
 
         self._new_password = None
 
-        self.expose_attribute(local_name='username', remote_name='userName', attribute_type=str)
+        self.expose_attribute(local_name='user_name', remote_name='userName', attribute_type=str)
         self.expose_attribute(local_name='password', attribute_type=str)
         self.expose_attribute(local_name='api_key', remote_name='APIKey', attribute_type=str)
 
     # Properties
 
-    def _get_username(self):
-        """ Get username """
-        return self._username
+    def _get_user_name(self):
+        """ Get user_name """
+        return self._user_name
 
-    def _set_username(self, username):
-        """ Set username """
-        self._username = username
+    def _set_user_name(self, user_name):
+        """ Set user_name """
+        self._user_name = user_name
 
-    username = property(_get_username, _set_username)
+    user_name = property(_get_user_name, _set_user_name)
 
     def _get_password(self):
         """ Get password """

@@ -44,8 +44,8 @@ class NURESTObject(object):
         self._attributes = dict()  # Dictionary of attribute name => NURemoteAttribute
 
         self.expose_attribute(local_name=u'id', remote_name=u'ID', attribute_type=str, is_identifier=True)
-        self.expose_attribute(local_name=u'external_id', remote_name=u'externalID', attribute_type=str)
-        #self.expose_attribute(local_name=u'local_id', remote_name=u'localID', attribute_type=str)
+        # self.expose_attribute(local_name=u'external_id', remote_name=u'externalID', attribute_type=str)
+        # self.expose_attribute(local_name=u'local_id', remote_name=u'localID', attribute_type=str)
         self.expose_attribute(local_name=u'parent_id', remote_name=u'parentID', attribute_type=str)
         self.expose_attribute(local_name=u'parent_type', remote_name=u'parentType', attribute_type=str)
         self.expose_attribute(local_name=u'creation_date', remote_name=u'creationDate', attribute_type=time, is_editable=False)
@@ -373,7 +373,7 @@ class NURESTObject(object):
         """ Fill the current object from dictionary """
 
         for remote_name, remote_value in dictionary.iteritems():
-            # Check if a local attribute is exposed with th remote_name
+            # Check if a local attribute is exposed with the remote_name
             # if no attribute is exposed, return None
             local_name = next((name for name, attribute in self._attributes.iteritems() if attribute.remote_name == remote_name), None)
 

@@ -69,6 +69,7 @@ class NURESTPushCenter(Singleton):
             return
 
         pushcenter_log.debug("NURESTPushCenter is stopping...")
+
         self._is_running = False
         self._thread = None
         self._current_connection = None
@@ -107,7 +108,7 @@ class NURESTPushCenter(Singleton):
         response = connection.response
 
         if response.status_code != 200:
-            pushcenter_log.error("NURESTPushCenter: Connection failure on %s.\nError: [%s] %s\nConnection with user %s" % (response.errors, response.status_code, response.reason, self._user.username))
+            pushcenter_log.error("NURESTPushCenter: Connection failure on %s.\nError: [%s] %s\nConnection with user %s" % (response.errors, response.status_code, response.reason, self._user.user_name))
             return
 
         data = response.data
