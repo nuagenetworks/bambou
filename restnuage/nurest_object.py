@@ -503,7 +503,7 @@ class NURESTObject(object):
         has_callbacks = connection.has_callbacks()
         should_post = not has_callbacks
 
-        restnuage_log.info('RESTNuage <<<<< Response for\n%s %s\n%s' % (connection._request.method, connection._request.url, json.dumps(connection._request.data, indent=4)))
+        restnuage_log.info('RESTNuage <<<<< Response for\n%s %s\n%s' % (connection._request.method, connection._request.url, json.dumps(connection._response.data, indent=4)))
 
         if  connection.has_response_success(should_post=should_post) and has_callbacks:
             callback = connection.callbacks['local']
