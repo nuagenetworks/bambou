@@ -212,7 +212,7 @@ class NURESTConnection(object):
         self._has_timeouted = False
 
         # Add specific headers
-        controller = NURESTLoginController.get_default_instance()
+        controller = NURESTLoginController()
 
         enterprise = controller.enterprise
         user_name = controller.user

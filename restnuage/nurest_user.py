@@ -80,7 +80,7 @@ class NURESTBasicUser(NURESTObject):
         if self._new_password:
             self.password = Sha1.encrypt(self._new_password)
 
-        controller = NURESTLoginController.get_default_instance()
+        controller = NURESTLoginController()
         controller.password = self._new_password
         controller.api_key = None
 
@@ -91,6 +91,6 @@ class NURESTBasicUser(NURESTObject):
         """ Launched when save has been successfully executed """
 
         self._new_password = None
-        controller = NURESTLoginController.get_default_instance()
+        controller = NURESTLoginController()
         controller.password = None
         controller.api_key = self.api_key

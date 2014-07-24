@@ -14,7 +14,7 @@ def main():
     user = User()
 
     # Initializes login controller
-    ctrl = NURESTLoginController.get_default_instance()
+    ctrl = NURESTLoginController()
     ctrl.user = u"csproot"
     ctrl.password = u"csproot"
     ctrl.enterprise = u"csp"

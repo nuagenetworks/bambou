@@ -43,7 +43,7 @@ __#1 Create your object models to extends NURESTObject or NURESTBasicUser__
 
 __#2 Start a new NURESTLoginController__
 
-    ctrl = NURESTLoginController.get_default_instance()
+    ctrl = NURESTLoginController()
     ctrl.user = u"your_user"
     ctrl.password = u"your_password"
     ctrl.enterprise = u"your_enterprise"
