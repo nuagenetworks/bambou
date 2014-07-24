@@ -7,27 +7,36 @@ from .utils.singleton import Singleton
 from restnuage import DEFAULT_USER, DEFAULT_PASSWORD, DEFAULT_ENTERPRISE, DEFAULT_URL
 
 
-class NURESTLoginController(Singleton):
+class NURESTLoginController(object):
+
+    _DEFAULT_INSTANCE = None
 
     def __init__(self):
         """ Initiliazes NURESTLoginController """
 
-        if not hasattr(self, '_initiliazed') or not self._initiliazed: # TODO : Clean here
-            self._initiliazed = True
-            self._is_impersonating = False
-            self._impersonation = None
+        self._initiliazed = True
+        self._is_impersonating = False
+        self._impersonation = None
 
-            self._user = DEFAULT_USER
-            self._password = DEFAULT_PASSWORD
-            self._api_key = None
-            self._enterprise = DEFAULT_ENTERPRISE
-            self._url = DEFAULT_URL
-            self._async = True
+        self._user = DEFAULT_USER
+        self._password = DEFAULT_PASSWORD
+        self._api_key = None
+        self._enterprise = DEFAULT_ENTERPRISE
+        self._url = DEFAULT_URL
+        self._async = True
 
     def __str__(self):
         """ Prints NURESTLoginController information """
 
         return "%s user=%s enterprise=%s url=%s " % (self.__class__, self._user, self._enterprise, self._url)
+
+    @classmethod
+    def get_default_instance(cls):
+        """ Get default RESTUser """
+        if not cls._DEFAULT_INSTANCE:
+            NURESTLoginController._DEFAULT_INSTANCE = cls()
+
+        return NURESTLoginController._DEFAULT_INSTANCE
 
     # Properties
 

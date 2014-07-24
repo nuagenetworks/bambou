@@ -12,8 +12,8 @@ from models import Enterprise, User
 
 
 user = User()
-push_center = NURESTPushCenter()
-ctrl = NURESTLoginController()
+push_center = NURESTPushCenter.get_default_instance()
+ctrl = NURESTLoginController.get_default_instance()
 
 
 def _did_add_enterprise(enterprise, connection):

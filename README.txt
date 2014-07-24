@@ -19,9 +19,9 @@ Follow these 3 steps to use your python environment.
     (restnuage-env) $ cd restnuage-env
 
 3) Clone repository
-    
+
     git clone http://github.mv.usa.alcatel.com/chserafi/restnuage.git
-    
+
 4) Install package dependencies listed in requirements.txt file
 
     (restnuage-env) $ cd restnuage
@@ -43,7 +43,7 @@ __#1 Create your object models to extends NURESTObject or NURESTBasicUser__
 
 __#2 Start a new NURESTLoginController__
 
-    ctrl = NURESTLoginController()
+    ctrl = NURESTLoginController.get_default_instance()
     ctrl.user = u"your_user"
     ctrl.password = u"your_password"
     ctrl.enterprise = u"your_enterprise"
@@ -59,7 +59,7 @@ __#3 Instanciate your model and fetch, save, create or delete it__
 
 __#4 Using push center notifications__
 
-    push_center = NURESTPushCenter()
+    push_center = NURESTPushCenter.get_default_instance()
     push_center.start()  # Start listening events
     push_center.get_last_events()  # Retrieve last events
     push_center.stop()  # Stop listening events

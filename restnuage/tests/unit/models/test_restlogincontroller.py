@@ -9,9 +9,9 @@ class LoginControllerSingleton(TestCase):
 
     def test_login_controller_is_singleton(self):
         """ login controller is singleton """
-        ctrl_a = NURESTLoginController()
+        ctrl_a = NURESTLoginController.get_default_instance()
         ctrl_a.user = u'Christophe'
-        ctrl_b = NURESTLoginController()
+        ctrl_b = NURESTLoginController.get_default_instance()
         ctrl_b.user = u'Toto'
 
         self.assertEquals(ctrl_b.user, u'Toto')
@@ -23,7 +23,7 @@ class GetAuthenticationHeader(TestCase):
     def test_get_authentication_header_without_api_key(self):
         """ Get authentication header without api key """
 
-        controller = NURESTLoginController()
+        controller = NURESTLoginController.get_default_instance()
         controller.user = u'christophe'
         controller.password = u'tuCr0IsKoi?'
         controller.api_key = None
@@ -34,7 +34,7 @@ class GetAuthenticationHeader(TestCase):
     def test_get_authentication_header_with_api_key(self):
         """ Get authentication header with api key """
 
-        controller = NURESTLoginController()
+        controller = NURESTLoginController.get_default_instance()
         controller.user = u'christophe'
         controller.password = None
         controller.api_key = u'12345ABCD'
@@ -48,7 +48,7 @@ class ResetLoginController(TestCase):
     def test_reset_login_controller(self):
         """ Reset login controller """
 
-        controller = NURESTLoginController()
+        controller = NURESTLoginController.get_default_instance()
         controller.user = u'christophe'
         controller.password = u'password'
         controller.url = u'http://www.google.fr'
@@ -68,7 +68,7 @@ class ImpersonateLoginController(TestCase):
 
     def setUp(self):
         """ Set up the context """
-        controller = NURESTLoginController()
+        controller = NURESTLoginController.get_default_instance()
         controller.user = u'christophe'
         controller.password = u'password'
         controller.url = u'http://www.google.fr'
@@ -77,13 +77,13 @@ class ImpersonateLoginController(TestCase):
 
     def tearDown(self):
         """ Cleaning context """
-        ctrl = NURESTLoginController()
+        ctrl = NURESTLoginController.get_default_instance()
         ctrl.reset()
 
     def test_impersonate(self):
         """ Start impersonate """
 
-        controller = NURESTLoginController()
+        controller = NURESTLoginController.get_default_instance()
         controller.impersonate(user=u'Alex', enterprise=u'Google')
 
         self.assertEquals(controller.is_impersonating, True)
@@ -92,7 +92,7 @@ class ImpersonateLoginController(TestCase):
 
     def test_stop_impersonate(self):
         """ Stop impersonate """
-        controller = NURESTLoginController()
+        controller = NURESTLoginController.get_default_instance()
         controller.impersonate(user=u'Alex', enterprise=u'Google')
         self.assertEquals(controller.is_impersonating, True)
 

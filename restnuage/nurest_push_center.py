@@ -11,13 +11,14 @@ from time import time
 
 from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
-from .utils.singleton import Singleton
 
 
-class NURESTPushCenter(Singleton):
+class NURESTPushCenter(object):
     """
         Wait for push notifications
     """
+
+    _DEFAULT_INSTANCE = None
 
     def __init__(self):
         """ Initialiez push """
@@ -31,6 +32,14 @@ class NURESTPushCenter(Singleton):
         self._user = None
         self._start_time = None
         self._timeout = None
+
+    @classmethod
+    def get_default_instance(cls):
+        """ Get default push center """
+        if not cls._DEFAULT_INSTANCE:
+            NURESTPushCenter._DEFAULT_INSTANCE = cls()
+
+        return NURESTPushCenter._DEFAULT_INSTANCE
 
     # Properties
 
