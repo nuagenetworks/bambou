@@ -2,7 +2,6 @@
 
 import uuid
 
-from .nurest_user import NURESTBasicUser
 from .nurest_request import NURESTRequest
 
 
@@ -115,6 +114,7 @@ class NURESTFetcher(object):
 
         request = None
 
+        from .nurest_user import NURESTBasicUser
         if isinstance(self._nurest_object, NURESTBasicUser):
             request = NURESTRequest(method="GET", url=self._remote_name)
         else:
@@ -184,6 +184,7 @@ class NURESTFetcher(object):
 
         request = None
 
+        from .nurest_user import NURESTBasicUser
         if isinstance(self._nurest_object, NURESTBasicUser):
             request = NURESTRequest(method="HEAD", url=self._remote_name)
         else:

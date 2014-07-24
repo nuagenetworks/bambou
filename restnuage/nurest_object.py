@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import logging
+import inspect
 import json
+import logging
 
 from time import time
 
 from .nurest_connection import NURESTConnection
+from .nurest_fetcher import NURESTFetcher
 from .nurest_request import NURESTRequest
 from .utils import NURemoteAttribute
 
@@ -388,12 +390,33 @@ class NURESTObject(object):
     def delete(self, callback=None, async=False, response_choice=None):
         """ Delete object and call given callback """
 
-        resource_url = self.get_resource_url()
+        self._delete_all_children()
 
-        if response_choice:
-            resource_url = '%s?responseChoice=%s' % (resource_url, response_choice)
+        resource_url = ''
 
-        return self._manage_child_entity(nurest_object=self, method='DELETE', async=async, callback=callback)
+        if response_choice is not None:
+            resource_url = '?responseChoice=%s' % response_choice
+
+        return self._manage_child_entity(nurest_object=self, resource_url=resource_url, method='DELETE', async=async, callback=callback)
+
+    def _delete_all_children(self):
+        """ Removes all children """
+
+        fetcher_infos = inspect.getmembers(self, lambda o: isinstance(o, NURESTFetcher))
+
+        if fetcher_infos:
+
+            for fetcher_info in fetcher_infos:
+                fetcher_name = fetcher_info[0]
+                fetcher = getattr(self, fetcher_name)
+
+                # Fetch all entities first
+                (fetcher, obj, fetched_objects, connection) = fetcher.fetch_entities()
+
+                # Delete all fetched objects
+                if fetched_objects is not None:
+                    for entity in fetched_objects:
+                        entity.delete()
 
     def save(self, callback=None, async=False):
         """ Update object and call given callback """
@@ -577,6 +600,8 @@ class NURESTObject(object):
             :param choice: if a choice has to be made
             :param callback: callback containing the object and the connection
         """
+
+        entity._delete_all_children()
 
         resource_url = entity.get_resource_url()
 
