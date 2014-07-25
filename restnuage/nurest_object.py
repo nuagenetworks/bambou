@@ -55,6 +55,8 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'last_updated_date', remote_name=u'lastUpdatedDate', attribute_type=time, is_readonly=True)
         self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
+        self.removes_children_autmatically = False
+
     # Properties
 
     def _get_creation_date(self):
@@ -390,7 +392,8 @@ class NURESTObject(object):
     def delete(self, callback=None, async=False, response_choice=None):
         """ Delete object and call given callback """
 
-        self._delete_all_children()
+        if not self.removes_children_autmatically:
+            self.delete_children()
 
         resource_url = ''
 
@@ -399,7 +402,7 @@ class NURESTObject(object):
 
         return self._manage_child_entity(nurest_object=self, resource_url=resource_url, method='DELETE', async=async, callback=callback)
 
-    def _delete_all_children(self):
+    def delete_children(self):
         """ Removes all children """
 
         fetcher_infos = inspect.getmembers(self, lambda o: isinstance(o, NURESTFetcher))
@@ -414,9 +417,10 @@ class NURESTObject(object):
                 (fetcher, obj, fetched_objects, connection) = fetcher.fetch_entities()
 
                 # Delete all fetched objects
-                if fetched_objects is not None:
+                if fetched_objects is not None and len(fetched_objects) > 0:
                     for entity in fetched_objects:
                         entity.delete()
+                    setattr(self, fetcher.local_name, [])
 
     def save(self, callback=None, async=False):
         """ Update object and call given callback """
@@ -601,7 +605,7 @@ class NURESTObject(object):
             :param callback: callback containing the object and the connection
         """
 
-        entity._delete_all_children()
+        entity.delete_children()
 
         resource_url = entity.get_resource_url()
 
