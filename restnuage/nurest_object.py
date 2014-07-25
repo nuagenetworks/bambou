@@ -55,7 +55,7 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'last_updated_date', remote_name=u'lastUpdatedDate', attribute_type=time, is_readonly=True)
         self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
-        self.removes_children_autmatically = False
+        self.can_delete_children = True
 
     # Properties
 
@@ -392,7 +392,7 @@ class NURESTObject(object):
     def delete(self, callback=None, async=False, response_choice=None):
         """ Delete object and call given callback """
 
-        if not self.removes_children_autmatically:
+        if self.can_delete_children:
             self.delete_children()
 
         resource_url = ''
