@@ -5,13 +5,13 @@ sys.path.append("../")
 from time import sleep
 
 from restnuage import NURESTLoginController
-from models import Enterprise, User
+from models import Enterprise, NURESTUser
 
 
 def main():
     """ Main method """
 
-    user = User()
+    user = NURESTUser()
 
     # Initializes login controller
     ctrl = NURESTLoginController()
