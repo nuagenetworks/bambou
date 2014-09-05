@@ -4,8 +4,6 @@ from base64 import urlsafe_b64encode
 
 from .utils.singleton import Singleton
 
-from restnuage import DEFAULT_USER, DEFAULT_PASSWORD, DEFAULT_ENTERPRISE, DEFAULT_URL
-
 
 class NURESTLoginController(Singleton):
 
@@ -17,11 +15,11 @@ class NURESTLoginController(Singleton):
             self._is_impersonating = False
             self._impersonation = None
 
-            self._user = DEFAULT_USER
-            self._password = DEFAULT_PASSWORD
+            self._user = None
+            self._password = None
             self._api_key = None
-            self._enterprise = DEFAULT_ENTERPRISE
-            self._url = DEFAULT_URL
+            self._enterprise = None
+            self._url = None
             self._async = True
 
     def __str__(self):
