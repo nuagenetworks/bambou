@@ -32,6 +32,7 @@ class NURESTPushCenter(object):
         self._user = None
         self._start_time = None
         self._timeout = None
+        self._delegate_methods = list()
 
     @classmethod
     def get_default_instance(cls):
@@ -69,6 +70,7 @@ class NURESTPushCenter(object):
         self._is_running = True
         self._user = user
         self._thread = threading.Thread(target=self._listen, name='push-center')
+        self._thread.daemon = True
         self._thread.start()
 
     def stop(self):
@@ -117,12 +119,15 @@ class NURESTPushCenter(object):
         response = connection.response
 
         if response.status_code != 200:
-            pushcenter_log.error("NURESTPushCenter: Connection failure on %s.\nError: [%s] %s\nConnection with user %s" % (response.errors, response.status_code, response.reason, self._user.user_name))
+            pushcenter_log.error("NURESTPushCenter: Connection failure on %s.\nError: [%s] %s\nConnection with user %s" % (response.errors, response.status_code, response.reason, connection.user.user_name))
             return
 
         data = response.data
 
-        if data:
+        if len(self._delegate_methods) > 0:
+            for m in self._delegate_methods:
+                m(data)
+        elif data:
             events = data['events']
             self.nb_events_received += len(events)
             self.nb_push_received += 1
@@ -161,3 +166,23 @@ class NURESTPushCenter(object):
 
         #connection.ignore_request_idle = True
         connection.start()
+
+    def add_delegate(self, callback):
+        """
+        Registers a new delegate
+        The prototype should be function(data), where data will be the decoded json push
+        """
+        if callback in self._delegate_methods:
+            return
+
+        self._delegate_methods.append(callback)
+
+    def remove_delegate(self, callback):
+        """
+        Removes a delegate
+        The prototype should be function(data), where data will be the decoded json push
+        """
+        if not callback in self._delegate_methods:
+            return
+
+        self._delegate_methods.remove(callback)
