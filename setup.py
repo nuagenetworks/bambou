@@ -8,6 +8,5 @@ setup(
     packages=['restnuage', 'restnuage.utils'],
     description='REST Library for Nuage Networks',
     long_description=open('README.txt').read(),
-    install_requires=[line for line in open('requirements.txt')],
-    data_files=[('settings.cfg')],
+    install_requires=[line for line in open('requirements.txt')]
 )
