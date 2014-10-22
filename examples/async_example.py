@@ -8,10 +8,10 @@ from time import sleep
 from bambou import NURESTLoginController
 from bambou import NURESTPushCenter
 
-from models import Enterprise, User
+from models import Enterprise, NURESTUser
 
 
-user = User()
+user = NURESTUser()
 push_center = NURESTPushCenter.get_default_instance()
 ctrl = NURESTLoginController()
 

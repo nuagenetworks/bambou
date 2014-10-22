@@ -7,13 +7,13 @@ from bambou import NURESTObject
 __all__ = ['Enterprise', 'User']
 
 
-class User(NURESTBasicUser):
+class NURESTUser(NURESTBasicUser):
     """ Defines a User """
 
     def __init__(self):
         """ Creates a new user """
 
-        super(User, self).__init__()
+        super(NURESTUser, self).__init__()
 
         self.email = None
         self.firstname = None

@@ -10,7 +10,6 @@ Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 """
 
 from base64 import urlsafe_b64encode
-
 from .utils.singleton import Singleton
 
 class NURESTLoginController(Singleton):

@@ -2,11 +2,11 @@
 
 # C extensions
 *.so
+dist
 
 # Packages
 *.egg
 *.egg-info
-dist
 build
 eggs
 parts

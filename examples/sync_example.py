@@ -15,7 +15,7 @@ logging.getLogger('bambou').addHandler(logging.StreamHandler())
 def main():
     """ Main method """
 
-    user = User()
+    user = NURESTUser()
 
     # Initializes login controller
     ctrl = NURESTLoginController()
