@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+Copyright (c) 2011-2012 Alcatel, Alcatel-Lucent, Inc. All Rights Reserved.
+
+This source code contains confidential information which is proprietary to Alcatel.
+No part of its contents may be used, copied, disclosed or conveyed to any party
+in any manner whatsoever without prior written permission from Alcatel.
+
+Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
+"""
 
 import inspect
 import json
@@ -10,6 +19,7 @@ from .nurest_login_controller import NURESTLoginController
 from .nurest_connection import NURESTConnection, HTTP_METHOD_DELETE, HTTP_METHOD_PUT, HTTP_METHOD_POST, HTTP_METHOD_GET
 from .nurest_fetcher import NURESTFetcher
 from .nurest_request import NURESTRequest
+from .nurest_modelcontroller import NURESTModelController
 from .utils import NURemoteAttribute
 
 bambou_log = logging.getLogger('bambou')
@@ -57,6 +67,9 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
         self.can_delete_children = True
+
+        model_controller = NURESTModelController.get_default()
+        model_controller.register_model(self.__class__)
 
     # Properties
 
@@ -188,7 +201,7 @@ class NURESTObject(object):
     def object_with_id(cls, id):
         """ Get a new NURESTObject with the given id """
 
-        new_object = NURESTObject()
+        new_object = cls()
         new_object.id = id
 
         return new_object
@@ -510,14 +523,18 @@ class NURESTObject(object):
             connection = self.send_request(request=request, async=async, user_info=nurest_object)
             return handler(connection)
 
-    def set_entities(self, entities, entity_type, async=False, callback=None):
+    def assign_entities(self, entities, async=False, callback=None):
         """ Reference a list of NURESTObject into the current resource
             :param entities: list of NURESTObject to link
             :param entity_type: Type of the object to link
             :param callback: Callback method that should be fired at the end
         """
 
+        if len(entities) == 0:
+            return
+
         ids = list()
+        entity_type = entities[0].__class__
 
         for entity in entities:
             ids.append(entity.id)
