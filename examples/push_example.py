@@ -3,12 +3,12 @@ import sys
 sys.path.append("../")
 
 from time import sleep
-from restnuage import NURESTLoginController, NURESTPushCenter, NURESTBasicUser
+from bambou import NURESTLoginController, NURESTPushCenter, NURESTBasicUser
 
 
 # this class is needed because you are not using our model
 # so you need to define that the rest user resource is /me
-class NURESTUser (NURESTBasicUser):
+class NURESTUser(NURESTBasicUser):
 
     @classmethod
     def get_remote_name(cls):
@@ -53,6 +53,7 @@ if __name__ == '__main__':
 
     # Then here we get the default push center
     push_center = NURESTPushCenter.get_default_instance()
+    push_center.url = ctrl.url
 
     # we register our delegate that will be called on each event
     push_center.add_delegate(did_receive_push);

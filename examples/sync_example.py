@@ -6,8 +6,9 @@ sys.path.append("../")
 from time import sleep
 
 from bambou import NURESTLoginController
-from models import Enterprise, User
+from models import Enterprise, NURESTUser
 
+# Exemple of how you can activate logs
 bambou_log = logging.getLogger('bambou')
 bambou_log.setLevel(logging.INFO)
 logging.getLogger('bambou').addHandler(logging.StreamHandler())
