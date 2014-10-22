@@ -11,8 +11,13 @@ Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
 import logging
 
-# NullHandler is only available for python >= 2.7
-logging.getLogger('bambou').addHandler(logging.NullHandler())
+bambou_logger = logging.getLogger('bambou')
+
+try:
+    # NullHandler is only available for python >= 2.7
+    # bambou_logger.addHandler(logging.NullHandler())
+except:
+    pass
 
 __all__ = ['NURESTBasicUser', 'NURESTConnection', 'NURESTModelController', 'NURESTFetcher', 'NURESTLoginController', 'NURESTObject', 'NURESTPushCenter', 'NURESTRequest', 'NURESTResponse']
 

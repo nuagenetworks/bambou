@@ -10,14 +10,13 @@ Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 """
 
 import json
-import logging
 import requests
 import threading
 
 from .nurest_login_controller import NURESTLoginController
 from .nurest_response import NURESTResponse
 
-bambou_log = logging.getLogger('bambou')
+from bambou import bambou_logger
 
 
 HTTP_CODE_ZERO = 0
@@ -177,21 +176,21 @@ class NURESTConnection(object):
             return False
 
         if status_code == HTTP_CODE_ZERO:
-            bambou_log.error("NURESTConnection: Connection error with code 0. Sending NUNURESTConnectionFailureNotification notification and exiting.")
+            bambou_logger.error("NURESTConnection: Connection error with code 0. Sending NUNURESTConnectionFailureNotification notification and exiting.")
             self._print_information()
             return False
 
-        bambou_log.error("NURESTConnection: Report this error, because this should not happen: %s" % self._response)
+        bambou_logger.error("NURESTConnection: Report this error, because this should not happen: %s" % self._response)
         return False
 
     def _print_information(self):
         """ Prints information instead of sending a confirmation """
 
         if len(self._response.errors) == 0:
-            bambou_log.error("NURESTConnection ERROR without error message [%s] %s" % (self._response.status_code, self._response.reason))
+            bambou_logger.error("NURESTConnection ERROR without error message [%s] %s" % (self._response.status_code, self._response.reason))
 
         else:
-            bambou_log.error("NURESTConnection (%s %s) ERROR %s:\n%s" % (self._request.method, self._request.url, self._response.status_code, json.dumps(self._response.errors, indent=4)))
+            bambou_logger.error("NURESTConnection (%s %s) ERROR %s:\n%s" % (self._request.method, self._request.url, self._response.status_code, json.dumps(self._response.errors, indent=4)))
 
     # HTTP Calls
 
@@ -211,7 +210,7 @@ class NURESTConnection(object):
 
     def _did_timeout(self):
         """ Called when a resquest has timeout """
-        bambou_log.debug('Bambou %s on %s has timeout (timeout=%ss)..' % (self._request.method, self._request.url, self.timeout))
+        bambou_logger.debug('Bambou %s on %s has timeout (timeout=%ss)..' % (self._request.method, self._request.url, self.timeout))
         self._has_timeouted = True
 
         if self._async and self._callback:
@@ -239,7 +238,7 @@ class NURESTConnection(object):
             user_name = self._user.user_name
             api_key = self._user.api_key
 
-        bambou_log.debug('Bambou has been sent with user:%s within enterprise:%s (Key=%s)' % (user_name, enterprise, api_key))
+        bambou_logger.debug('Bambou has been sent with user:%s within enterprise:%s (Key=%s)' % (user_name, enterprise, api_key))
 
         if self._uses_authentication:
             self._request.set_header('X-Nuage-Organization', enterprise)

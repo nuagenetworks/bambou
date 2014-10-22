@@ -10,10 +10,6 @@ Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 """
 
 import json
-import logging
-
-pushcenter_log = logging.getLogger('pushcenter')
-
 import threading
 
 from time import time
@@ -21,16 +17,19 @@ from time import time
 from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
 
+from bambou import bambou_logger
+
 
 class NURESTPushCenter(object):
     """
         Wait for push notifications
     """
 
-    _DEFAULT_INSTANCE = None
+    __default_instance = None
 
     def __init__(self):
-        """ Initialiez push """
+        """ Initialize push center """
+
         self._url = None
         self._is_running = False
         self._current_connection = None
@@ -46,10 +45,10 @@ class NURESTPushCenter(object):
     @classmethod
     def get_default_instance(cls):
         """ Get default push center """
-        if not cls._DEFAULT_INSTANCE:
-            NURESTPushCenter._DEFAULT_INSTANCE = cls()
+        if not cls.__default_instance:
+            NURESTPushCenter.__default_instance = cls()
 
-        return NURESTPushCenter._DEFAULT_INSTANCE
+        return NURESTPushCenter.__default_instance
 
     # Properties
 
@@ -75,7 +74,7 @@ class NURESTPushCenter(object):
             self._timeout = timeout
             self._start_time = int(time())
 
-        pushcenter_log.debug("NURESTPushCenter is starting...")
+        bambou_logger.debug("[NURESTPushCenter] Starting push center on url %s ..." % self.url)
         self._is_running = True
         self._user = user
         self._thread = threading.Thread(target=self._listen, name='push-center')
@@ -88,7 +87,7 @@ class NURESTPushCenter(object):
         if not self._is_running:
             return
 
-        pushcenter_log.debug("NURESTPushCenter is stopping...")
+        bambou_logger.debug("[NURESTPushCenter] Stopping...")
 
         self._is_running = False
         self._thread = None
@@ -128,7 +127,7 @@ class NURESTPushCenter(object):
         response = connection.response
 
         if response.status_code != 200:
-            pushcenter_log.error("NURESTPushCenter: Connection failure on %s.\nError: [%s] %s\nConnection with user %s" % (response.errors, response.status_code, response.reason, connection.user.user_name))
+            bambou_logger.error("[NURESTPushCenter]: Connection failure on %s.\nError: [%s] %s\nConnection with user %s" % (response.errors, response.status_code, response.reason, connection.user.user_name))
             return
 
         data = response.data
@@ -141,7 +140,7 @@ class NURESTPushCenter(object):
             self.nb_events_received += len(events)
             self.nb_push_received += 1
 
-            pushcenter_log.info("NURESTPushCenter Received Push #%s (total=%s, latest=%s)\n%s" % (self.nb_push_received, self.nb_events_received, len(events), json.dumps(events, indent=4)))
+            bambou_logger.info("[NURESTPushCenter] Received Push #%s (total=%s, latest=%s)\n%s" % (self.nb_push_received, self.nb_events_received, len(events), json.dumps(events, indent=4)))
             self._last_events.extend(events)
 
         if self._is_running:
@@ -168,13 +167,13 @@ class NURESTPushCenter(object):
 
         if self._timeout:
             if int(time()) - self._start_time >= self._timeout:
-                pushcenter_log.debug("NURESTPushCenter has timeout (timeout=%ss)." % self._timeout)
+                bambou_logger.debug("[NURESTPushCenter] Timeout (timeout=%ss)." % self._timeout)
                 return
 
             else:
                 connection.timeout = self._timeout
 
-        pushcenter_log.info('Bambou Sending >>>>>>\n%s %s' % (request.method, request.url))
+        bambou_logger.info('Bambou Sending >>>>>>\n%s %s' % (request.method, request.url))
 
         #connection.ignore_request_idle = True
         connection.start()

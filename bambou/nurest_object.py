@@ -11,7 +11,6 @@ Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
 import inspect
 import json
-import logging
 
 from time import time
 
@@ -22,7 +21,7 @@ from .nurest_request import NURESTRequest
 from .nurest_modelcontroller import NURESTModelController
 from .utils import NURemoteAttribute
 
-bambou_log = logging.getLogger('bambou')
+from bambou import bambou_logger
 
 
 class NURESTObject(object):
@@ -489,7 +488,7 @@ class NURESTObject(object):
         connection = NURESTConnection(request=request, callback=self._did_receive_response, callbacks=callbacks, async=async)
         connection.user_info = user_info
 
-        bambou_log.info('Bambou Sending >>>>>>\n%s %s with following data:\n%s' % (request.method, request.url, json.dumps(request.data, indent=4)))
+        bambou_logger.info('Bambou Sending >>>>>>\n%s %s with following data:\n%s' % (request.method, request.url, json.dumps(request.data, indent=4)))
 
         return connection.start()
 
@@ -569,7 +568,7 @@ class NURESTObject(object):
         has_callbacks = connection.has_callbacks()
         should_post = not has_callbacks
 
-        bambou_log.info('Bambou <<<<< Response for\n%s %s\n%s' % (connection._request.method, connection._request.url, json.dumps(connection._response.data, indent=4)))
+        bambou_logger.info('Bambou <<<<< Response for\n%s %s\n%s' % (connection._request.method, connection._request.url, json.dumps(connection._response.data, indent=4)))
 
         if  connection.has_response_success(should_post=should_post) and has_callbacks:
             callback = connection.callbacks['local']

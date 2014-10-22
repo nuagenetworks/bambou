@@ -9,9 +9,10 @@ from bambou import NURESTLoginController
 from models import Enterprise, NURESTUser
 
 # Exemple of how you can activate logs
-bambou_log = logging.getLogger('bambou')
-bambou_log.setLevel(logging.INFO)
-logging.getLogger('bambou').addHandler(logging.StreamHandler())
+
+from bambou import bambou_logger
+bambou_logger.setLevel(logging.ERROR)
+bambou_logger.addHandler(logging.StreamHandler())
 
 def main():
     """ Main method """
