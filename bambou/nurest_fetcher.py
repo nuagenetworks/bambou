@@ -3,6 +3,7 @@
 import uuid
 
 from .nurest_request import NURESTRequest
+from .nurest_connection import HTTP_METHOD_GET, HTTP_METHOD_HEAD
 
 
 class NURESTFetcher(object):
@@ -11,18 +12,19 @@ class NURESTFetcher(object):
     def __init__(self):
         """ Initliazes the fetcher """
 
-        self._remote_name = "/%s" % self.__class__.managed_class().get_resource_name()
-        self._nurest_object = None
+        self.latest_loaded_page = 0
+        self.master_order = None
+        self.nurest_object = None
+        self.ordered_by = ''
+        self.page_size = 0
+        self.query_string = None
+        self.total_count = 0
+        self._group_by = []
+        self._last_connnection = None
         self._local_name = None
         self._master_filter = False
-        self.order_by = None
+        self._nurest_object = None
         self._transaction_id = None
-        self._last_connnection = None
-        self.total_count = 0
-        self.page_size = 0
-        self.latest_loaded_page = 0
-        self.ordered_by = ''
-        self._group_by = []
 
     # Properties
 
@@ -55,6 +57,12 @@ class NURESTFetcher(object):
         raise NotImplementedError('%s has no managed class. Implements managed_class method first.' % cls)
 
     @classmethod
+    def managed_object_remote_name(cls):
+        """ Returns managed object remote name """
+
+        return cls.managed_class().get_resource_name()
+
+    @classmethod
     def fetcher_with_entity(cls, entity, local_name):
         """ Fetch an attribute of the object """
 
@@ -63,7 +71,7 @@ class NURESTFetcher(object):
         fetcher.local_name = local_name
 
         setattr(entity, local_name, [])
-        entity.register_children(getattr(entity, local_name), cls.managed_class().get_resource_name())
+        entity.register_children(getattr(entity, local_name), cls.managed_object_remote_name())
 
         return fetcher
 
@@ -86,8 +94,8 @@ class NURESTFetcher(object):
         elif filter:  # TODO: Cappuccino master filter is a CPPredicate
             request.set_header('X-Nuage-Filter', filter)
 
-        if self.order_by:
-            request.set_header('X-Nuage-OrderBy', self.order_by)
+        if self.master_order:
+            request.set_header('X-Nuage-OrderBy', self.master_order)
 
         if page:
             request.set_header('X-Nuage-Page', page)
@@ -104,6 +112,16 @@ class NURESTFetcher(object):
             request.set_header('X-Nuage-GroupBy', 'true')
             request.set_header('X-Nuage-Attributes', header)
 
+    def _prepare_url(self):
+        """ Prepare url for request """
+
+        url = self.nurest_object.get_resource_url_for_child_type(self.__class__.managed_class())
+
+        if self.query_string:
+            url += "?%s", self.query_string
+
+        return url
+
     def fetch_entities(self, async=False, callback=None):
         """ Fetch entities and call the callback method """
 
@@ -112,14 +130,7 @@ class NURESTFetcher(object):
     def fetch_matching_entities(self, filter=None, page=None, async=False, callback=None):
         """ Fetch entities that matches filter and page"""
 
-        request = None
-
-        from .nurest_user import NURESTBasicUser
-        if isinstance(self._nurest_object, NURESTBasicUser):
-            request = NURESTRequest(method="GET", url=self._remote_name)
-        else:
-            url = self._nurest_object.get_resource_url() + self._remote_name
-            request = NURESTRequest(method="GET", url=url)
+        request = NURESTRequest(method=HTTP_METHOD_GET, url=self._prepare_url())
 
         self._prepare_headers(request=request, filter=filter, page=page)
         self._transaction_id = uuid.uuid4().hex
@@ -182,14 +193,7 @@ class NURESTFetcher(object):
     def count_matching(self, filter=None, async=False, callback=None):
         """ Retrieve count of entities that matches filter and call callback method """
 
-        request = None
-
-        from .nurest_user import NURESTBasicUser
-        if isinstance(self._nurest_object, NURESTBasicUser):
-            request = NURESTRequest(method="HEAD", url=self._remote_name)
-        else:
-            url = url = self.get_resource_url() + self._remote_name
-            request = NURESTRequest(method="HEAD", url=url)
+        request = NURESTRequest(method=HTTP_METHOD_HEAD, url=self._prepare_url())
 
         self._prepare_headers(request=request, filter=filter, page=None)
 

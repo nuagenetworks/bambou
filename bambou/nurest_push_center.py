@@ -22,7 +22,7 @@ class NURESTPushCenter(object):
 
     def __init__(self):
         """ Initialiez push """
-        self._url = ''
+        self._url = None
         self._is_running = False
         self._current_connection = None
         self._last_events = list()
@@ -140,6 +140,9 @@ class NURESTPushCenter(object):
     def _listen(self, uuid=None):
         """ Listen a connection uuid """
 
+        if self.url is None:
+            raise Exception("NURESTPushCenter needs to have a valid URL. please use setURL: before starting it.")
+
         events_url = "%s/events" % self.url
         if uuid:
             events_url = "%s?uuid=%s" % (events_url, uuid)
@@ -157,7 +160,7 @@ class NURESTPushCenter(object):
             else:
                 connection.timeout = self._timeout
 
-        pushcenter_log.info('RESTNuage Sending >>>>>>\n%s %s' % (request.method, request.url))
+        pushcenter_log.info('Bambou Sending >>>>>>\n%s %s' % (request.method, request.url))
 
         #connection.ignore_request_idle = True
         connection.start()

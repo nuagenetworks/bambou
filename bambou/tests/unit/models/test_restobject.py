@@ -2,7 +2,8 @@
 
 from unittest import TestCase
 
-from restnuage.tests import Enterprise
+from bambou import NURESTLoginController
+from bambou.tests import Enterprise
 
 
 class GetResourceTests(TestCase):
@@ -10,7 +11,13 @@ class GetResourceTests(TestCase):
     @classmethod
     def setUpClass(self):
         """ Initialize context """
-        pass
+
+        controller = NURESTLoginController()
+        controller.user = u'christophe'
+        controller.password = u'password'
+        controller.url = u'http://www.google.fr'
+        controller.api_key = u'12345'
+        controller.enterprise = u'Alcatel'
 
     @classmethod
     def tearDownClass(self):
@@ -34,7 +41,26 @@ class GetResourceTests(TestCase):
 
         enterprise = Enterprise()
         enterprise.id = 4
-        self.assertEquals(enterprise.get_resource_url(), u'/enterprises/4')
+        self.assertEquals(enterprise.get_resource_url(), u'http://www.google.fr/enterprises/4')
+
+    def test_get_resource_base_url(self):
+        """ Get object resource base url """
+
+        self.assertEquals(Enterprise.base_url(), u'http://www.google.fr')
+
+
+    def test_get_resource_base_url(self):
+        """ Get object resource base url """
+
+        enterprise = Enterprise()
+        enterprise.id = 4
+        self.assertEquals(enterprise.get_resource_url_for_child_type(Enterprise), u'http://www.google.fr/enterprises/4/enterprises')
+
+    def test_object_with_id(self):
+        """ Get object resource base url """
+
+        enterprise = Enterprise.object_with_id(4)
+        self.assertEquals(enterprise.id, 4)
 
 
 class CompressionTests(TestCase):

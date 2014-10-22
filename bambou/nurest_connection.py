@@ -8,7 +8,7 @@ import threading
 from .nurest_login_controller import NURESTLoginController
 from .nurest_response import NURESTResponse
 
-restnuage_log = logging.getLogger('restnuage')
+bambou_log = logging.getLogger('bambou')
 
 
 HTTP_CODE_ZERO = 0
@@ -26,6 +26,13 @@ HTTP_CODE_CONFLICT = 409
 HTTP_CODE_PRECONDITION_FAILED = 412
 HTTP_CODE_INTERNAL_SERVER_ERROR = 500
 HTTP_CODE_SERVICE_UNAVAILABLE = 503
+
+
+HTTP_METHOD_HEAD = 'HEAD'
+HTTP_METHOD_POST = 'POST'
+HTTP_METHOD_GET = 'GET'
+HTTP_METHOD_PUT = 'PUT'
+HTTP_METHOD_DELETE = 'DELETE'
 
 
 class NURESTConnection(object):
@@ -161,21 +168,21 @@ class NURESTConnection(object):
             return False
 
         if status_code == HTTP_CODE_ZERO:
-            restnuage_log.error("NURESTConnection: Connection error with code 0. Sending NUNURESTConnectionFailureNotification notification and exiting.")
+            bambou_log.error("NURESTConnection: Connection error with code 0. Sending NUNURESTConnectionFailureNotification notification and exiting.")
             self._print_information()
             return False
 
-        restnuage_log.error("NURESTConnection: Report this error, because this should not happen: %s" % self._response)
+        bambou_log.error("NURESTConnection: Report this error, because this should not happen: %s" % self._response)
         return False
 
     def _print_information(self):
         """ Prints information instead of sending a confirmation """
 
         if len(self._response.errors) == 0:
-            restnuage_log.error("NURESTConnection ERROR without error message [%s] %s" % (self._response.status_code, self._response.reason))
+            bambou_log.error("NURESTConnection ERROR without error message [%s] %s" % (self._response.status_code, self._response.reason))
 
         else:
-            restnuage_log.error("NURESTConnection (%s %s) ERROR %s:\n%s" % (self._request.method, self._request.url, self._response.status_code, json.dumps(self._response.errors, indent=4)))
+            bambou_log.error("NURESTConnection (%s %s) ERROR %s:\n%s" % (self._request.method, self._request.url, self._response.status_code, json.dumps(self._response.errors, indent=4)))
 
     # HTTP Calls
 
@@ -195,7 +202,7 @@ class NURESTConnection(object):
 
     def _did_timeout(self):
         """ Called when a resquest has timeout """
-        restnuage_log.debug('RESTNuage %s on %s has timeout (timeout=%ss)..' % (self._request.method, self._request.url, self.timeout))
+        bambou_log.debug('Bambou %s on %s has timeout (timeout=%ss)..' % (self._request.method, self._request.url, self.timeout))
         self._has_timeouted = True
 
         if self._async and self._callback:
@@ -223,7 +230,7 @@ class NURESTConnection(object):
             user_name = self._user.user_name
             api_key = self._user.api_key
 
-        restnuage_log.debug('RESTNuage has been sent with user:%s within enterprise:%s (Key=%s)' % (user_name, enterprise, api_key))
+        bambou_log.debug('Bambou has been sent with user:%s within enterprise:%s (Key=%s)' % (user_name, enterprise, api_key))
 
         if self._uses_authentication:
             self._request.set_header('X-Nuage-Organization', enterprise)
@@ -234,11 +241,9 @@ class NURESTConnection(object):
 
         headers = self._request.get_headers()
 
-        url = "%s%s" % (controller.url, self._request.url)
-
         try:  # TODO : Remove this ugly try/except after http://mvjira.mv.usa.alcatel.com/browse/VSD-546
             response = requests.request(method=self._request.method,
-                                      url=url,
+                                      url=self._request.url,
                                       data=json.dumps(self._request.data),
                                       headers=headers,
                                       verify=False,
@@ -246,7 +251,7 @@ class NURESTConnection(object):
         except requests.exceptions.SSLError:
             try:
                 response = requests.request(method=self._request.method,
-                                          url=url,
+                                          url=self._request.url,
                                           data=json.dumps(self._request.data),
                                           headers=headers,
                                           verify=False,

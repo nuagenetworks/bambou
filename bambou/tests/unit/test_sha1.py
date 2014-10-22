@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from restnuage.utils import Sha1
+from bambou.utils import Sha1
 
 
 class Sha1Tests(TestCase):

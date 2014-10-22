@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
-from restnuage import NURESTObject
-from restnuage import NURESTBasicUser
+from bambou import NURESTObject
+from bambou import NURESTBasicUser
 
 
 class User(NURESTBasicUser):
@@ -46,6 +46,18 @@ class User(NURESTBasicUser):
         """ Boolean to say if the resource name should be fixed. Default is False """
 
         return True
+
+    def get_resource_url(self):
+        """ Get resource complete url """
+
+        name = self.__class__.get_resource_name()
+        url = self.__class__.base_url()
+        return "%s/%s" % (url, name)
+
+    def get_resource_url_for_child_type(self, entity_type):
+        """ Get the resource url for the entity type """
+
+        return "%s/%s" % (self.__class__.base_url(), entity_type.get_resource_name())
 
 
 class Enterprise(NURESTObject):

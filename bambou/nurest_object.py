@@ -6,12 +6,13 @@ import logging
 
 from time import time
 
-from .nurest_connection import NURESTConnection
+from .nurest_login_controller import NURESTLoginController
+from .nurest_connection import NURESTConnection, HTTP_METHOD_DELETE, HTTP_METHOD_PUT, HTTP_METHOD_POST, HTTP_METHOD_GET
 from .nurest_fetcher import NURESTFetcher
 from .nurest_request import NURESTRequest
 from .utils import NURemoteAttribute
 
-restnuage_log = logging.getLogger('restnuage')
+bambou_log = logging.getLogger('bambou')
 
 
 class NURESTObject(object):
@@ -184,8 +185,17 @@ class NURESTObject(object):
         return False
 
     @classmethod
+    def object_with_id(cls, id):
+        """ Get a new NURESTObject with the given id """
+
+        new_object = NURESTObject()
+        new_object.id = id
+
+        return new_object
+
+    @classmethod
     def get_resource_name(cls):
-        """ Provides the REST query name based on object's name """
+        """ Resource name of the object. It will compute the plural if needed """
 
         query_name = cls.get_remote_name()
 
@@ -199,7 +209,6 @@ class NURESTObject(object):
             vowels = ['a', 'e', 'i', 'o', 'u', 'y']
 
             if query_name[-2].lower() not in vowels:
-            #if query_name[length - 2:] == "ry" or query_name[length - 2:] == "cy" or query_name[length - 2:] == "cy":
                 query_name = query_name[:len(query_name) - 1]
                 query_name += "ies"
 
@@ -212,11 +221,24 @@ class NURESTObject(object):
         """ Get resource complete url """
 
         name = self.__class__.get_resource_name()
+        url = self.__class__.base_url()
 
         if self.id is not None:
-            return "/%s/%s" % (name, self.id)
+            return "%s/%s/%s" % (url, name, self.id)
 
-        return "/%s" % name
+        return "%s/%s" % (url, name)
+
+    def get_resource_url_for_child_type(self, entity_type):
+        """ Get the resource url for the entity type """
+
+        return "%s/%s" % (self.get_resource_url(), entity_type.get_resource_name())
+
+    @classmethod
+    def base_url(cls):
+        """ Override this method to set object base url """
+
+        controller = NURESTLoginController()
+        return controller.url
 
     # def __cmp__(self, rest_object):
     #     """ Compare with another object """
@@ -235,10 +257,13 @@ class NURESTObject(object):
         if self.get_remote_name() != rest_object.get_remote_name():
             return False
 
-        if self.id != rest_object.id:
-            return False
+        if self.id and rest_object.id:
+            return self.id == rest_object.id
 
-        return True
+        if self.local_id and rest_object.local_id:
+            return self.local_id == rest_object.local_id
+
+        return False
 
     def __str__(self):
         """ Prints a NURESTObject """
@@ -275,7 +300,7 @@ class NURESTObject(object):
     def is_owned_by_current_user(self):
         """ Check if the current user owns the object """
 
-        from restnuage.nurest_user import NURESTBasicUser
+        from bambou.nurest_user import NURESTBasicUser
         current_user = NURESTBasicUser.get_default_user()
         return self._owner == current_user.id
 
@@ -331,7 +356,9 @@ class NURESTObject(object):
 
         local_name = child.get_remote_name()
         children = self.get_children(local_name)
-        children.append(child)
+
+        if child not in children:
+            children.append(child)
 
     def remove_child(self, child):
         """ Remove a child """
@@ -395,12 +422,7 @@ class NURESTObject(object):
         if self.can_delete_children:
             self.delete_children()
 
-        resource_url = ''
-
-        if response_choice is not None:
-            resource_url = '?responseChoice=%s' % response_choice
-
-        return self._manage_child_entity(nurest_object=self, resource_url=resource_url, method='DELETE', async=async, callback=callback)
+        return self._manage_child_entity(nurest_object=self, method=HTTP_METHOD_DELETE, async=async, callback=callback, response_choice=response_choice)
 
     def delete_children(self):
         """ Removes all children """
@@ -425,12 +447,12 @@ class NURESTObject(object):
     def save(self, callback=None, async=False):
         """ Update object and call given callback """
 
-        return self._manage_child_entity(nurest_object=self, method='PUT', async=async, callback=callback)
+        return self._manage_child_entity(nurest_object=self, method=HTTP_METHOD_PUT, async=async, callback=callback)
 
     def fetch(self, callback=None, async=False):
         """ Fetch all information about the current object """
 
-        request = NURESTRequest(method='GET', url=self.get_resource_url())
+        request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
         if async:
             self.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback)
@@ -454,30 +476,30 @@ class NURESTObject(object):
         connection = NURESTConnection(request=request, callback=self._did_receive_response, callbacks=callbacks, async=async)
         connection.user_info = user_info
 
-        restnuage_log.info('RESTNuage Sending >>>>>>\n%s %s with following data:\n%s' % (request.method, request.url, json.dumps(request.data, indent=4)))
+        bambou_log.info('Bambou Sending >>>>>>\n%s %s with following data:\n%s' % (request.method, request.url, json.dumps(request.data, indent=4)))
 
         return connection.start()
 
-    def _manage_child_entity(self, nurest_object, resource_url='', method='GET', async=False, callback=None, handler=None):
+    def _manage_child_entity(self, nurest_object, method=HTTP_METHOD_GET, async=False, callback=None, handler=None, response_choice=None):
         """ Low level child management. Send given HTTP method with given entity to given ressource of current object
 
             :param nurest_object: the NURESTObject object to manage
-            :param resource_url: the resource url of the object to manage
             :param method: the HTTP method to use (GET, POST, PUT, DELETE)
             :param callback: the callback to call at the end
             :param handler: a custom handler to call when complete, before calling the callback
         """
 
-        request = None
+        url = None
 
-        from restnuage.nurest_user import NURESTBasicUser
-        if isinstance(self, NURESTBasicUser):
-            # Creates a url relative to the server base url
-            request = NURESTRequest(method=method, url=resource_url, data=nurest_object.to_dict())
-
+        if method == HTTP_METHOD_POST:
+            url = self.get_resource_url_for_child_type(nurest_object.__class__)
         else:
-            url = self.get_resource_url() + resource_url  # Creates a url relative to the current object url
-            request = NURESTRequest(method=method, url=url, data=nurest_object.to_dict())
+            url = self.get_resource_url()
+
+            if method == HTTP_METHOD_DELETE and response_choice is not None:
+                url += '?responseChoice=%s' % response_choice
+
+        request = NURESTRequest(method=method, url=url, data=nurest_object.to_dict())
 
         if not handler:
             handler = self._did_perform_standard_operation
@@ -500,9 +522,9 @@ class NURESTObject(object):
         for entity in entities:
             ids.append(entity.id)
 
-        url = "%s/%s" % (self.get_resource_url(), entity_type.get_resource_name())
+        url = self.get_resource_url_for_child_type(entity_type)
 
-        request = NURESTRequest(method="PUT", url=url, data=ids)
+        request = NURESTRequest(method=HTTP_METHOD_PUT, url=url, data=ids)
 
         if async:
             self.send_request(request=request,
@@ -530,7 +552,7 @@ class NURESTObject(object):
         has_callbacks = connection.has_callbacks()
         should_post = not has_callbacks
 
-        restnuage_log.info('RESTNuage <<<<< Response for\n%s %s\n%s' % (connection._request.method, connection._request.url, json.dumps(connection._response.data, indent=4)))
+        bambou_log.info('Bambou <<<<< Response for\n%s %s\n%s' % (connection._request.method, connection._request.url, json.dumps(connection._response.data, indent=4)))
 
         if  connection.has_response_success(should_post=should_post) and has_callbacks:
             callback = connection.callbacks['local']
@@ -578,8 +600,24 @@ class NURESTObject(object):
         """
 
         return self._manage_child_entity(nurest_object=entity,
-                                  resource_url=entity.get_resource_url(),
-                                  method='POST',
+                                  method=HTTP_METHOD_POST,
+                                  async=async,
+                                  callback=callback,
+                                  handler=self._did_add_child_entity)
+
+    def instantiate_child_entity(self, entity, from_template, async=False, callback=None):
+        """ Instantiate an entity given NURESTObject into resource of current object
+            for example, to add a NUGroup into a NUEnterprise, you can call
+            enterprise.add_child_entity(nurest_object=my_group)
+
+            :param entity: the NURESTObject object to add
+            :param callback: callback containing the object and the connection
+            :param async: should the request be done asynchronously or not
+        """
+
+        entity.template_id = from_template.id
+        return self._manage_child_entity(nurest_object=entity,
+                                  method=HTTP_METHOD_POST,
                                   async=async,
                                   callback=callback,
                                   handler=self._did_add_child_entity)
@@ -607,13 +645,8 @@ class NURESTObject(object):
 
         entity.delete_children()
 
-        resource_url = entity.get_resource_url()
-
-        if response_choice:
-            resource_url = '%s?responseChoice=%s' % (resource_url, response_choice)
-
         self._manage_child_entity(nurest_object=entity,
-                                  resource_url=resource_url,
-                                  method='DELETE',
+                                  method=HTTP_METHOD_DELETE,
                                   async=async,
-                                  callback=callback)
+                                  callback=callback,
+                                  response_choice=response_choice)

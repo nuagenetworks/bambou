@@ -5,8 +5,8 @@ sys.path.append("../")
 import threading
 from time import sleep
 
-from restnuage import NURESTLoginController
-from restnuage import NURESTPushCenter
+from bambou import NURESTLoginController
+from bambou import NURESTPushCenter
 
 from models import Enterprise, User
 
@@ -25,10 +25,12 @@ def _did_add_enterprise(enterprise, connection):
         sleep(6)
 
         # Remove enterprise
-        user.remove_child_entity(entity=enterprise, callback=_did_remove_enterprise, async=True, response_choice=1)
+        # user.remove_child_entity(entity=enterprise,
+        enterprise.delete(callback=_did_remove_enterprise, async=True, response_choice=1)
 
     else:
-        print "Enterprise has not been saved"
+        push_center.stop()
+        print "Enterprise has not been saved : " + str(connection.response.errors)
 
     push_center.get_last_events()
 
@@ -53,7 +55,7 @@ def _did_user_fetch(user, connection):
 
     # Add a new enterprise and process callback named `_did_add_enterprise`
     enterprise = Enterprise()
-    enterprise.name = 'Test'
+    enterprise.name = 'Async Enterprise test'
     enterprise.description = 'Description of test enterprise'
     user.add_child_entity(entity=enterprise, callback=_did_add_enterprise, async=True)
 
@@ -65,12 +67,15 @@ def main():
     ctrl.user = u"csproot"
     ctrl.password = u"csproot"
     ctrl.enterprise = u"csp"
-    ctrl.url = u"https://135.227.220.152:8443/nuage/api/v1_0"
+    ctrl.url = u"https://135.227.220.152:8443/nuage/api/v3_0"
+
+    # Set push_center address to listen
+    push_center.url = ctrl.url
 
     # Logs in and process callback named `_did_user_fetch`
     user.fetch(callback=_did_user_fetch, async=True)
 
-    print "\n End\nUser %s (%s)" % (user, threading.current_thread())
+    print "\nEnd Main\nUser %s (%s)" % (user, threading.current_thread())
 
 if __name__ == '__main__':
     main()

@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from restnuage import NURESTLoginController
+from bambou import NURESTLoginController
 
 
 class LoginControllerSingleton(TestCase):

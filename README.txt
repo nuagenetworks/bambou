@@ -1,5 +1,5 @@
-# RESTNuage
-=========================
+# Bambou - bends but does not break !
+====================================
 
 Python REST layer for Nuage Networks' application
 
@@ -9,30 +9,30 @@ Follow these 3 steps to use your python environment.
 
 1) First, you should install your environment if you have not done already
 
-    $ virtual-env --no-site-packages restnuage-env
+    $ virtual-env --no-site-packages bambou-env
     $ Installing Setuptools..[]..done.
 
 2) Activate your environment
 
-    $ cd restnuage-env
+    $ cd bambou-env
     $ source bin/activate
-    (restnuage-env) $ cd restnuage-env
+    (bambou-env) $ cd bambou-env
 
 3) Clone repository
 
-    git clone http://github.mv.usa.alcatel.com/chserafi/restnuage.git
+    git clone http://github.mv.usa.alcatel.com/chserafi/bambou.git
 
 4) Install package dependencies listed in requirements.txt file
 
-    (restnuage-env) $ cd restnuage
-    (restnuage-env) $ pip install -r requirements.txt
+    (bambou-env) $ cd bambou
+    (bambou-env) $ pip install -r requirements.txt
 
 
 ### Usage
 
 __#1 Create your object models to extends NURESTObject or NURESTBasicUser__
 
-    from restnuage.nurest_user import NURESTBasicUser
+    from bambou.nurest_user import NURESTBasicUser
     class User(NURESTBasicUser):
 
         @classmethod

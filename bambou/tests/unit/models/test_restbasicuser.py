@@ -2,13 +2,21 @@
 
 from unittest import TestCase
 
-from restnuage.tests import User
+from bambou import NURESTLoginController
+from bambou.tests import User, Enterprise
 
 
 class GetResourceTests(TestCase):
 
     def test_get_name(self):
         """ Get object name """
+
+        controller = NURESTLoginController()
+        controller.user = u'user'
+        controller.password = u'password'
+        controller.url = u'https://example.com/api/v3_0'
+        controller.api_key = u'12345'
+        controller.enterprise = u'Alcatel'
 
         user = User()
         self.assertEquals(user.get_class_remote_name(), 'me')
@@ -22,7 +30,13 @@ class GetResourceTests(TestCase):
         """ Get object resource url """
 
         user = User()
-        self.assertEquals(user.get_resource_url(), u'/me')
+        self.assertEquals(user.get_resource_url(), u'https://example.com/api/v3_0/me')
+
+    def test_get_resource_url_for_child_type(self):
+        """ Get object resources for child type """
+
+        user = User()
+        self.assertEquals(user.get_resource_url_for_child_type(Enterprise), u'https://example.com/api/v3_0/enterprises')
 
 
 class CompressionTests(TestCase):
