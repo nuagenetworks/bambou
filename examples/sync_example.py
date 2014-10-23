@@ -11,7 +11,7 @@ from models import Enterprise, NURESTUser
 # Exemple of how you can activate logs
 
 from bambou import bambou_logger
-bambou_logger.setLevel(logging.ERROR)
+bambou_logger.setLevel(logging.INFO)
 bambou_logger.addHandler(logging.StreamHandler())
 
 def main():
@@ -36,7 +36,7 @@ def main():
     enterprise.name = 'Christophe Test'
     enterprise.description = 'Hey hey hey'
 
-    (enterprise, connection) = user.add_child_entity(entity=enterprise, async=False)
+    (enterprise, connection) = user.add_child_object(nurest_object=enterprise, async=False)
 
     print 'Sleeping... 6 sec'
     sleep(6)

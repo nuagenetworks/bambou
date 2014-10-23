@@ -115,14 +115,14 @@ class NURESTFetcher(object):
         return cls.managed_class().get_resource_name()
 
     @classmethod
-    def fetcher_with_entity(cls, entity, local_name):
+    def fetcher_with_object(cls, nurest_object, local_name):
         """ Register the fetcher for a served object.
 
             This method will fill the attribute indicated by `local_name` of
-            the given object `entity` with fetched objects of type `managed_class`
+            the given object `nurest_object` with fetched objects of type `managed_class`
 
             Args:
-                entity: the instance of the object to serve
+                nurest_object: the instance of the object to serve
                 local_name: the name of the attribute to fill when objects will be fetched
 
             Returns:
@@ -130,11 +130,11 @@ class NURESTFetcher(object):
         """
 
         fetcher = cls()
-        fetcher.nurest_object = entity
+        fetcher.nurest_object = nurest_object
         fetcher.local_name = local_name
 
-        setattr(entity, local_name, [])
-        entity.register_children(getattr(entity, local_name), cls.managed_object_remote_name())
+        setattr(nurest_object, local_name, [])
+        nurest_object.register_children(getattr(nurest_object, local_name), cls.managed_object_remote_name())
 
         return fetcher
 
@@ -193,8 +193,8 @@ class NURESTFetcher(object):
 
         return url
 
-    def fetch_entities(self, async=False, callback=None):
-        """ Fetch entities and fill the local name of the served object.
+    def fetch_objects(self, async=False, callback=None):
+        """ Fetch objects and fill the local name of the served object.
 
             This method fetches all managed class objects and store them
             in local_name of the served object.
@@ -208,10 +208,10 @@ class NURESTFetcher(object):
                 Otherwise, it returns a tuple of information (fetcher, served object, fetched objects, connection)
         """
 
-        return self.fetch_matching_entities(async=async, callback=callback)
+        return self.fetch_matching_objects(async=async, callback=callback)
 
-    def fetch_matching_entities(self, filter=None, page=None, async=False, callback=None):
-        """ Fetch entities according to given filter and page.
+    def fetch_matching_objects(self, filter=None, page=None, async=False, callback=None):
+        """ Fetch objects according to given filter and page.
 
             This method fetches all managed class objects and store them
             in local_name of the served object.
@@ -233,14 +233,14 @@ class NURESTFetcher(object):
         self._transaction_id = uuid.uuid4().hex
 
         if async:
-            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_fetch_entities, remote_callback=callback)
+            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_fetch_objects, remote_callback=callback)
             return self._transaction_id
 
         connection = self._nurest_object.send_request(request=request, async=async)
-        return self._did_fetch_entities(connection=connection)
+        return self._did_fetch_objects(connection=connection)
 
-    def _did_fetch_entities(self, connection):
-        """ Fetching entities has been done """
+    def _did_fetch_objects(self, connection):
+        """ Fetching objects has been done """
 
         self._last_connnection = connection
         response = connection.response

@@ -54,10 +54,10 @@ class User(NURESTBasicUser):
         url = self.__class__.base_url()
         return "%s/%s" % (url, name)
 
-    def get_resource_url_for_child_type(self, entity_type):
-        """ Get the resource url for the entity type """
+    def get_resource_url_for_child_type(self, nurest_object_type):
+        """ Get the resource url for the nurest_object type """
 
-        return "%s/%s" % (self.__class__.base_url(), entity_type.get_resource_name())
+        return "%s/%s" % (self.__class__.base_url(), nurest_object_type.get_resource_name())
 
 
 class Enterprise(NURESTObject):

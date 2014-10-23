@@ -118,7 +118,7 @@ in any manner whatsoever without prior written permission from Alcatel.</p>
 <dl class="class">
 <dt id="bambou.NURESTConnection">
 <em class="property">class </em><tt class="descclassname">bambou.</tt><tt class="descname">NURESTConnection</tt><big>(</big><em>request</em>, <em>async</em>, <em>callback=None</em>, <em>callbacks={}</em>, <em>user=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTConnection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Enhances requests</p>
+<dd><p>Connection that enable HTTP requests</p>
 <dl class="attribute">
 <dt id="bambou.NURESTConnection.async">
 <tt class="descname">async</tt><a class="headerlink" href="#bambou.NURESTConnection.async" title="Permalink to this definition">¶</a></dt>
@@ -306,25 +306,9 @@ Otherwise it will return a tuple of information containing
 </dd></dl>
 
 <dl class="method">
-<dt id="bambou.NURESTFetcher.fetch_entities">
-<tt class="descname">fetch_entities</tt><big>(</big><em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.fetch_entities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetch entities and fill the local name of the served object.</p>
-<p>This method fetches all managed class objects and store them
-in local_name of the served object.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>async: Boolean to make a asynchronous call. Default is False
-callback: Callback that should be called in case of a async request</dd>
-<dt>Returns:</dt>
-<dd>It returns a transaction ID in case of an asynchronous call.
-Otherwise, it returns a tuple of information (fetcher, served object, fetched objects, connection)</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="bambou.NURESTFetcher.fetch_matching_entities">
-<tt class="descname">fetch_matching_entities</tt><big>(</big><em>filter=None</em>, <em>page=None</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.fetch_matching_entities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetch entities according to given filter and page.</p>
+<dt id="bambou.NURESTFetcher.fetch_matching_objects">
+<tt class="descname">fetch_matching_objects</tt><big>(</big><em>filter=None</em>, <em>page=None</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.fetch_matching_objects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch objects according to given filter and page.</p>
 <p>This method fetches all managed class objects and store them
 in local_name of the served object.</p>
 <dl class="docutils">
@@ -339,15 +323,31 @@ Otherwise, it returns a tuple of information (fetcher, served object, fetched ob
 </dl>
 </dd></dl>
 
-<dl class="classmethod">
-<dt id="bambou.NURESTFetcher.fetcher_with_entity">
-<em class="property">classmethod </em><tt class="descname">fetcher_with_entity</tt><big>(</big><em>entity</em>, <em>local_name</em><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.fetcher_with_entity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register the fetcher for a served object.</p>
-<p>This method will fill the attribute indicated by <cite>local_name</cite> of
-the given object <cite>entity</cite> with fetched objects of type <cite>managed_class</cite></p>
+<dl class="method">
+<dt id="bambou.NURESTFetcher.fetch_objects">
+<tt class="descname">fetch_objects</tt><big>(</big><em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.fetch_objects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch objects and fill the local name of the served object.</p>
+<p>This method fetches all managed class objects and store them
+in local_name of the served object.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>entity: the instance of the object to serve
+<dd>async: Boolean to make a asynchronous call. Default is False
+callback: Callback that should be called in case of a async request</dd>
+<dt>Returns:</dt>
+<dd>It returns a transaction ID in case of an asynchronous call.
+Otherwise, it returns a tuple of information (fetcher, served object, fetched objects, connection)</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bambou.NURESTFetcher.fetcher_with_object">
+<em class="property">classmethod </em><tt class="descname">fetcher_with_object</tt><big>(</big><em>nurest_object</em>, <em>local_name</em><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.fetcher_with_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register the fetcher for a served object.</p>
+<p>This method will fill the attribute indicated by <cite>local_name</cite> of
+the given object <cite>nurest_object</cite> with fetched objects of type <cite>managed_class</cite></p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>nurest_object: the instance of the object to serve
 local_name: the name of the attribute to fill when objects will be fetched</dd>
 <dt>Returns:</dt>
 <dd>It returns the fetcher instance.</dd>
@@ -556,14 +556,14 @@ Provides basic saving and fetching utilities</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bambou.NURESTObject.add_child_entity">
-<tt class="descname">add_child_entity</tt><big>(</big><em>entity</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.add_child_entity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add given entity to the current object</p>
+<dt id="bambou.NURESTObject.add_child_object">
+<tt class="descname">add_child_object</tt><big>(</big><em>nurest_object</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.add_child_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add given nurest_object to the current object</p>
 <p>For example, to add a NUGroup into a NUEnterprise, you can call
-enterprise.add_child_entity(entity=my_group)</p>
+enterprise.add_child_object(nurest_object=my_group)</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>entity: the NURESTObject object to add
+<dd>nurest_object: the NURESTObject object to add
 async: should the request be done asynchronously or not
 callback: callback containing the object and the connection</dd>
 <dt>Returns:</dt>
@@ -572,13 +572,13 @@ callback: callback containing the object and the connection</dd>
 </dd></dl>
 
 <dl class="method">
-<dt id="bambou.NURESTObject.assign_entities">
-<tt class="descname">assign_entities</tt><big>(</big><em>entities</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.assign_entities" title="Permalink to this definition">¶</a></dt>
+<dt id="bambou.NURESTObject.assign_objects">
+<tt class="descname">assign_objects</tt><big>(</big><em>objects</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.assign_objects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reference a list of objects into the current resource</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>entities: list of NURESTObject to link
-entity_type: Type of the object to link
+<dd>objects: list of NURESTObject to link
+nurest_object_type: Type of the object to link
 callback: Callback method that should be fired at the end</dd>
 <dt>Returns:</dt>
 <dd>Returns the current object and the connection (object, connection)</dd>
@@ -708,8 +708,8 @@ callback: Callback method that will be triggered in case of asynchronous call</d
 
 <dl class="method">
 <dt id="bambou.NURESTObject.get_resource_url_for_child_type">
-<tt class="descname">get_resource_url_for_child_type</tt><big>(</big><em>entity_type</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.get_resource_url_for_child_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the resource url for the entity type</p>
+<tt class="descname">get_resource_url_for_child_type</tt><big>(</big><em>nurest_object_type</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.get_resource_url_for_child_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the resource url for the nurest_object type</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -719,12 +719,12 @@ callback: Callback method that will be triggered in case of asynchronous call</d
 </dd></dl>
 
 <dl class="method">
-<dt id="bambou.NURESTObject.instantiate_child_entity">
-<tt class="descname">instantiate_child_entity</tt><big>(</big><em>entity</em>, <em>from_template</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.instantiate_child_entity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instantiate an entity from a template object</p>
+<dt id="bambou.NURESTObject.instantiate_child_object">
+<tt class="descname">instantiate_child_object</tt><big>(</big><em>nurest_object</em>, <em>from_template</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.instantiate_child_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate an nurest_object from a template object</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>entity: the NURESTObject object to add
+<dd>nurest_object: the NURESTObject object to add
 from_template: the NURESTObject template object
 async: should the request be done asynchronously or not
 callback: callback containing the object and the connection</dd>
@@ -822,14 +822,14 @@ callback: callback containing the object and the connection</dd>
 </dd></dl>
 
 <dl class="method">
-<dt id="bambou.NURESTObject.remove_child_entity">
-<tt class="descname">remove_child_entity</tt><big>(</big><em>entity</em>, <em>async=False</em>, <em>callback=None</em>, <em>response_choice=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.remove_child_entity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes given entity into resource from current object</p>
+<dt id="bambou.NURESTObject.remove_child_object">
+<tt class="descname">remove_child_object</tt><big>(</big><em>nurest_object</em>, <em>async=False</em>, <em>callback=None</em>, <em>response_choice=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.remove_child_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes given nurest_object into resource from current object</p>
 <p>For example, to remove a NUGroup from a NUEnterprise, you can call
-enterprise.remove_child_entity(entity=my_group)</p>
+enterprise.remove_child_object(nurest_object=my_group)</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>entity: the NURESTObject object to remove
+<dd>nurest_object: the NURESTObject object to remove
 async:should the request be done asynchronously or not
 callback: callback containing the object and the connection
 response_choice: if a confirmation has to be done, what would be the choice</dd>

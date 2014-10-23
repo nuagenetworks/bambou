@@ -279,10 +279,10 @@ class NURESTObject(object):
 
         return "%s/%s" % (url, name)
 
-    def get_resource_url_for_child_type(self, entity_type):
-        """ Get the resource url for the entity type """
+    def get_resource_url_for_child_type(self, nurest_object_type):
+        """ Get the resource url for the nurest_object type """
 
-        return "%s/%s" % (self.get_resource_url(), entity_type.get_resource_name())
+        return "%s/%s" % (self.get_resource_url(), nurest_object_type.get_resource_name())
 
     @classmethod
     def base_url(cls):
@@ -481,7 +481,7 @@ class NURESTObject(object):
         if self.can_delete_children:
             self.delete_children()
 
-        return self._manage_child_entity(nurest_object=self, method=HTTP_METHOD_DELETE, async=async, callback=callback, response_choice=response_choice)
+        return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_DELETE, async=async, callback=callback, response_choice=response_choice)
 
     def delete_children(self):
         """ Removes all children of the current object
@@ -498,13 +498,13 @@ class NURESTObject(object):
                 fetcher_name = fetcher_info[0]
                 fetcher = getattr(self, fetcher_name)
 
-                # Fetch all entities first
-                (fetcher, obj, fetched_objects, connection) = fetcher.fetch_entities()
+                # Fetch all objects first
+                (fetcher, obj, fetched_objects, connection) = fetcher.fetch_objects()
 
                 # Delete all fetched objects
                 if fetched_objects is not None and len(fetched_objects) > 0:
-                    for entity in fetched_objects:
-                        entity.delete()
+                    for nurest_object in fetched_objects:
+                        nurest_object.delete()
                     setattr(self, fetcher.local_name, [])
 
     def save(self, async=False, callback=None):
@@ -515,7 +515,7 @@ class NURESTObject(object):
                 callback: Callback method that will be triggered in case of asynchronous call
         """
 
-        return self._manage_child_entity(nurest_object=self, method=HTTP_METHOD_PUT, async=async, callback=callback)
+        return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_PUT, async=async, callback=callback)
 
     def fetch(self, async=False, callback=None):
         """ Fetch all information about the current object
@@ -564,8 +564,8 @@ class NURESTObject(object):
 
         return connection.start()
 
-    def _manage_child_entity(self, nurest_object, method=HTTP_METHOD_GET, async=False, callback=None, handler=None, response_choice=None):
-        """ Low level child management. Send given HTTP method with given entity to given ressource of current object
+    def _manage_child_object(self, nurest_object, method=HTTP_METHOD_GET, async=False, callback=None, handler=None, response_choice=None):
+        """ Low level child management. Send given HTTP method with given nurest_object to given ressource of current object
 
             Args:
                 nurest_object: the NURESTObject object to manage
@@ -598,28 +598,28 @@ class NURESTObject(object):
             connection = self.send_request(request=request, async=async, user_info=nurest_object)
             return handler(connection)
 
-    def assign_entities(self, entities, async=False, callback=None):
+    def assign_objects(self, objects, async=False, callback=None):
         """ Reference a list of objects into the current resource
 
             Args:
-                entities: list of NURESTObject to link
-                entity_type: Type of the object to link
+                objects: list of NURESTObject to link
+                nurest_object_type: Type of the object to link
                 callback: Callback method that should be fired at the end
 
             Returns:
                 Returns the current object and the connection (object, connection)
         """
 
-        if len(entities) == 0:
+        if len(objects) == 0:
             return
 
         ids = list()
-        entity_type = entities[0].__class__
+        nurest_object_type = objects[0].__class__
 
-        for entity in entities:
-            ids.append(entity.id)
+        for nurest_object in objects:
+            ids.append(nurest_object.id)
 
-        url = self.get_resource_url_for_child_type(entity_type)
+        url = self.get_resource_url_for_child_type(nurest_object_type)
 
         request = NURESTRequest(method=HTTP_METHOD_PUT, url=url, data=ids)
 
@@ -628,11 +628,11 @@ class NURESTObject(object):
                               local_callback=self._did_perform_standard_operation,
                               async=async,
                               remote_callback=callback,
-                              user_info=entities)
+                              user_info=objects)
         else:
             connection = self.send_request(request=request,
                                            async=async,
-                                           user_info=entities)
+                                           user_info=objects)
 
             return self._did_perform_standard_operation(connection)
 
@@ -685,14 +685,14 @@ class NURESTObject(object):
 
     # Advanced REST Operations
 
-    def add_child_entity(self, entity, async=False, callback=None):
-        """ Add given entity to the current object
+    def add_child_object(self, nurest_object, async=False, callback=None):
+        """ Add given nurest_object to the current object
 
             For example, to add a NUGroup into a NUEnterprise, you can call
-            enterprise.add_child_entity(entity=my_group)
+            enterprise.add_child_object(nurest_object=my_group)
 
             Args:
-                entity: the NURESTObject object to add
+                nurest_object: the NURESTObject object to add
                 async: should the request be done asynchronously or not
                 callback: callback containing the object and the connection
 
@@ -700,17 +700,17 @@ class NURESTObject(object):
                 Returns the object and connection (object, connection)
         """
 
-        return self._manage_child_entity(nurest_object=entity,
+        return self._manage_child_object(nurest_object=nurest_object,
                                   method=HTTP_METHOD_POST,
                                   async=async,
                                   callback=callback,
-                                  handler=self._did_add_child_entity)
+                                  handler=self._did_add_child_object)
 
-    def instantiate_child_entity(self, entity, from_template, async=False, callback=None):
-        """ Instantiate an entity from a template object
+    def instantiate_child_object(self, nurest_object, from_template, async=False, callback=None):
+        """ Instantiate an nurest_object from a template object
 
             Args:
-                entity: the NURESTObject object to add
+                nurest_object: the NURESTObject object to add
                 from_template: the NURESTObject template object
                 async: should the request be done asynchronously or not
                 callback: callback containing the object and the connection
@@ -719,15 +719,15 @@ class NURESTObject(object):
                 Returns the object and connection (object, connection)
         """
 
-        entity.template_id = from_template.id
-        return self._manage_child_entity(nurest_object=entity,
+        nurest_object.template_id = from_template.id
+        return self._manage_child_object(nurest_object=nurest_object,
                                   method=HTTP_METHOD_POST,
                                   async=async,
                                   callback=callback,
-                                  handler=self._did_add_child_entity)
+                                  handler=self._did_add_child_object)
 
-    def _did_add_child_entity(self, connection):
-        """ Callback called after adding a new child entity """
+    def _did_add_child_object(self, connection):
+        """ Callback called after adding a new child nurest_object """
 
         response = connection.response
         try:
@@ -737,14 +737,14 @@ class NURESTObject(object):
 
         return self._did_perform_standard_operation(connection)
 
-    def remove_child_entity(self, entity, async=False, callback=None, response_choice=None):
-        """ Removes given entity into resource from current object
+    def remove_child_object(self, nurest_object, async=False, callback=None, response_choice=None):
+        """ Removes given nurest_object into resource from current object
 
             For example, to remove a NUGroup from a NUEnterprise, you can call
-            enterprise.remove_child_entity(entity=my_group)
+            enterprise.remove_child_object(nurest_object=my_group)
 
             Args:
-                entity: the NURESTObject object to remove
+                nurest_object: the NURESTObject object to remove
                 async:should the request be done asynchronously or not
                 callback: callback containing the object and the connection
                 response_choice: if a confirmation has to be done, what would be the choice
@@ -753,9 +753,9 @@ class NURESTObject(object):
                 Returns the object and connection (object, connection)
         """
 
-        entity.delete_children()
+        nurest_object.delete_children()
 
-        self._manage_child_entity(nurest_object=entity,
+        self._manage_child_object(nurest_object=nurest_object,
                                   method=HTTP_METHOD_DELETE,
                                   async=async,
                                   callback=callback,

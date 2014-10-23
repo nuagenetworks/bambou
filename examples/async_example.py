@@ -17,7 +17,7 @@ ctrl = NURESTLoginController()
 
 
 def _did_add_enterprise(enterprise, connection):
-    """ Callback after user.add_child_entity(entity=enterprise...) """
+    """ Callback after user.add_child_object(nurest_object=enterprise...) """
 
     if connection.response.status_code < 300:
         print "Enterprise saved with ID=%s" % enterprise.id
@@ -25,7 +25,7 @@ def _did_add_enterprise(enterprise, connection):
         sleep(6)
 
         # Remove enterprise
-        # user.remove_child_entity(entity=enterprise,
+        # user.remove_child_object(nurest_object=enterprise,
         enterprise.delete(callback=_did_remove_enterprise, async=True, response_choice=1)
 
     else:
@@ -36,7 +36,7 @@ def _did_add_enterprise(enterprise, connection):
 
 
 def _did_remove_enterprise(enterprise, connection):
-    """ Callback method after user.remove_child_entity(entity=enterprise...) """
+    """ Callback method after user.remove_child_object(nurest_object=enterprise...) """
 
     print "Enterprise %s has been removed" % enterprise
     push_center.stop()
@@ -57,7 +57,7 @@ def _did_user_fetch(user, connection):
     enterprise = Enterprise()
     enterprise.name = 'Async Enterprise test'
     enterprise.description = 'Description of test enterprise'
-    user.add_child_entity(entity=enterprise, callback=_did_add_enterprise, async=True)
+    user.add_child_object(nurest_object=enterprise, callback=_did_add_enterprise, async=True)
 
 
 def main():
