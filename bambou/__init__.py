@@ -15,7 +15,7 @@ bambou_logger = logging.getLogger('bambou')
 
 try:
     # NullHandler is only available for python >= 2.7
-    # bambou_logger.addHandler(logging.NullHandler())
+    bambou_logger.addHandler(logging.NullHandler())
 except:
     pass
 

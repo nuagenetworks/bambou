@@ -16,7 +16,11 @@ from .nurest_connection import HTTP_METHOD_GET, HTTP_METHOD_HEAD
 
 
 class NURESTFetcher(object):
-    """ Object fetcher for childrens """
+    """ Object fetcher for childrens
+
+        This object is intended to fetch a specific type of object declared
+        by `managed_class` method
+    """
 
     def __init__(self):
         """ Initliazes the fetcher """
@@ -38,21 +42,44 @@ class NURESTFetcher(object):
     # Properties
 
     def _get_object(self):
-        """ Get object to fetch """
+        """ Get served object
+
+            The fetcher will fill the served object with fetched objects
+
+            Returns:
+                Returns the object it is serving.
+        """
+
         return self._nurest_object
 
     def _set_object(self, nurest_object):
-        """ Set object to fetch """
+        """ Set the served object
+
+            Args:
+                nurest_object: the objec to serve
+        """
+
         self._nurest_object = nurest_object
 
     nurest_object = property(_get_object, _set_object)
 
     def _get_local_name(self):
-        """ Get local name to fetch """
+        """ Get the name of the attribute that has to be filled
+
+            Returns:
+                Returns the name of the attribute in the served object
+                that will be filled
+        """
+
         return self._local_name
 
     def _set_local_name(self, local_name):
-        """ Set local name to fetch """
+        """ Set the name of the attribut that has to be filled
+
+            Args:
+                local_name: the attribute name of the served object
+        """
+
         self._local_name = local_name
 
     local_name = property(_get_local_name, _set_local_name)
@@ -61,19 +88,46 @@ class NURESTFetcher(object):
 
     @classmethod
     def managed_class(cls):
-        """ Returns the type of the object that is managed within this fetcher """
+        """ Defines the object type that is managed by this fetcher.
+
+            This method has to be overrided to indicate which object the fetcher
+            is allowed to fetch.
+
+            Returns:
+                Returns a type of NURESTObject
+
+            Raises:
+                NotImplementedError: if this method is not overriden
+
+        """
 
         raise NotImplementedError('%s has no managed class. Implements managed_class method first.' % cls)
 
     @classmethod
     def managed_object_remote_name(cls):
-        """ Returns managed object remote name """
+        """ Remote name of the managed object
+
+            Returns:
+                Returns a string representing the resource name of the object
+                that has to be fetched.
+        """
 
         return cls.managed_class().get_resource_name()
 
     @classmethod
     def fetcher_with_entity(cls, entity, local_name):
-        """ Fetch an attribute of the object """
+        """ Register the fetcher for a served object.
+
+            This method will fill the attribute indicated by `local_name` of
+            the given object `entity` with fetched objects of type `managed_class`
+
+            Args:
+                entity: the instance of the object to serve
+                local_name: the name of the attribute to fill when objects will be fetched
+
+            Returns:
+                It returns the fetcher instance.
+        """
 
         fetcher = cls()
         fetcher.nurest_object = entity
@@ -85,11 +139,19 @@ class NURESTFetcher(object):
         return fetcher
 
     def flush(self):
-        """ Removes all objects  """
+        """ Removes all fetched objects
+
+            It will clear attribute of the served object
+        """
+
         setattr(self.nurest_object, self.local_name, [])
 
     def new(self):
-        """ Instanciates a new instance of managed class """
+        """ Create an instance of the managed class
+
+            Returns:
+                Returns an instance of managed_class
+        """
 
         managed_class = self.managed_class()
         return managed_class()
@@ -100,7 +162,7 @@ class NURESTFetcher(object):
         if self._master_filter:
             request.set_header('X-Nuage-Filter', self._master_filter)
 
-        elif filter:  # TODO: Cappuccino master filter is a CPPredicate
+        elif filter:
             request.set_header('X-Nuage-Filter', filter)
 
         if self.master_order:
@@ -132,12 +194,38 @@ class NURESTFetcher(object):
         return url
 
     def fetch_entities(self, async=False, callback=None):
-        """ Fetch entities and call the callback method """
+        """ Fetch entities and fill the local name of the served object.
+
+            This method fetches all managed class objects and store them
+            in local_name of the served object.
+
+            Args:
+                async: Boolean to make a asynchronous call. Default is False
+                callback: Callback that should be called in case of a async request
+
+            Returns:
+                It returns a transaction ID in case of an asynchronous call.
+                Otherwise, it returns a tuple of information (fetcher, served object, fetched objects, connection)
+        """
 
         return self.fetch_matching_entities(async=async, callback=callback)
 
     def fetch_matching_entities(self, filter=None, page=None, async=False, callback=None):
-        """ Fetch entities that matches filter and page"""
+        """ Fetch entities according to given filter and page.
+
+            This method fetches all managed class objects and store them
+            in local_name of the served object.
+
+            Args:
+                filter: string that represents a predicate filter
+                page: number of the page to load
+                async: Boolean to make a asynchronous call. Default is False
+                callback: Callback that should be called in case of a async request
+
+            Returns:
+                It returns a transaction ID in case of an asynchronous call.
+                Otherwise, it returns a tuple of information (fetcher, served object, fetched objects, connection)
+        """
 
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self._prepare_url())
 
@@ -194,20 +282,49 @@ class NURESTFetcher(object):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def count(self, callback=None):
-        """ Retrieve count of entities and call callback method  """
+    def count(self, async=False, callback=None):
+        """ Get the total count of objects that can be fetched
+
+            This method can be asynchronous and trigger the callback method
+            when result is ready.
+
+            Args:
+                async: Boolean to indicate an asynchronous call. Default is False
+                callback: Method that will be triggered if async call is made
+
+            Returns:
+                Returns a transaction ID when asynchronous call is made.
+                Otherwise it will return a tuple of information containing
+                (fetcher, served object, count of fetched objects)
+        """
 
         self.count_matching(callback=callback)
 
     def count_matching(self, filter=None, async=False, callback=None):
-        """ Retrieve count of entities that matches filter and call callback method """
+        """ Get the total count of objects that can be fetched according to filter
+
+            This method can be asynchronous and trigger the callback method
+            when result is ready.
+
+            Args:
+                filter: string that represents a predicate fitler (eg. name == 'x')
+                async: Boolean to indicate an asynchronous call. Default is False
+                callback: Method that will be triggered if async call is made
+
+            Returns:
+                Returns a transaction ID when asynchronous call is made.
+                Otherwise it will return a tuple of information containing
+                (fetcher, served object, count of fetched objects)
+        """
 
         request = NURESTRequest(method=HTTP_METHOD_HEAD, url=self._prepare_url())
 
         self._prepare_headers(request=request, filter=filter, page=None)
 
         if async:
+            self._transaction_id = uuid.uuid4().hex
             self._nurest_object.send_request(request=request, async=async, local_callback=self._did_count, remote_callback=callback)
+            return self._transaction_id
 
         else:
             self._nurest_object.send_request(request=request, async=async)
@@ -238,8 +355,3 @@ class NURESTFetcher(object):
                     callback(self, self._nurest_object, content, connection)
             else:
                 return (self, self._nurest_object, content, connection)
-
-    def latests_sort_descriptors(self):
-        """ Returns an array of descriptors """
-
-        raise NotImplementedError('Check CPSortDescriptor before implementation')

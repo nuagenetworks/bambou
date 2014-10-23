@@ -21,8 +21,12 @@ from bambou import bambou_logger
 
 
 class NURESTPushCenter(object):
-    """
-        Wait for push notifications
+    """ Push center wait for push notifications.
+
+        It has to listen a specific URL.
+
+        Every time a notification is send, it will automatically get it
+        and store it into get_last_events method.
     """
 
     __default_instance = None
@@ -45,6 +49,7 @@ class NURESTPushCenter(object):
     @classmethod
     def get_default_instance(cls):
         """ Get default push center """
+
         if not cls.__default_instance:
             NURESTPushCenter.__default_instance = cls()
 
@@ -54,10 +59,12 @@ class NURESTPushCenter(object):
 
     def _get_url(self):
         """ Get url """
+
         return self._url
 
     def _set_url(self, url):
         """ Set url """
+
         self._url = url
 
     url = property(_get_url, _set_url)
@@ -65,7 +72,12 @@ class NURESTPushCenter(object):
     # Control Methods
 
     def start(self, timeout=None, user=None):
-        """ Start push center """
+        """ Start push center
+
+            Args:
+                timeout: number of seconds before timeout. Used for testing purpose only.
+                user: NURESTUser object that is listening. Used for testing purpose only.
+        """
 
         if self._is_running:
             return
@@ -96,7 +108,10 @@ class NURESTPushCenter(object):
         self._timeout = None
 
     def wait_until_exit(self):
-        """ Wait until thread exit """
+        """ Wait until thread exit
+
+            Used for testing purpose only
+        """
 
         if self._timeout is None:
             raise Exception("Thread will never exit. Use stop or specify timeout when starting it!")
@@ -107,7 +122,11 @@ class NURESTPushCenter(object):
     # Events
 
     def get_last_events(self):
-        """ Retrieve events that has been  """
+        """ Retrieve events that has been
+
+            Returns:
+                Returns a list of events and flush existing events.
+        """
 
         events = self._last_events
         self._last_events = list()
@@ -179,20 +198,28 @@ class NURESTPushCenter(object):
         connection.start()
 
     def add_delegate(self, callback):
+        """ Registers a new delegate
+
+            The prototype should be function(data), where data will be the decoded json push
+
+            Args:
+                callback: method to trigger when push center receives events
         """
-        Registers a new delegate
-        The prototype should be function(data), where data will be the decoded json push
-        """
+
         if callback in self._delegate_methods:
             return
 
         self._delegate_methods.append(callback)
 
     def remove_delegate(self, callback):
+        """ Removes a delegate
+
+            The prototype should be function(data), where data will be the decoded json push
+
+            Args:
+                callback: method to trigger when push center receives events
         """
-        Removes a delegate
-        The prototype should be function(data), where data will be the decoded json push
-        """
+
         if not callback in self._delegate_methods:
             return
 

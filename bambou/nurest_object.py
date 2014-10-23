@@ -32,13 +32,14 @@ class NURESTObject(object):
     def __init__(self, creation_date=None, external_id=None, id=None, local_id=None, owner=None, parent_id=None, parent_type=None):
         """ Initializes the object with general information
 
-            :param creation_date: datetime when the object as been created
-            :param external_id: external identifier of the object
-            :param id: identifier of the object
-            :param local_id: internal identifier of the object
-            :param owner: string representing the owner
-            :param parent_id: identifier of the object's parent
-            :param parent_type: type of the parent
+            Args:
+                creation_date: datetime when the object as been created
+                external_id: external identifier of the object
+                id: identifier of the object
+                local_id: internal identifier of the object
+                owner: string representing the owner
+                parent_id: identifier of the object's parent
+                parent_type: type of the parent
         """
 
         self._creation_date = creation_date
@@ -56,8 +57,6 @@ class NURESTObject(object):
         self._attributes = dict()  # Dictionary of attribute name => NURemoteAttribute
 
         self.expose_attribute(local_name=u'id', remote_name=u'ID', attribute_type=str, is_identifier=True)
-        # self.expose_attribute(local_name=u'external_id', remote_name=u'externalID', attribute_type=str)
-        # self.expose_attribute(local_name=u'local_id', remote_name=u'localID', attribute_type=str)
         self.expose_attribute(local_name=u'parent_id', remote_name=u'parentID', attribute_type=str)
         self.expose_attribute(local_name=u'parent_type', remote_name=u'parentType', attribute_type=str)
         self.expose_attribute(local_name=u'creation_date', remote_name=u'creationDate', attribute_type=time, is_editable=False)
@@ -74,100 +73,120 @@ class NURESTObject(object):
 
     def _get_creation_date(self):
         """ Get creation date """
+
         return self._creation_date
 
     def _set_creation_date(self, creation_date):
         """ Set creation date """
+
         self._creation_date = creation_date
 
     creation_date = property(_get_creation_date, _set_creation_date)
 
     def _get_external_id(self):
         """ Get external id """
+
         return self._external_id
 
     def _set_external_id(self, external_id):
         """ Set external id """
+
         self._external_id = external_id
 
     external_id = property(_get_external_id, _set_external_id)
 
     def _get_id(self):
         """ Get object id """
+
         return self._id
 
     def _set_id(self, id):
         """ Set object id """
+
         self._id = id
 
     id = property(_get_id, _set_id)
 
     def _get_local_id(self):
         """ Get local id """
+
         return self._local_id
 
     def _set_local_id(self, local_id):
         """ Set local id """
+
         self._local_id = local_id
 
     local_id = property(_get_local_id, _set_local_id)
 
     def _get_owner(self):
         """ Get owner """
+
         return self._owner
 
     def _set_owner(self, owner):
         """ Set owner """
+
         self._owner = owner
 
     owner = property(_get_owner, _set_owner)
 
     def _get_parent_id(self):
         """ Get parent id """
+
         return self._parent_id
 
     def _set_parent_id(self, parent_id):
         """ Set parent id """
+
         self._parent_id = parent_id
 
     parent_id = property(_get_parent_id, _set_parent_id)
 
     def _get_parent_type(self):
         """ Get parent type """
+
         return self._parent_type
 
     def _set_parent_type(self, parent_type):
-        """ Set parent id """
+        """ Set parent type """
+
         self._parent_type = parent_type
 
     parent_type = property(_get_parent_type, _set_parent_type)
 
     def _get_parent(self):
         """ Get parent """
+
         return self._parent
 
     def _set_parent(self, parent):
         """ Set parent id """
+
         self._parent = parent
 
     parent = property(_get_parent, _set_parent)
 
     def _get_last_updated_by(self):
         """ Get last updated by user id info """
+
         return self._last_updated_by
 
     def _set_last_updated_by(self, user_id):
         """ Set last updated by user id info """
+
         self._last_updated_by = user_id
 
     last_updated_by = property(_get_last_updated_by, _set_last_updated_by)
 
     def _get_last_updated_date(self):
         """ Get last updated date """
+
         return self._last_updated_date
 
     def _set_last_updated_date(self, update_date):
         """ Set last updated by user id info """
+
         self._last_updated_date = update_date
 
     last_updated_date = property(_get_last_updated_date, _set_last_updated_date)
@@ -175,13 +194,23 @@ class NURESTObject(object):
     # Methods
 
     def get_attributes(self):
-        """ Get required attributes """
+        """ Get all attributes information
+
+            Returns:
+                Returns a dictionnary containing attribute information
+        """
 
         return self._attributes.values()
 
     @classmethod
     def get_remote_name(cls):
-        """ Provides the class name used for resource  """
+        """ Provides the class name used for resource
+
+            This method has to be implemented.
+
+            Raises:
+                NotImplementedError
+        """
 
         raise NotImplementedError('%s has no defined name. Implements get_remote_name method first.' % cls)
 
@@ -198,7 +227,11 @@ class NURESTObject(object):
 
     @classmethod
     def object_with_id(cls, id):
-        """ Get a new NURESTObject with the given id """
+        """ Get a new object with the given id
+
+            Returns:
+                Returns a new instance with specified id
+        """
 
         new_object = cls()
         new_object.id = id
@@ -207,7 +240,13 @@ class NURESTObject(object):
 
     @classmethod
     def get_resource_name(cls):
-        """ Resource name of the object. It will compute the plural if needed """
+        """ Resource name of the object.
+
+            It will compute the plural if needed
+
+            Returns:
+                Returns a string that represents the resouce name of the object
+        """
 
         query_name = cls.get_remote_name()
 
@@ -252,11 +291,6 @@ class NURESTObject(object):
         controller = NURESTLoginController()
         return controller.url
 
-    # def __cmp__(self, rest_object):
-    #     """ Compare with another object """
-    #
-    #     return self.__eq__(rest_object)
-
     def __eq__(self, rest_object):
         """ Compare with another object """
 
@@ -283,7 +317,11 @@ class NURESTObject(object):
         return "%s (ID=%s)" % (self.__class__, self.id)
 
     def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False):
-        """ Expose local_name as remote_name """
+        """ Expose local_name as remote_name
+
+            An exposed attribute `local_name` will be sent within the HTTP request as
+            a `remote_name`
+        """
 
         if remote_name is None:
             remote_name = local_name
@@ -428,8 +466,17 @@ class NURESTObject(object):
 
     # HTTP Calls
 
-    def delete(self, callback=None, async=False, response_choice=None):
-        """ Delete object and call given callback """
+    def delete(self, async=False, callback=None, response_choice=None):
+        """ Delete object and call given callback in case of async call.
+
+            If can_delete_children is set to True, it will automatically try
+            to delete its children.
+
+            Args:
+                async: Boolean to make an asynchronous call. Default is False
+                callback: Callback method that will be triggered in case of asynchronous call
+                response_choice: Automatically send a response choice when confirmation is needed
+        """
 
         if self.can_delete_children:
             self.delete_children()
@@ -437,7 +484,11 @@ class NURESTObject(object):
         return self._manage_child_entity(nurest_object=self, method=HTTP_METHOD_DELETE, async=async, callback=callback, response_choice=response_choice)
 
     def delete_children(self):
-        """ Removes all children """
+        """ Removes all children of the current object
+
+            This method has been developped to try removing all children of a given object.
+            For each child, it will try calling delete method.
+        """
 
         fetcher_infos = inspect.getmembers(self, lambda o: isinstance(o, NURESTFetcher))
 
@@ -456,13 +507,23 @@ class NURESTObject(object):
                         entity.delete()
                     setattr(self, fetcher.local_name, [])
 
-    def save(self, callback=None, async=False):
-        """ Update object and call given callback """
+    def save(self, async=False, callback=None):
+        """ Update object and call given callback in case of async call
+
+            Args:
+                async: Boolean to make an asynchronous call. Default is False
+                callback: Callback method that will be triggered in case of asynchronous call
+        """
 
         return self._manage_child_entity(nurest_object=self, method=HTTP_METHOD_PUT, async=async, callback=callback)
 
-    def fetch(self, callback=None, async=False):
-        """ Fetch all information about the current object """
+    def fetch(self, async=False, callback=None):
+        """ Fetch all information about the current object
+
+            Args:
+                async: Boolean to make an asynchronous call. Default is False
+                callback: Callback method that will be triggered in case of asynchronous call
+        """
 
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
@@ -475,7 +536,18 @@ class NURESTObject(object):
     # REST HTTP Calls
 
     def send_request(self, request, async, local_callback=None, remote_callback=None, user_info=None):
-        """ Sends the request, calls the local callback, then the remote callback """
+        """ Sends a request, calls the local callback, then the remote callback in case of async call
+
+            Args:
+                request: The request to send
+                async: Boolean to make an asynchronous call.
+                local_callback: local method that will be triggered in case of async call
+                remote_callback: remote moethd that will be triggered in case of async call
+                user_info: contains additionnal information to carry during the request
+
+            Returns:
+                Returns the object and connection (object, connection)
+        """
 
         callbacks = dict()
 
@@ -495,10 +567,14 @@ class NURESTObject(object):
     def _manage_child_entity(self, nurest_object, method=HTTP_METHOD_GET, async=False, callback=None, handler=None, response_choice=None):
         """ Low level child management. Send given HTTP method with given entity to given ressource of current object
 
-            :param nurest_object: the NURESTObject object to manage
-            :param method: the HTTP method to use (GET, POST, PUT, DELETE)
-            :param callback: the callback to call at the end
-            :param handler: a custom handler to call when complete, before calling the callback
+            Args:
+                nurest_object: the NURESTObject object to manage
+                method: the HTTP method to use (GET, POST, PUT, DELETE)
+                callback: the callback to call at the end
+                handler: a custom handler to call when complete, before calling the callback
+
+            Returns:
+                Returns the object and connection (object, connection)
         """
 
         url = None
@@ -523,10 +599,15 @@ class NURESTObject(object):
             return handler(connection)
 
     def assign_entities(self, entities, async=False, callback=None):
-        """ Reference a list of NURESTObject into the current resource
-            :param entities: list of NURESTObject to link
-            :param entity_type: Type of the object to link
-            :param callback: Callback method that should be fired at the end
+        """ Reference a list of objects into the current resource
+
+            Args:
+                entities: list of NURESTObject to link
+                entity_type: Type of the object to link
+                callback: Callback method that should be fired at the end
+
+            Returns:
+                Returns the current object and the connection (object, connection)
         """
 
         if len(entities) == 0:
@@ -562,7 +643,6 @@ class NURESTObject(object):
 
         if connection.has_timeouted:
             print "NURESTConnection has timeout."
-            # TODO : Should send a notification error message here
             return
 
         has_callbacks = connection.has_callbacks()
@@ -606,13 +686,18 @@ class NURESTObject(object):
     # Advanced REST Operations
 
     def add_child_entity(self, entity, async=False, callback=None):
-        """ Add given NURESTObject into resource of current object
-            for example, to add a NUGroup into a NUEnterprise, you can call
-            enterprise.add_child_entity(nurest_object=my_group)
+        """ Add given entity to the current object
 
-            :param entity: the NURESTObject object to add
-            :param callback: callback containing the object and the connection
-            :param async: should the request be done asynchronously or not
+            For example, to add a NUGroup into a NUEnterprise, you can call
+            enterprise.add_child_entity(entity=my_group)
+
+            Args:
+                entity: the NURESTObject object to add
+                async: should the request be done asynchronously or not
+                callback: callback containing the object and the connection
+
+            Returns:
+                Returns the object and connection (object, connection)
         """
 
         return self._manage_child_entity(nurest_object=entity,
@@ -622,13 +707,16 @@ class NURESTObject(object):
                                   handler=self._did_add_child_entity)
 
     def instantiate_child_entity(self, entity, from_template, async=False, callback=None):
-        """ Instantiate an entity given NURESTObject into resource of current object
-            for example, to add a NUGroup into a NUEnterprise, you can call
-            enterprise.add_child_entity(nurest_object=my_group)
+        """ Instantiate an entity from a template object
 
-            :param entity: the NURESTObject object to add
-            :param callback: callback containing the object and the connection
-            :param async: should the request be done asynchronously or not
+            Args:
+                entity: the NURESTObject object to add
+                from_template: the NURESTObject template object
+                async: should the request be done asynchronously or not
+                callback: callback containing the object and the connection
+
+            Returns:
+                Returns the object and connection (object, connection)
         """
 
         entity.template_id = from_template.id
@@ -650,13 +738,19 @@ class NURESTObject(object):
         return self._did_perform_standard_operation(connection)
 
     def remove_child_entity(self, entity, async=False, callback=None, response_choice=None):
-        """ Removes given NURESTObject into resource from current object
-            for example, to remove a NUGroup from a NUEnterprise, you can call
-            enterprise.remove_child_entity(nurest_object=my_group)
+        """ Removes given entity into resource from current object
 
-            :param entity: the NURESTObject object to remove
-            :param choice: if a choice has to be made
-            :param callback: callback containing the object and the connection
+            For example, to remove a NUGroup from a NUEnterprise, you can call
+            enterprise.remove_child_entity(entity=my_group)
+
+            Args:
+                entity: the NURESTObject object to remove
+                async:should the request be done asynchronously or not
+                callback: callback containing the object and the connection
+                response_choice: if a confirmation has to be done, what would be the choice
+
+            Returns:
+                Returns the object and connection (object, connection)
         """
 
         entity.delete_children()

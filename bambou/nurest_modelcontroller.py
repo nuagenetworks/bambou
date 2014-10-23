@@ -19,6 +19,7 @@ class NURESTModelController(Singleton):
 
     def __init__(self):
         """ Initializes the Model controller """
+
         self._model_registry = dict()
 
     @classmethod
@@ -33,6 +34,7 @@ class NURESTModelController(Singleton):
     def register_model(self, model):
         """
             Register a model class according to its remote name
+
             Args:
                 model: the model to register
         """
@@ -47,6 +49,7 @@ class NURESTModelController(Singleton):
 
     def get_models(self, remote_name):
         """ Retrieve all models from a given remote name
+
             Args:
                 remote_name: the remote name entry
 
@@ -61,7 +64,11 @@ class NURESTModelController(Singleton):
         return []
 
     def get_first_model(self, remote_name):
-        """ Get the first model corresponding to a remote_name """
+        """ Get the first model corresponding to a remote_name
+
+            Args:
+                remote_name: the remote name
+        """
 
         models = self.get_models(remote_name)
 

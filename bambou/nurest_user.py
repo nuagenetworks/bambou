@@ -17,7 +17,10 @@ from .utils import Sha1
 
 
 class NURESTBasicUser(NURESTObject):
-    """ Defines a basic user """
+    """ NURESTBasicUser defines a user that can log in.
+
+        Only one NURESTBasicUser can be connected at a time.
+    """
 
     __default_user = None
 
@@ -40,30 +43,36 @@ class NURESTBasicUser(NURESTObject):
 
     def _get_user_name(self):
         """ Get user_name """
+
         return self._user_name
 
     def _set_user_name(self, user_name):
         """ Set user_name """
+
         self._user_name = user_name
 
     user_name = property(_get_user_name, _set_user_name)
 
     def _get_password(self):
         """ Get password """
+
         return self._password
 
     def _set_password(self, password):
         """ Set password """
+
         self._password = password
 
     password = property(_get_password, _set_password)
 
     def _get_api_key(self):
         """ Get API Key """
+
         return self._api_key
 
     def _set_api_key(self, api_key):
         """ Set API Key """
+
         self._api_key = api_key
 
     api_key = property(_get_api_key, _set_api_key)
@@ -71,6 +80,7 @@ class NURESTBasicUser(NURESTObject):
     @classmethod
     def get_default_user(cls):
         """ Get default user """
+
         if not cls.__default_user:
             NURESTBasicUser.__default_user = cls()
 

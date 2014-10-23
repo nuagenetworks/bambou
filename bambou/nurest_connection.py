@@ -47,10 +47,15 @@ class NURESTConnection(object):
     """ Enhances requests """
 
     def __init__(self, request, async, callback=None, callbacks=dict(), user=None):
-        """ Intializes a new connection for a request
-            :param request: the NURESTRequest to send
-            :param callback: the method that will be fired after sending
-            :param callbacks: a dictionary of user callbacks. Should contains local and remote callbacks
+        """ Intializes a new connection for a given request
+
+            NURESTConnection object is in charge of the HTTP call. It relies on request library
+
+            Args:
+                request: the NURESTRequest to send
+                async: A boolean to explain whether or not the call has to be made asynchronously
+                callback: the method that will be fired after sending
+                callbacks: a dictionary of user callbacks. Should contains local and remote callbacks
         """
 
         self._uses_authentication = True
@@ -73,59 +78,114 @@ class NURESTConnection(object):
     # Properties
 
     def _get_callbacks(self):
-        """ Get callbacks """
+        """ Get callbacks
+
+            Returns:
+                It returns an array containing user callbacks
+        """
+
         return self._callbacks
 
     callbacks = property(_get_callbacks, None)
 
     def _get_response(self):
-        """ Get response """
+        """ Get response
+
+            Returns:
+                It returns the NURESTResponse object of the request
+        """
+
         return self._response
 
     response = property(_get_response, None)
 
     def _get_user_info(self):
-        """ Get user info """
+        """ Get user info
+
+            Returns:
+                It returns additionnal user information
+        """
+
         return self._user_info
 
     def _set_user_info(self, info):
-        """ Set user info """
+        """ Set user info
+
+            Args:
+                info: Information to carry
+        """
+
         self._user_info = info
 
     user_info = property(_get_user_info, _set_user_info)
 
     def _get_timeout(self):
-        """ Get timeout """
+        """ Get timeout
+
+            Returns:
+                It returns the timeout time in seconds. Default is 3000.
+        """
+
         return self._xhr_timeout
 
     def _set_timeout(self, timeout):
-        """ Set timeout """
+        """ Set timeout
+
+            Args:
+                timeout: Number of seconds before timeout
+        """
+
         self._xhr_timeout = timeout
 
     timeout = property(_get_timeout, _set_timeout)
 
     def _get_ignore_request_idle(self):
-        """ Get ignore request idle """
+        """ Get ignore request idle
+
+            Returns:
+                It returns a boolean. By default ignore request idle is set to False.
+        """
+
         return self._ignore_request_idle
 
-    def _set_ignore_request_idle(self, timeout):
-        """ Set ignore request idle """
-        self._ignore_request_idle = timeout
+    def _set_ignore_request_idle(self, ignore):
+        """ Set ignore request idle
+
+            Args:
+                ignore: boolean to ignore request idle
+        """
+
+        self._ignore_request_idle = ignore
 
     ignore_request_idle = property(_get_ignore_request_idle, _set_ignore_request_idle)
 
     def _has_timeouted(self):
-        """ Get has timouted """
+        """ Get has timouted
+
+            Returns:
+                Returns True if the request has timeout.
+        """
+
         return self._has_timeouted
 
     has_timeouted = property(_has_timeouted, None)
 
     def _get_async(self):
-        """ Get async """
+        """ Get async
+
+            Returns:
+                Returns True if the request is asynchronous
+        """
+
         return self._async
 
     def _set_async(self, async):
-        """ Set async """
+        """ Set async
+
+            Args:
+                async: boolean to make asynchronous http request
+        """
+
         self._async = async
 
     async = property(_get_async, None)
@@ -133,12 +193,23 @@ class NURESTConnection(object):
     # Methods
 
     def has_callbacks(self):
-        """ Returns YES if there is a local or remote callbacks """
+        """  Check if the request has callbacks
+
+            Returns:
+                Returns YES if there is a local or remote callbacks
+        """
 
         return len(self._callbacks) > 0
 
     def has_response_success(self, should_post=False):
-        """ Return True if the response has succeed, False otherwise """
+        """ Check if the response succeed or not.
+
+            In case of error, this method also print messages and set
+            an array of errors in the response object.
+
+            Returns:
+                Returns True if the response has succeed, False otherwise
+        """
 
         status_code = self._response.status_code
 
@@ -210,6 +281,7 @@ class NURESTConnection(object):
 
     def _did_timeout(self):
         """ Called when a resquest has timeout """
+
         bambou_logger.debug('Bambou %s on %s has timeout (timeout=%ss)..' % (self._request.method, self._request.url, self.timeout))
         self._has_timeouted = True
 
@@ -218,11 +290,8 @@ class NURESTConnection(object):
         else:
             return self
 
-        # TODO : Translate this line:
-        #[[CPRunLoop currentRunLoop] limitDateForMode:CPDefaultRunLoopMode];
-
     def _make_request(self):
-        """ make an asyn request """
+        """ Make a synchronous request """
 
         self._has_timeouted = False
 
@@ -249,7 +318,7 @@ class NURESTConnection(object):
 
         headers = self._request.get_headers()
 
-        try:  # TODO : Remove this ugly try/except after http://mvjira.mv.usa.alcatel.com/browse/VSD-546
+        try:  # TODO : Remove this ugly try/except after fixing Java issue: http://mvjira.mv.usa.alcatel.com/browse/VSD-546
             response = requests.request(method=self._request.method,
                                       url=self._request.url,
                                       data=json.dumps(self._request.data),
@@ -269,13 +338,13 @@ class NURESTConnection(object):
 
         except requests.exceptions.Timeout:
             return self._did_timeout()
-        # requests.exceptions.ConnectionError
 
         return self._did_receive_response(response)
 
-    def start(self):  # TODO : Use Timeout here and _ignore_request_idle
+    def start(self):
         """ Make an HTTP request with a specific method """
 
+        # TODO : Use Timeout here and _ignore_request_idle
         if self._async:
             thread = threading.Thread(target=self._make_request)
             thread.is_daemon = False
