@@ -44,7 +44,7 @@ HTTP_METHOD_DELETE = 'DELETE'
 
 
 class NURESTConnection(object):
-    """ Enhances requests """
+    """ Connection that enable HTTP requests """
 
     def __init__(self, request, async, callback=None, callbacks=dict(), user=None):
         """ Intializes a new connection for a given request
