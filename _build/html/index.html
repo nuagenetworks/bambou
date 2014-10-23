@@ -1,0 +1,1092 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to Bambou’s documentation! &mdash; Bambou 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Bambou 0.0.1 documentation" href="#" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">Bambou 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-bambou-s-documentation">
+<h1>Welcome to Bambou&#8217;s documentation!<a class="headerlink" href="#welcome-to-bambou-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Bambou is a RESTful library that wraps <cite>requests</cite> and provide some very useful framework to create a SDK.</p>
+<p>It can be used both synchronously or asynchronously.</p>
+<p>It provides:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">NURESTObject</span></tt>: All instances have access to CRUD operation and make HTTP request. Any model should inherit from this class.</li>
+<li><tt class="docutils literal"><span class="pre">NURESTBasicUser</span></tt> represents the user currently logged in into our application</li>
+<li><tt class="docutils literal"><span class="pre">NURESTFetcher</span></tt> allows an object to fetch its children</li>
+<li><tt class="docutils literal"><span class="pre">NURESTConnection</span></tt> define then connection used for sending a <cite>NURESTRequest</cite> and getting a <cite>NURESTResponse</cite></li>
+<li><tt class="docutils literal"><span class="pre">NURESTLoginController</span></tt> manage a user connection</li>
+<li><tt class="docutils literal"><span class="pre">NURESTPushCenter</span></tt> allows you to start and stop listening for notification on a specific API URL.</li>
+</ul>
+</div></blockquote>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+<span class="target" id="module-bambou"></span><p>Copyright (c) 2011-2012 Alcatel, Alcatel-Lucent, Inc. All Rights Reserved.</p>
+<p>This source code contains confidential information which is proprietary to Alcatel.
+No part of its contents may be used, copied, disclosed or conveyed to any party
+in any manner whatsoever without prior written permission from Alcatel.</p>
+<p>Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.</p>
+<dl class="class">
+<dt id="bambou.NURESTBasicUser">
+<em class="property">class </em><tt class="descclassname">bambou.</tt><tt class="descname">NURESTBasicUser</tt><a class="headerlink" href="#bambou.NURESTBasicUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>NURESTBasicUser defines a user that can log in.</p>
+<p>Only one NURESTBasicUser can be connected at a time.</p>
+<dl class="attribute">
+<dt id="bambou.NURESTBasicUser.api_key">
+<tt class="descname">api_key</tt><a class="headerlink" href="#bambou.NURESTBasicUser.api_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get API Key</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bambou.NURESTBasicUser.get_default_user">
+<em class="property">classmethod </em><tt class="descname">get_default_user</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTBasicUser.get_default_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get default user</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTBasicUser.password">
+<tt class="descname">password</tt><a class="headerlink" href="#bambou.NURESTBasicUser.password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get password</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTBasicUser.prepare_change_password">
+<tt class="descname">prepare_change_password</tt><big>(</big><em>new_password</em><big>)</big><a class="headerlink" href="#bambou.NURESTBasicUser.prepare_change_password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares password modification</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTBasicUser.save">
+<tt class="descname">save</tt><big>(</big><em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTBasicUser.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the user and perform the callback method</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTBasicUser.user_name">
+<tt class="descname">user_name</tt><a class="headerlink" href="#bambou.NURESTBasicUser.user_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get user_name</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bambou.NURESTConnection">
+<em class="property">class </em><tt class="descclassname">bambou.</tt><tt class="descname">NURESTConnection</tt><big>(</big><em>request</em>, <em>async</em>, <em>callback=None</em>, <em>callbacks={}</em>, <em>user=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enhances requests</p>
+<dl class="attribute">
+<dt id="bambou.NURESTConnection.async">
+<tt class="descname">async</tt><a class="headerlink" href="#bambou.NURESTConnection.async" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get async</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns True if the request is asynchronous</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTConnection.callbacks">
+<tt class="descname">callbacks</tt><a class="headerlink" href="#bambou.NURESTConnection.callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get callbacks</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>It returns an array containing user callbacks</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTConnection.has_callbacks">
+<tt class="descname">has_callbacks</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTConnection.has_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the request has callbacks</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns YES if there is a local or remote callbacks</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTConnection.has_response_success">
+<tt class="descname">has_response_success</tt><big>(</big><em>should_post=False</em><big>)</big><a class="headerlink" href="#bambou.NURESTConnection.has_response_success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the response succeed or not.</p>
+<p>In case of error, this method also print messages and set
+an array of errors in the response object.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns True if the response has succeed, False otherwise</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTConnection.has_timeouted">
+<tt class="descname">has_timeouted</tt><a class="headerlink" href="#bambou.NURESTConnection.has_timeouted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get has timouted</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns True if the request has timeout.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTConnection.ignore_request_idle">
+<tt class="descname">ignore_request_idle</tt><a class="headerlink" href="#bambou.NURESTConnection.ignore_request_idle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get ignore request idle</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>It returns a boolean. By default ignore request idle is set to False.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTConnection.response">
+<tt class="descname">response</tt><a class="headerlink" href="#bambou.NURESTConnection.response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get response</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>It returns the NURESTResponse object of the request</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTConnection.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTConnection.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make an HTTP request with a specific method</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTConnection.timeout">
+<tt class="descname">timeout</tt><a class="headerlink" href="#bambou.NURESTConnection.timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get timeout</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>It returns the timeout time in seconds. Default is 3000.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTConnection.user_info">
+<tt class="descname">user_info</tt><a class="headerlink" href="#bambou.NURESTConnection.user_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get user info</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>It returns additionnal user information</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bambou.NURESTModelController">
+<em class="property">class </em><tt class="descclassname">bambou.</tt><tt class="descname">NURESTModelController</tt><a class="headerlink" href="#bambou.NURESTModelController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access any object via its remote name</p>
+<dl class="classmethod">
+<dt id="bambou.NURESTModelController.get_default">
+<em class="property">classmethod </em><tt class="descname">get_default</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTModelController.get_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get default controller</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTModelController.get_first_model">
+<tt class="descname">get_first_model</tt><big>(</big><em>remote_name</em><big>)</big><a class="headerlink" href="#bambou.NURESTModelController.get_first_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the first model corresponding to a remote_name</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>remote_name: the remote name</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTModelController.get_models">
+<tt class="descname">get_models</tt><big>(</big><em>remote_name</em><big>)</big><a class="headerlink" href="#bambou.NURESTModelController.get_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all models from a given remote name</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>remote_name: the remote name entry</dd>
+<dt>Returns:</dt>
+<dd>A list of models corresponding to remote name arg.
+An empty list if no entries found for the remote name</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTModelController.register_model">
+<tt class="descname">register_model</tt><big>(</big><em>model</em><big>)</big><a class="headerlink" href="#bambou.NURESTModelController.register_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a model class according to its remote name</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>model: the model to register</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bambou.NURESTFetcher">
+<em class="property">class </em><tt class="descclassname">bambou.</tt><tt class="descname">NURESTFetcher</tt><a class="headerlink" href="#bambou.NURESTFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object fetcher for childrens</p>
+<p>This object is intended to fetch a specific type of object declared
+by <cite>managed_class</cite> method</p>
+<dl class="method">
+<dt id="bambou.NURESTFetcher.count">
+<tt class="descname">count</tt><big>(</big><em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the total count of objects that can be fetched</p>
+<p>This method can be asynchronous and trigger the callback method
+when result is ready.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>async: Boolean to indicate an asynchronous call. Default is False
+callback: Method that will be triggered if async call is made</dd>
+<dt>Returns:</dt>
+<dd>Returns a transaction ID when asynchronous call is made.
+Otherwise it will return a tuple of information containing
+(fetcher, served object, count of fetched objects)</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTFetcher.count_matching">
+<tt class="descname">count_matching</tt><big>(</big><em>filter=None</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.count_matching" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the total count of objects that can be fetched according to filter</p>
+<p>This method can be asynchronous and trigger the callback method
+when result is ready.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>filter: string that represents a predicate fitler (eg. name == &#8216;x&#8217;)
+async: Boolean to indicate an asynchronous call. Default is False
+callback: Method that will be triggered if async call is made</dd>
+<dt>Returns:</dt>
+<dd>Returns a transaction ID when asynchronous call is made.
+Otherwise it will return a tuple of information containing
+(fetcher, served object, count of fetched objects)</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTFetcher.fetch_entities">
+<tt class="descname">fetch_entities</tt><big>(</big><em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.fetch_entities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch entities and fill the local name of the served object.</p>
+<p>This method fetches all managed class objects and store them
+in local_name of the served object.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>async: Boolean to make a asynchronous call. Default is False
+callback: Callback that should be called in case of a async request</dd>
+<dt>Returns:</dt>
+<dd>It returns a transaction ID in case of an asynchronous call.
+Otherwise, it returns a tuple of information (fetcher, served object, fetched objects, connection)</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTFetcher.fetch_matching_entities">
+<tt class="descname">fetch_matching_entities</tt><big>(</big><em>filter=None</em>, <em>page=None</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.fetch_matching_entities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch entities according to given filter and page.</p>
+<p>This method fetches all managed class objects and store them
+in local_name of the served object.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>filter: string that represents a predicate filter
+page: number of the page to load
+async: Boolean to make a asynchronous call. Default is False
+callback: Callback that should be called in case of a async request</dd>
+<dt>Returns:</dt>
+<dd>It returns a transaction ID in case of an asynchronous call.
+Otherwise, it returns a tuple of information (fetcher, served object, fetched objects, connection)</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bambou.NURESTFetcher.fetcher_with_entity">
+<em class="property">classmethod </em><tt class="descname">fetcher_with_entity</tt><big>(</big><em>entity</em>, <em>local_name</em><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.fetcher_with_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register the fetcher for a served object.</p>
+<p>This method will fill the attribute indicated by <cite>local_name</cite> of
+the given object <cite>entity</cite> with fetched objects of type <cite>managed_class</cite></p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>entity: the instance of the object to serve
+local_name: the name of the attribute to fill when objects will be fetched</dd>
+<dt>Returns:</dt>
+<dd>It returns the fetcher instance.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTFetcher.flush">
+<tt class="descname">flush</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all fetched objects</p>
+<p>It will clear attribute of the served object</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTFetcher.local_name">
+<tt class="descname">local_name</tt><a class="headerlink" href="#bambou.NURESTFetcher.local_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of the attribute that has to be filled</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns the name of the attribute in the served object
+that will be filled</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bambou.NURESTFetcher.managed_class">
+<em class="property">classmethod </em><tt class="descname">managed_class</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.managed_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the object type that is managed by this fetcher.</p>
+<p>This method has to be overrided to indicate which object the fetcher
+is allowed to fetch.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns a type of NURESTObject</dd>
+<dt>Raises:</dt>
+<dd>NotImplementedError: if this method is not overriden</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bambou.NURESTFetcher.managed_object_remote_name">
+<em class="property">classmethod </em><tt class="descname">managed_object_remote_name</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.managed_object_remote_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remote name of the managed object</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns a string representing the resource name of the object
+that has to be fetched.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTFetcher.new">
+<tt class="descname">new</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTFetcher.new" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an instance of the managed class</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns an instance of managed_class</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTFetcher.nurest_object">
+<tt class="descname">nurest_object</tt><a class="headerlink" href="#bambou.NURESTFetcher.nurest_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get served object</p>
+<p>The fetcher will fill the served object with fetched objects</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns the object it is serving.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bambou.NURESTLoginController">
+<em class="property">class </em><tt class="descclassname">bambou.</tt><tt class="descname">NURESTLoginController</tt><a class="headerlink" href="#bambou.NURESTLoginController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Singleton that holds information about the current user session</p>
+<dl class="attribute">
+<dt id="bambou.NURESTLoginController.api_key">
+<tt class="descname">api_key</tt><a class="headerlink" href="#bambou.NURESTLoginController.api_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get API Key</p>
+<p>API Key is available when NURESTUser has been fetched.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns the string containing the API Key</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTLoginController.async">
+<tt class="descname">async</tt><a class="headerlink" href="#bambou.NURESTLoginController.async" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is asynchronous controller</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns True if the controller is asynchronous</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTLoginController.enterprise">
+<tt class="descname">enterprise</tt><a class="headerlink" href="#bambou.NURESTLoginController.enterprise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the enterprise name</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns the name of the enterprise</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTLoginController.get_authentication_header">
+<tt class="descname">get_authentication_header</tt><big>(</big><em>user=None</em>, <em>api_key=None</em>, <em>password=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTLoginController.get_authentication_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return authenication string to place in Authorization Header</p>
+<p>If API Token is set, it&#8217;ll be used. Otherwise, the clear
+text password will be sent. Users of NURESTLoginController are responsible to
+clean the password property.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns the XREST Authentication string with API Key or user password encoded.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTLoginController.impersonate">
+<tt class="descname">impersonate</tt><big>(</big><em>user</em>, <em>enterprise</em><big>)</big><a class="headerlink" href="#bambou.NURESTLoginController.impersonate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Impersonate a user in a enterprise</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>user: the name of the user to impersonate
+enterprise: the name of the enterprise where to use impersonation</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTLoginController.impersonation">
+<tt class="descname">impersonation</tt><a class="headerlink" href="#bambou.NURESTLoginController.impersonation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get impersonation information</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns string information about the impersonsation</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTLoginController.is_impersonating">
+<tt class="descname">is_impersonating</tt><a class="headerlink" href="#bambou.NURESTLoginController.is_impersonating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if we are currently using impersonation</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns True if currently using impersonation</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTLoginController.password">
+<tt class="descname">password</tt><a class="headerlink" href="#bambou.NURESTLoginController.password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get user password</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns user password</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTLoginController.reset">
+<tt class="descname">reset</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTLoginController.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset controller</p>
+<p>It removes all information about previous session</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTLoginController.stop_impersonate">
+<tt class="descname">stop_impersonate</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTLoginController.stop_impersonate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop impersonization</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTLoginController.url">
+<tt class="descname">url</tt><a class="headerlink" href="#bambou.NURESTLoginController.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get API URL endpoint</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns the API URL endpoint</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTLoginController.user">
+<tt class="descname">user</tt><a class="headerlink" href="#bambou.NURESTLoginController.user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the user name</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns the name of the user</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bambou.NURESTObject">
+<em class="property">class </em><tt class="descclassname">bambou.</tt><tt class="descname">NURESTObject</tt><big>(</big><em>creation_date=None</em>, <em>external_id=None</em>, <em>id=None</em>, <em>local_id=None</em>, <em>owner=None</em>, <em>parent_id=None</em>, <em>parent_type=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines an object as a NURESTObject one
+Provides basic saving and fetching utilities</p>
+<dl class="method">
+<dt id="bambou.NURESTObject.add_child">
+<tt class="descname">add_child</tt><big>(</big><em>child</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.add_child" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a child</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.add_child_entity">
+<tt class="descname">add_child_entity</tt><big>(</big><em>entity</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.add_child_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add given entity to the current object</p>
+<p>For example, to add a NUGroup into a NUEnterprise, you can call
+enterprise.add_child_entity(entity=my_group)</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>entity: the NURESTObject object to add
+async: should the request be done asynchronously or not
+callback: callback containing the object and the connection</dd>
+<dt>Returns:</dt>
+<dd>Returns the object and connection (object, connection)</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.assign_entities">
+<tt class="descname">assign_entities</tt><big>(</big><em>entities</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.assign_entities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a list of objects into the current resource</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>entities: list of NURESTObject to link
+entity_type: Type of the object to link
+callback: Callback method that should be fired at the end</dd>
+<dt>Returns:</dt>
+<dd>Returns the current object and the connection (object, connection)</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bambou.NURESTObject.base_url">
+<em class="property">classmethod </em><tt class="descname">base_url</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTObject.base_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this method to set object base url</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTObject.creation_date">
+<tt class="descname">creation_date</tt><a class="headerlink" href="#bambou.NURESTObject.creation_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get creation date</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.delete">
+<tt class="descname">delete</tt><big>(</big><em>async=False</em>, <em>callback=None</em>, <em>response_choice=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete object and call given callback in case of async call.</p>
+<p>If can_delete_children is set to True, it will automatically try
+to delete its children.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>async: Boolean to make an asynchronous call. Default is False
+callback: Callback method that will be triggered in case of asynchronous call
+response_choice: Automatically send a response choice when confirmation is needed</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.delete_children">
+<tt class="descname">delete_children</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTObject.delete_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all children of the current object</p>
+<p>This method has been developped to try removing all children of a given object.
+For each child, it will try calling delete method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.expose_attribute">
+<tt class="descname">expose_attribute</tt><big>(</big><em>local_name</em>, <em>attribute_type</em>, <em>remote_name=None</em>, <em>display_name=None</em>, <em>is_required=False</em>, <em>is_readonly=False</em>, <em>max_length=None</em>, <em>min_length=None</em>, <em>is_identifier=False</em>, <em>choices=None</em>, <em>is_unique=False</em>, <em>is_email=False</em>, <em>is_login=False</em>, <em>is_editable=True</em>, <em>is_password=False</em>, <em>can_order=False</em>, <em>can_search=False</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.expose_attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expose local_name as remote_name</p>
+<p>An exposed attribute <cite>local_name</cite> will be sent within the HTTP request as
+a <cite>remote_name</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTObject.external_id">
+<tt class="descname">external_id</tt><a class="headerlink" href="#bambou.NURESTObject.external_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get external id</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.fetch">
+<tt class="descname">fetch</tt><big>(</big><em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.fetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch all information about the current object</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>async: Boolean to make an asynchronous call. Default is False
+callback: Callback method that will be triggered in case of asynchronous call</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.from_dict">
+<tt class="descname">from_dict</tt><big>(</big><em>dictionary</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill the current object from dictionary</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.get_attributes">
+<tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTObject.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all attributes information</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns a dictionnary containing attribute information</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.get_children">
+<tt class="descname">get_children</tt><big>(</big><em>local_name</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve children according to local name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.get_class_remote_name">
+<tt class="descname">get_class_remote_name</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTObject.get_class_remote_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides the resource name of the instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.get_formated_creation_date">
+<tt class="descname">get_formated_creation_date</tt><big>(</big><em>format='mmm dd yyyy HH:MM:ss'</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.get_formated_creation_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return creation date with a given format. Default is &#8216;mmm dd yyyy HH:MM:ss&#8217;</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bambou.NURESTObject.get_remote_name">
+<em class="property">classmethod </em><tt class="descname">get_remote_name</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTObject.get_remote_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides the class name used for resource</p>
+<p>This method has to be implemented.</p>
+<dl class="docutils">
+<dt>Raises:</dt>
+<dd>NotImplementedError</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bambou.NURESTObject.get_resource_name">
+<em class="property">classmethod </em><tt class="descname">get_resource_name</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTObject.get_resource_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resource name of the object.</p>
+<p>It will compute the plural if needed</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns a string that represents the resouce name of the object</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.get_resource_url">
+<tt class="descname">get_resource_url</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTObject.get_resource_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get resource complete url</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.get_resource_url_for_child_type">
+<tt class="descname">get_resource_url_for_child_type</tt><big>(</big><em>entity_type</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.get_resource_url_for_child_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the resource url for the entity type</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTObject.id">
+<tt class="descname">id</tt><a class="headerlink" href="#bambou.NURESTObject.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get object id</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.instantiate_child_entity">
+<tt class="descname">instantiate_child_entity</tt><big>(</big><em>entity</em>, <em>from_template</em>, <em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.instantiate_child_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate an entity from a template object</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>entity: the NURESTObject object to add
+from_template: the NURESTObject template object
+async: should the request be done asynchronously or not
+callback: callback containing the object and the connection</dd>
+<dt>Returns:</dt>
+<dd>Returns the object and connection (object, connection)</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.is_owned_by_current_user">
+<tt class="descname">is_owned_by_current_user</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTObject.is_owned_by_current_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the current user owns the object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.is_parents_owned_by_current_user">
+<tt class="descname">is_parents_owned_by_current_user</tt><big>(</big><em>remote_names</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.is_parents_owned_by_current_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the current user owns one of the parents</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bambou.NURESTObject.is_resource_name_fixed">
+<em class="property">classmethod </em><tt class="descname">is_resource_name_fixed</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTObject.is_resource_name_fixed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean to say if the resource name should be fixed. Default is False</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTObject.last_updated_by">
+<tt class="descname">last_updated_by</tt><a class="headerlink" href="#bambou.NURESTObject.last_updated_by" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get last updated by user id info</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTObject.last_updated_date">
+<tt class="descname">last_updated_date</tt><a class="headerlink" href="#bambou.NURESTObject.last_updated_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get last updated date</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTObject.local_id">
+<tt class="descname">local_id</tt><a class="headerlink" href="#bambou.NURESTObject.local_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get local id</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bambou.NURESTObject.object_with_id">
+<em class="property">classmethod </em><tt class="descname">object_with_id</tt><big>(</big><em>id</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.object_with_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a new object with the given id</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns a new instance with specified id</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTObject.owner">
+<tt class="descname">owner</tt><a class="headerlink" href="#bambou.NURESTObject.owner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get owner</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTObject.parent">
+<tt class="descname">parent</tt><a class="headerlink" href="#bambou.NURESTObject.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parent</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTObject.parent_id">
+<tt class="descname">parent_id</tt><a class="headerlink" href="#bambou.NURESTObject.parent_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parent id</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTObject.parent_type">
+<tt class="descname">parent_type</tt><a class="headerlink" href="#bambou.NURESTObject.parent_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parent type</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.parent_with_remote_name_matching">
+<tt class="descname">parent_with_remote_name_matching</tt><big>(</big><em>remote_names</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.parent_with_remote_name_matching" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return parent that matches a remote name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.register_children">
+<tt class="descname">register_children</tt><big>(</big><em>children</em>, <em>local_name</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.register_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a list of children to the local name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.remove_child">
+<tt class="descname">remove_child</tt><big>(</big><em>child</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.remove_child" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a child</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.remove_child_entity">
+<tt class="descname">remove_child_entity</tt><big>(</big><em>entity</em>, <em>async=False</em>, <em>callback=None</em>, <em>response_choice=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.remove_child_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes given entity into resource from current object</p>
+<p>For example, to remove a NUGroup from a NUEnterprise, you can call
+enterprise.remove_child_entity(entity=my_group)</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>entity: the NURESTObject object to remove
+async:should the request be done asynchronously or not
+callback: callback containing the object and the connection
+response_choice: if a confirmation has to be done, what would be the choice</dd>
+<dt>Returns:</dt>
+<dd>Returns the object and connection (object, connection)</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.save">
+<tt class="descname">save</tt><big>(</big><em>async=False</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update object and call given callback in case of async call</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>async: Boolean to make an asynchronous call. Default is False
+callback: Callback method that will be triggered in case of asynchronous call</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.send_request">
+<tt class="descname">send_request</tt><big>(</big><em>request</em>, <em>async</em>, <em>local_callback=None</em>, <em>remote_callback=None</em>, <em>user_info=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.send_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a request, calls the local callback, then the remote callback in case of async call</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>request: The request to send
+async: Boolean to make an asynchronous call.
+local_callback: local method that will be triggered in case of async call
+remote_callback: remote moethd that will be triggered in case of async call
+user_info: contains additionnal information to carry during the request</dd>
+<dt>Returns:</dt>
+<dd>Returns the object and connection (object, connection)</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.to_dict">
+<tt class="descname">to_dict</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTObject.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionnary of attributes to use for rest calls
+Overrides this method to add your own attributes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTObject.update_child">
+<tt class="descname">update_child</tt><big>(</big><em>child</em><big>)</big><a class="headerlink" href="#bambou.NURESTObject.update_child" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update child</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bambou.NURESTPushCenter">
+<em class="property">class </em><tt class="descclassname">bambou.</tt><tt class="descname">NURESTPushCenter</tt><a class="headerlink" href="#bambou.NURESTPushCenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Push center wait for push notifications.</p>
+<p>It has to listen a specific URL.</p>
+<p>Every time a notification is send, it will automatically get it
+and store it into get_last_events method.</p>
+<dl class="method">
+<dt id="bambou.NURESTPushCenter.add_delegate">
+<tt class="descname">add_delegate</tt><big>(</big><em>callback</em><big>)</big><a class="headerlink" href="#bambou.NURESTPushCenter.add_delegate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registers a new delegate</p>
+<p>The prototype should be function(data), where data will be the decoded json push</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>callback: method to trigger when push center receives events</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bambou.NURESTPushCenter.get_default_instance">
+<em class="property">classmethod </em><tt class="descname">get_default_instance</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTPushCenter.get_default_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get default push center</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTPushCenter.get_last_events">
+<tt class="descname">get_last_events</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTPushCenter.get_last_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve events that has been</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Returns a list of events and flush existing events.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTPushCenter.remove_delegate">
+<tt class="descname">remove_delegate</tt><big>(</big><em>callback</em><big>)</big><a class="headerlink" href="#bambou.NURESTPushCenter.remove_delegate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a delegate</p>
+<p>The prototype should be function(data), where data will be the decoded json push</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>callback: method to trigger when push center receives events</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTPushCenter.start">
+<tt class="descname">start</tt><big>(</big><em>timeout=None</em>, <em>user=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTPushCenter.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start push center</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>timeout: number of seconds before timeout. Used for testing purpose only.
+user: NURESTUser object that is listening. Used for testing purpose only.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTPushCenter.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTPushCenter.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the current thread</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTPushCenter.url">
+<tt class="descname">url</tt><a class="headerlink" href="#bambou.NURESTPushCenter.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get url</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTPushCenter.wait_until_exit">
+<tt class="descname">wait_until_exit</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTPushCenter.wait_until_exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait until thread exit</p>
+<p>Used for testing purpose only</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bambou.NURESTRequest">
+<em class="property">class </em><tt class="descclassname">bambou.</tt><tt class="descname">NURESTRequest</tt><big>(</big><em>method</em>, <em>url</em>, <em>data=None</em>, <em>params=None</em>, <em>filter=None</em>, <em>page=None</em>, <em>order_by=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTRequest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request that will be send via the connection</p>
+<dl class="attribute">
+<dt id="bambou.NURESTRequest.data">
+<tt class="descname">data</tt><a class="headerlink" href="#bambou.NURESTRequest.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTRequest.get_headers">
+<tt class="descname">get_headers</tt><big>(</big><big>)</big><a class="headerlink" href="#bambou.NURESTRequest.get_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare headers to send</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTRequest.method">
+<tt class="descname">method</tt><a class="headerlink" href="#bambou.NURESTRequest.method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get method</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTRequest.params">
+<tt class="descname">params</tt><a class="headerlink" href="#bambou.NURESTRequest.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get url</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bambou.NURESTRequest.set_header">
+<tt class="descname">set_header</tt><big>(</big><em>header</em>, <em>value</em><big>)</big><a class="headerlink" href="#bambou.NURESTRequest.set_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set header value</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTRequest.url">
+<tt class="descname">url</tt><a class="headerlink" href="#bambou.NURESTRequest.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get url</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bambou.NURESTResponse">
+<em class="property">class </em><tt class="descclassname">bambou.</tt><tt class="descname">NURESTResponse</tt><big>(</big><em>status_code</em>, <em>headers=None</em>, <em>data=None</em>, <em>reason=None</em>, <em>errors=None</em><big>)</big><a class="headerlink" href="#bambou.NURESTResponse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Response that will be received via the connection</p>
+<dl class="attribute">
+<dt id="bambou.NURESTResponse.data">
+<tt class="descname">data</tt><a class="headerlink" href="#bambou.NURESTResponse.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get data</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTResponse.headers">
+<tt class="descname">headers</tt><a class="headerlink" href="#bambou.NURESTResponse.headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get headers</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTResponse.reason">
+<tt class="descname">reason</tt><a class="headerlink" href="#bambou.NURESTResponse.reason" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get error reason</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bambou.NURESTResponse.status_code">
+<tt class="descname">status_code</tt><a class="headerlink" href="#bambou.NURESTResponse.status_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get method</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to Bambou&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2014, Christophe Serafin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.2.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.6.1</a>
+      
+      |
+      <a href="_sources/index.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>
