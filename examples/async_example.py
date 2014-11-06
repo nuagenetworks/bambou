@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
+
+
 import sys
+import threading
 sys.path.append("../")
 
-import threading
 from time import sleep
 
 from bambou import NURESTLoginController
 from bambou import NURESTPushCenter
 
 from models import Enterprise, NURESTUser
-
 
 user = NURESTUser()
 push_center = NURESTPushCenter.get_default_instance()
@@ -20,7 +22,7 @@ def _did_add_enterprise(enterprise, connection):
     """ Callback after user.add_child_object(nurest_object=enterprise...) """
 
     if connection.response.status_code < 300:
-        print "Enterprise saved with ID=%s" % enterprise.id
+        print("Enterprise saved with ID=%s" % enterprise.id)
 
         sleep(6)
 
@@ -30,7 +32,7 @@ def _did_add_enterprise(enterprise, connection):
 
     else:
         push_center.stop()
-        print "Enterprise has not been saved : " + str(connection.response.errors)
+        print("Enterprise has not been saved : " + str(connection.response.errors))
 
     push_center.get_last_events()
 
@@ -38,14 +40,14 @@ def _did_add_enterprise(enterprise, connection):
 def _did_remove_enterprise(enterprise, connection):
     """ Callback method after user.remove_child_object(nurest_object=enterprise...) """
 
-    print "Enterprise %s has been removed" % enterprise
+    print("Enterprise %s has been removed" % enterprise)
     push_center.stop()
 
 
 def _did_user_fetch(user, connection):
     """ Callback method after user.fetch """
 
-    print "** User did fetch in thread"
+    print("** User did fetch in thread")
 
     # Set controller API Key for authentication
     ctrl.api_key = user.api_key
@@ -75,7 +77,7 @@ def main():
     # Logs in and process callback named `_did_user_fetch`
     user.fetch(callback=_did_user_fetch, async=True)
 
-    print "\nEnd Main\nUser %s (%s)" % (user, threading.current_thread())
+    print("\nEnd Main\nUser %s (%s)" % (user, threading.current_thread()))
 
 if __name__ == '__main__':
     main()

@@ -9,6 +9,8 @@ in any manner whatsoever without prior written permission from Alcatel.
 Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 """
 
+from __future__ import print_function
+
 import logging
 
 bambou_logger = logging.getLogger('bambou')

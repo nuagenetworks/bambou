@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import print_function
+
 import sys
 import logging
 sys.path.append("../")
@@ -13,6 +16,7 @@ from models import Enterprise, NURESTUser
 from bambou import bambou_logger
 bambou_logger.setLevel(logging.INFO)
 bambou_logger.addHandler(logging.StreamHandler())
+
 
 def main():
     """ Main method """
@@ -30,7 +34,7 @@ def main():
     (user, connection) = user.fetch(async=False)
     ctrl.api_key = user.api_key
 
-    print ctrl.api_key
+    print(ctrl.api_key)
 
     enterprise = Enterprise()
     enterprise.name = 'Christophe Test'
@@ -38,7 +42,7 @@ def main():
 
     (enterprise, connection) = user.add_child_object(nurest_object=enterprise, async=False)
 
-    print 'Sleeping... 6 sec'
+    print('Sleeping for... 6 sec')
     sleep(6)
 
     enterprise.delete(response_choice=1)

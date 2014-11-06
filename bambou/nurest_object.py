@@ -445,7 +445,7 @@ class NURESTObject(object):
 
                 dictionary[remote_name] = value
             else:
-                #print 'Attribute %s could not be found for object %s' % (local_name, self)
+                # print('Attribute %s could not be found for object %s' % (local_name, self))
                 pass
 
         return dictionary
@@ -461,7 +461,7 @@ class NURESTObject(object):
             if local_name:
                 setattr(self, local_name, remote_value)
             else:
-                #print 'Attribute %s could not be added to object %s' % (remote_name, self)
+                # print('Attribute %s could not be added to object %s' % (remote_name, self))
                 pass
 
     # HTTP Calls
@@ -642,7 +642,7 @@ class NURESTObject(object):
         """ Receive a response from the connection """
 
         if connection.has_timeouted:
-            print "NURESTConnection has timeout."
+            print("NURESTConnection has timeout.")
             return
 
         has_callbacks = connection.has_callbacks()
