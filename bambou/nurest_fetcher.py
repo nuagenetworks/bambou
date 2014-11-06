@@ -35,7 +35,7 @@ class NURESTFetcher(object):
         self._group_by = []
         self._last_connnection = None
         self._local_name = None
-        self._master_filter = False
+        # self._master_filter = False
         self._nurest_object = None
         self._transaction_id = None
 
@@ -156,14 +156,20 @@ class NURESTFetcher(object):
         managed_class = self.managed_class()
         return managed_class()
 
-    def _prepare_headers(self, request, filter=None, page=None):
-        """ Prepare headers for the given request """
+    def _prepare_headers(self, request, filter=None, master_filter=None, page=None):
+        """ Prepare headers for the given request
 
-        if self._master_filter:
-            request.set_header('X-Nuage-Filter', self._master_filter)
+            Args:
+                request: the NURESTRequest to send
+                filter: string
+                master_filter: string
+                page: int
+        """
 
-        elif filter:
-            request.set_header('X-Nuage-Filter', filter)
+        rest_filter = self._rest_filter_from_filter(filter, master_filter)
+
+        if rest_filter:
+            request.set_header('X-Nuage-Filter', self.filter)
 
         if self.master_order:
             request.set_header('X-Nuage-OrderBy', self.master_order)
@@ -182,6 +188,29 @@ class NURESTFetcher(object):
 
             request.set_header('X-Nuage-GroupBy', 'true')
             request.set_header('X-Nuage-Attributes', header)
+
+    def _rest_filter_from_filter(self, filter=None, master_filter=None):
+        """ Computes a REST Filter according to filter and master_filter
+
+            Args:
+                filter: Filter as string
+                master_filter as string
+
+            Returns:
+                A string representing all filters. If no filter has been
+                provided, returns None.
+        """
+
+        if not filter and not master_filter:
+            return None
+
+        if master_filter and not filter:
+            return str(master_filter)
+
+        if filter and not master_filter:
+            return str(filter)
+
+        return "%s AND (%s)" % (master_filter, filter)
 
     def _prepare_url(self):
         """ Prepare url for request """
