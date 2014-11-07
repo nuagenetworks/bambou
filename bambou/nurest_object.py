@@ -386,46 +386,6 @@ class NURESTObject(object):
 
         return self._creation_date.strftime('mmm dd yyyy HH:MM:ss')
 
-    # Children management
-
-    # TODO-CS: [Nov 6 2014, 4.13pm] Commented to avoid confusion with add_child_object
-    # def register_children(self, children, local_name):
-    #     """ Register a list of children to the local name """
-    #
-    #     self._children[local_name] = children
-    #
-    # def get_children(self, local_name):
-    #     """ Retrieve children according to local name """
-    #
-    #     if local_name in self._children:
-    #         return self._children[local_name]
-    #
-    #     return []
-    #
-    # def add_child(self, child):
-    #     """ Add a child """
-    #
-    #     local_name = child.get_remote_name()
-    #     children = self.get_children(local_name)
-    #
-    #     if child not in children:
-    #         children.append(child)
-    #
-    # def remove_child(self, child):
-    #     """ Remove a child """
-    #
-    #     local_name = child.get_remote_name()
-    #     children = self.get_children(local_name)
-    #     children.remove(child)
-    #
-    # def update_child(self, child):
-    #     """ Update child """
-    #
-    #     local_name = child.get_remote_name()
-    #     children = self.get_children(local_name)
-    #     index = children.index(child)
-    #     children[index] = child
-
     # Compression / Decompression
 
     def to_dict(self):
