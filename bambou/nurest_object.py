@@ -388,42 +388,43 @@ class NURESTObject(object):
 
     # Children management
 
-    def register_children(self, children, local_name):
-        """ Register a list of children to the local name """
-
-        self._children[local_name] = children
-
-    def get_children(self, local_name):
-        """ Retrieve children according to local name """
-
-        if local_name in self._children:
-            return self._children[local_name]
-
-        return []
-
-    def add_child(self, child):
-        """ Add a child """
-
-        local_name = child.get_remote_name()
-        children = self.get_children(local_name)
-
-        if child not in children:
-            children.append(child)
-
-    def remove_child(self, child):
-        """ Remove a child """
-
-        local_name = child.get_remote_name()
-        children = self.get_children(local_name)
-        children.remove(child)
-
-    def update_child(self, child):
-        """ Update child """
-
-        local_name = child.get_remote_name()
-        children = self.get_children(local_name)
-        index = children.index(child)
-        children[index] = child
+    # TODO-CS: [Nov 6 2014, 4.13pm] Commented to avoid confusion with add_child_object
+    # def register_children(self, children, local_name):
+    #     """ Register a list of children to the local name """
+    #
+    #     self._children[local_name] = children
+    #
+    # def get_children(self, local_name):
+    #     """ Retrieve children according to local name """
+    #
+    #     if local_name in self._children:
+    #         return self._children[local_name]
+    #
+    #     return []
+    #
+    # def add_child(self, child):
+    #     """ Add a child """
+    #
+    #     local_name = child.get_remote_name()
+    #     children = self.get_children(local_name)
+    #
+    #     if child not in children:
+    #         children.append(child)
+    #
+    # def remove_child(self, child):
+    #     """ Remove a child """
+    #
+    #     local_name = child.get_remote_name()
+    #     children = self.get_children(local_name)
+    #     children.remove(child)
+    #
+    # def update_child(self, child):
+    #     """ Update child """
+    #
+    #     local_name = child.get_remote_name()
+    #     children = self.get_children(local_name)
+    #     index = children.index(child)
+    #     children[index] = child
 
     # Compression / Decompression
 
@@ -736,27 +737,3 @@ class NURESTObject(object):
             pass
 
         return self._did_perform_standard_operation(connection)
-
-    def remove_child_object(self, nurest_object, async=False, callback=None, response_choice=None):
-        """ Removes given nurest_object into resource from current object
-
-            For example, to remove a NUGroup from a NUEnterprise, you can call
-            enterprise.remove_child_object(nurest_object=my_group)
-
-            Args:
-                nurest_object: the NURESTObject object to remove
-                async:should the request be done asynchronously or not
-                callback: callback containing the object and the connection
-                response_choice: if a confirmation has to be done, what would be the choice
-
-            Returns:
-                Returns the object and connection (object, connection)
-        """
-
-        nurest_object.delete_children()
-
-        self._manage_child_object(nurest_object=nurest_object,
-                                  method=HTTP_METHOD_DELETE,
-                                  async=async,
-                                  callback=callback,
-                                  response_choice=response_choice)

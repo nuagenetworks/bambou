@@ -134,7 +134,7 @@ class NURESTFetcher(object):
         fetcher.local_name = local_name
 
         setattr(nurest_object, local_name, [])
-        nurest_object.register_children(getattr(nurest_object, local_name), cls.managed_object_remote_name())
+        # nurest_object.register_children(getattr(nurest_object, local_name), cls.managed_object_remote_name())
 
         return fetcher
 
@@ -169,7 +169,7 @@ class NURESTFetcher(object):
         rest_filter = self._rest_filter_from_filter(filter, master_filter)
 
         if rest_filter:
-            request.set_header('X-Nuage-Filter', self.filter)
+            request.set_header('X-Nuage-Filter', rest_filter)
 
         if self.master_order:
             request.set_header('X-Nuage-OrderBy', self.master_order)
