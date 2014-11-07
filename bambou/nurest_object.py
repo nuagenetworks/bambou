@@ -65,6 +65,7 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
         self.can_delete_children = True
+        self._children_registry = dict()
 
         model_controller = NURESTModelController.get_default()
         model_controller.register_model(self.__class__)
@@ -381,10 +382,156 @@ class NURESTObject(object):
 
         return None
 
+    def _genealogic_types(self):
+        """ Get genealogic types
+
+            Returns:
+                Returns a list of all parent types
+        """
+
+        types = []
+        parent = self
+
+        while parent:
+            types.push(parent.get_resource_name())
+            parent = parent.parent
+
+        return types
+
+    def _genealogic_ids(self):
+        """ Get all genealogic ids
+
+            Returns:
+                 A list of all parent ids
+        """
+
+        ids = []
+        parent = self
+
+        while parent:
+            ids.push(parent.id)
+            parent = parent.parent
+
+        return ids
+
+    def _genealogy_contains_type(self, resource_name):
+        """ Check if parents contains an object of type resource_name
+
+            Args:
+                resource_name: the name of the resource to find
+
+            Returns:
+                Returns True if a parent of type has been found. False otherwise.
+        """
+
+        resource_names = self._genealogic_types()
+        return resource_name in resource_names
+
+    def _genealogy_contains_id(self, id):
+        """ Check if parents contains an object of type resource_name
+
+            Args:
+                id: the id of the resource to find
+
+            Returns:
+                Returns True if a parent with specific id has been found. False otherwise.
+        """
+
+        ids = self._genealogic_ids()
+        return id in ids
+
     def get_formated_creation_date(self, format='mmm dd yyyy HH:MM:ss'):
         """ Return creation date with a given format. Default is 'mmm dd yyyy HH:MM:ss' """
 
+        if not self._creation_date:
+            return u"No date"
+
         return self._creation_date.strftime('mmm dd yyyy HH:MM:ss')
+
+    # Memory management
+
+    def discard(self):
+        """ Discard the current object and its children """
+
+        self.discard_children()
+        self._parent = None
+
+        self._children_registry = dict()
+
+        print ("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
+
+        del self
+
+    def discard_children(self):
+        """ Discard current object children """
+
+        for child in self._children_registry:
+            child.discard()
+
+    def register_children_list(self, children, resource_name):
+        """ Register children of the current object
+
+            Args:
+                children: List of NURESTObject instances
+                resource_name: Name of the children resource
+        """
+
+        self._children_registry[resource_name] = children
+
+    def children_with_resource_name(self, resource_name):
+        """ Get all children according to the given resource_name
+
+            Args:
+                resource_name: the name of the resource
+
+            Returns:
+                Returns a list of children. If no children has been found,
+                returns an empty list.
+        """
+
+        if resource_name not in self._children_registry:
+            return []
+
+        return self._children_registry[resource_name]
+
+    # Children management
+
+    def register_children(self, children, local_name):
+        """ Register a list of children to the local name """
+
+        self._children[local_name] = children
+
+    def get_children(self, local_name):
+        """ Retrieve children according to local name """
+
+        if local_name in self._children:
+            return self._children[local_name]
+
+        return []
+
+    def _add_child(self, child):
+        """ Add a child """
+
+        local_name = child.get_remote_name()
+        children = self.get_children(local_name)
+
+        if child not in children:
+            children.append(child)
+
+    def _remove_child(self, child):
+        """ Remove a child """
+
+        local_name = child.get_remote_name()
+        children = self.get_children(local_name)
+        children.remove(child)
+
+    def _update_child(self, child):
+        """ Update child """
+
+        local_name = child.get_remote_name()
+        children = self.get_children(local_name)
+        index = children.index(child)
+        children[index] = child
 
     # Compression / Decompression
 

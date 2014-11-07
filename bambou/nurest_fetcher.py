@@ -134,6 +134,7 @@ class NURESTFetcher(object):
         fetcher.local_name = local_name
 
         setattr(nurest_object, local_name, [])
+        nurest_object.register_children(getattr(nurest_object, local_name), cls.managed_object_remote_name())
 
         return fetcher
 
