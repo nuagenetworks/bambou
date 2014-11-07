@@ -2,6 +2,42 @@
 
 from bambou import NURESTObject
 from bambou import NURESTBasicUser
+from bambou import NURESTFetcher
+
+
+class Enterprise(NURESTObject):
+    """ Creates a enterprise object for tests """
+
+    def __init__(self, id=None, name='Alcatel-Lucent'):
+        """ Creates a new Enterprise """
+        super(Enterprise, self).__init__()
+        self.id = id
+        self.name = name
+        self.description = None
+        self.invisible = True
+
+        self.expose_attribute(local_name='name', attribute_type=str, is_required=True)
+        self.expose_attribute(local_name='description', attribute_type=str)
+
+    @classmethod
+    def get_remote_name(cls):
+        """ Provides enterprise classname  """
+
+        return u"enterprise"
+
+
+class EnterprisesFetcher(NURESTFetcher):
+    """ Represents a Enterprises fetcher """
+
+    @classmethod
+    def managed_class(cls):
+        """ This fetcher manages NUEnterprise objects
+
+            Returns:
+                Returns the NUEnterprise class
+        """
+
+        return Enterprise
 
 
 class User(NURESTBasicUser):
@@ -21,6 +57,8 @@ class User(NURESTBasicUser):
         self.avatar_data = None
         self.api_key_expiry = None
 
+        self.enterprises = [];
+
         self.expose_attribute(local_name='email', remote_name='email', attribute_type=str)
         self.expose_attribute(local_name='firstname', remote_name='firstName', attribute_type=str)
         self.expose_attribute(local_name='lastname', remote_name='lastName', attribute_type=str)
@@ -31,9 +69,8 @@ class User(NURESTBasicUser):
         self.expose_attribute(local_name='avatar_data', remote_name='avatarData', attribute_type=str)
         self.expose_attribute(local_name='api_key_expiry', remote_name='APIKeyExpiry', attribute_type=str)
 
-        # Overides from parents because rest name changed
-        self.expose_attribute(local_name='user_name', remote_name='userName', attribute_type=str)  # TODO : Declare bug here
-        self.expose_attribute(local_name='external_id', remote_name='externalId', attribute_type=str)  # TODO : Declare bug here
+        self.enterprises = []
+        self.enterprises_fetcher = EnterprisesFetcher.fetcher_with_object(nurest_object=self, local_name=u'enterprises')
 
     @classmethod
     def get_remote_name(cls):
@@ -58,24 +95,3 @@ class User(NURESTBasicUser):
         """ Get the resource url for the nurest_object type """
 
         return "%s/%s" % (self.__class__.base_url(), nurest_object_type.get_resource_name())
-
-
-class Enterprise(NURESTObject):
-    """ Creates a enterprise object for tests """
-
-    def __init__(self, id=None, name='Alcatel-Lucent'):
-        """ Creates a new Enterprise """
-        super(Enterprise, self).__init__()
-        self.id = id
-        self.name = name
-        self.description = None
-        self.invisible = True
-
-        self.expose_attribute(local_name='name', attribute_type=str, is_required=True)
-        self.expose_attribute(local_name='description', attribute_type=str)
-
-    @classmethod
-    def get_remote_name(cls):
-        """ Provides enterprise classname  """
-
-        return u"enterprise"
