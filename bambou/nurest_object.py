@@ -678,12 +678,17 @@ class NURESTObject(object):
             Args:
                 nurest_object: the NURESTObject object to manage
                 method: the HTTP method to use (GET, POST, PUT, DELETE)
+                async: True or False to make an asynchronous request
                 callback: the callback to call at the end
                 handler: a custom handler to call when complete, before calling the callback
 
             Returns:
                 Returns the object and connection (object, connection)
         """
+
+        # Force asynchronous request when having a callback
+        if callback:
+            async = True
 
         url = None
 
