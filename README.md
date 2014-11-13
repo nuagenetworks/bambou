@@ -10,7 +10,7 @@ All objects that inherits from `NURESTObject` will be able to discuss with your 
 Usage
 -----
 
-__#1 Create your object models to extends NURESTObject or NURESTBasicUser__
+*1. Create your object models to extends NURESTObject or NURESTBasicUser*
 ::
 
     from bambou.nurest_user import NURESTBasicUser
@@ -22,7 +22,7 @@ __#1 Create your object models to extends NURESTObject or NURESTBasicUser__
 
             return "user"
 
-__#2 Start a new NURESTLoginController__
+*2. Start a new NURESTLoginController*
 ::
 
     ctrl = NURESTLoginController()
@@ -30,9 +30,8 @@ __#2 Start a new NURESTLoginController__
     ctrl.password = u"your_password"
     ctrl.enterprise = u"your_enterprise"
     ctrl.url = u"your_url"
-    #ctrl.async = False  # Default is True
 
-__#3 Instanciate your model and fetch, save, create or delete it__
+*3. Instanciate your model and fetch, save, create or delete it*
 ::
 
     user = User()
@@ -40,7 +39,7 @@ __#3 Instanciate your model and fetch, save, create or delete it__
     user.firstname = u'John'
     user.save(callback=another_callback)
 
-__#4 Using push center notifications__
+*4. Using push center notifications*
 ::
 
     push_center = NURESTPushCenter.get_default_instance()
@@ -49,7 +48,7 @@ __#4 Using push center notifications__
     push_center.stop()  # Stop listening events
 
 Examples
--------
+--------
 ::
 
     $ cd examples

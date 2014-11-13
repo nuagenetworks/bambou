@@ -6,7 +6,7 @@
 Welcome to Bambou's documentation!
 ==================================
 
-Bambou is a RESTful library that wraps `requests` and provide some very useful framework to create a SDK.
+Bambou is a RESTful library that wraps `requests` and provide a very useful framework to create a SDK.
 
 It can be used both synchronously or asynchronously.
 
