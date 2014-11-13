@@ -1,36 +1,17 @@
-# Bambou - bends but does not break !
+Bambou - bends but does not break !
 ====================================
 
-Python REST layer for Nuage Networks' application
+Python REST layer for Nuage Networks' Virtual Service Directory (http://www.nuagenetworks.net/).
 
-### Setting up your python environment
-
-Follow these 3 steps to use your python environment.
-
-1) First, you should install your environment if you have not done already
-
-    $ virtual-env --no-site-packages bambou-env
-    $ Installing Setuptools..[]..done.
-
-2) Activate your environment
-
-    $ cd bambou-env
-    $ source bin/activate
-    (bambou-env) $ cd bambou-env
-
-3) Clone repository
-
-    git clone http://github.mv.usa.alcatel.com/chserafi/bambou.git
-
-4) Install package dependencies listed in requirements.txt file
-
-    (bambou-env) $ cd bambou
-    (bambou-env) $ pip install -r requirements.txt
+Bambou works on top of `request` library and provides an object layer.
+All objects that inherits from `NURESTObject` will be able to discuss with your VSD Backend.
 
 
-### Usage
+Usage
+-----
 
 __#1 Create your object models to extends NURESTObject or NURESTBasicUser__
+::
 
     from bambou.nurest_user import NURESTBasicUser
     class User(NURESTBasicUser):
@@ -42,6 +23,7 @@ __#1 Create your object models to extends NURESTObject or NURESTBasicUser__
             return "user"
 
 __#2 Start a new NURESTLoginController__
+::
 
     ctrl = NURESTLoginController()
     ctrl.user = u"your_user"
@@ -51,6 +33,7 @@ __#2 Start a new NURESTLoginController__
     #ctrl.async = False  # Default is True
 
 __#3 Instanciate your model and fetch, save, create or delete it__
+::
 
     user = User()
     user.fetch(callback=your_callback)
@@ -58,13 +41,16 @@ __#3 Instanciate your model and fetch, save, create or delete it__
     user.save(callback=another_callback)
 
 __#4 Using push center notifications__
+::
 
     push_center = NURESTPushCenter.get_default_instance()
     push_center.start()  # Start listening events
     push_center.get_last_events()  # Retrieve last events
     push_center.stop()  # Stop listening events
 
-### Examples
+Examples
+-------
+::
 
     $ cd examples
     $ python sync_example.py  # To launch the synchronized example
