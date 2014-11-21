@@ -222,24 +222,7 @@ class NURESTFetcher(object):
 
         return url
 
-    def fetch_objects(self, async=False, callback=None):
-        """ Fetch objects and fill the local name of the served object.
-
-            This method fetches all managed class objects and store them
-            in local_name of the served object.
-
-            Args:
-                async: Boolean to make a asynchronous call. Default is False
-                callback: Callback that should be called in case of a async request
-
-            Returns:
-                It returns a transaction ID in case of an asynchronous call.
-                Otherwise, it returns a tuple of information (fetcher, served object, fetched objects, connection)
-        """
-
-        return self.fetch_matching_objects(async=async, callback=callback)
-
-    def fetch_matching_objects(self, filter=None, page=None, async=False, callback=None):
+    def fetch_objects(self, filter=None, page=None, async=False, callback=None):
         """ Fetch objects according to given filter and page.
 
             This method fetches all managed class objects and store them
