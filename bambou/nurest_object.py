@@ -792,7 +792,7 @@ class NURESTObject(object):
         else:
 
             if connection.response.status_code >= 300:
-                raise Exception("[ERROR %s] %s" % (connection.response.status_code, connection.response.errors)
+                raise Exception("[ERROR %s] %s" % (connection.response.status_code, connection.response.errors))
 
             if connection.user_info:
                 return (connection.user_info, connection)
