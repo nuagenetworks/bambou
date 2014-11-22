@@ -353,6 +353,10 @@ class NURESTFetcher(object):
             if callback:
                 callback(self, self._nurest_object, count)
         else:
+
+            if connection.response.status_code >= 300:
+                raise Exception("[ERROR %s] %s" % (connection.response.status_code, connection.response.errors))
+
             return (self, self._nurest_object, count)
 
     def _send_content(self, content, connection):
