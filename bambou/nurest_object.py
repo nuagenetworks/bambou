@@ -711,7 +711,7 @@ class NURESTObject(object):
             connection = self.send_request(request=request, async=async, user_info=nurest_object)
             return handler(connection)
 
-    def assign_objects(self, objects, async=False, callback=None):
+    def assign_objects(self, objects, nurest_object_type, async=False, callback=None):
         """ Reference a list of objects into the current resource
 
             Args:
@@ -727,7 +727,6 @@ class NURESTObject(object):
             return
 
         ids = list()
-        nurest_object_type = objects[0].__class__
 
         for nurest_object in objects:
             ids.append(nurest_object.id)
@@ -791,7 +790,7 @@ class NURESTObject(object):
                 callback(self, connection)
         else:
 
-            if connection.response.status_code >= 300:
+            if connection.response.status_code >= 400:
                 raise Exception("[ERROR %s] %s" % (connection.response.status_code, connection.response.errors))
 
             if connection.user_info:
