@@ -3,6 +3,7 @@
 from unittest import TestCase
 from mock import patch
 
+from bambou.exceptions import BambouHTTPError
 from bambou.tests.functionnal import get_login_as_user, build_mock_response, get_mock_arg, get_valid_enterprise
 
 
@@ -43,7 +44,7 @@ class Create(TestCase):
         mock = build_mock_response(status_code=409, data=enterprise, error=u"Name already exists")
 
         with patch('bambou.NURESTObject.send_request', mock):
-            with self.assertRaises(Exception):
+            with self.assertRaises(BambouHTTPError):
                 (obj, connection) = user.add_child_object(enterprise)
 
         request = get_mock_arg(mock, 'request')

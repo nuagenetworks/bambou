@@ -3,6 +3,7 @@
 from unittest import TestCase
 from mock import patch
 
+from bambou.exceptions import BambouHTTPError
 from bambou.tests.functionnal import get_login_as_user, build_mock_response, get_mock_arg, get_valid_enterprise
 
 
@@ -44,7 +45,7 @@ class Update(TestCase):
         mock = build_mock_response(status_code=404, data=enterprise, error=u"Enterprise not found")
 
         with patch('bambou.NURESTObject.send_request', mock):
-            with self.assertRaises(Exception):
+            with self.assertRaises(BambouHTTPError):
                 (obj, connection) = enterprise.save()
 
         request = get_mock_arg(mock, 'request')

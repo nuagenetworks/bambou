@@ -3,6 +3,7 @@
 from unittest import TestCase
 from mock import patch
 
+from bambou.exceptions import BambouHTTPError
 from bambou.tests.functionnal import get_login_as_user, build_mock_response, get_mock_arg, get_valid_enterprise
 
 
@@ -40,7 +41,7 @@ class Delete(TestCase):
         mock = build_mock_response(status_code=400, data=self.enterprise, error=u"Internal error")
 
         with patch('bambou.NURESTObject.send_request', mock):
-            with self.assertRaises(Exception):
+            with self.assertRaises(BambouHTTPError):
                 (obj, connection) = self.enterprise.delete(response_choice=1)
 
         request = get_mock_arg(mock, 'request')

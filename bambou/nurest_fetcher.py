@@ -11,6 +11,7 @@ Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
 import uuid
 
+from .exceptions import BambouHTTPError
 from .nurest_request import NURESTRequest
 from .nurest_connection import HTTP_METHOD_GET, HTTP_METHOD_HEAD
 
@@ -355,7 +356,7 @@ class NURESTFetcher(object):
         else:
 
             if connection.response.status_code >= 400:
-                raise Exception("[ERROR %s] %s" % (connection.response.status_code, connection.response.errors))
+                raise BambouHTTPError(response=connection.response)
 
             return (self, self._nurest_object, count)
 

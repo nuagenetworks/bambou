@@ -14,6 +14,7 @@ import json
 
 from time import time
 
+from .exceptions import BambouHTTPError
 from .nurest_login_controller import NURESTLoginController
 from .nurest_connection import NURESTConnection, HTTP_METHOD_DELETE, HTTP_METHOD_PUT, HTTP_METHOD_POST, HTTP_METHOD_GET
 from .nurest_fetcher import NURESTFetcher
@@ -792,7 +793,7 @@ class NURESTObject(object):
         else:
 
             if connection.response.status_code >= 400:
-                raise Exception("[ERROR %s] %s" % (connection.response.status_code, connection.response.errors))
+                raise BambouHTTPError(response=connection.response)
 
             if connection.user_info:
                 return (connection.user_info, connection)
