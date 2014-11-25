@@ -99,3 +99,5 @@ class NURESTRequest(object):
         """ Set header value """
 
         self._headers[header] = value
+
+    headers = property(get_headers, set_header)

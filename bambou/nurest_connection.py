@@ -97,7 +97,17 @@ class NURESTConnection(object):
 
         return self._response
 
-    response = property(_get_response, None)
+    def _set_response(self, response):
+        """ Set response
+
+            Args:
+                response: the NURESTResponse object
+
+        """
+
+        self._response = response
+
+    response = property(_get_response, _set_response)
 
     def _get_user_info(self):
         """ Get user info
