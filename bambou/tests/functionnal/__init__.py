@@ -78,7 +78,6 @@ def build_mock_response(status_code, data, filter=None, order_by=None, page=None
     if page:
         headers['X-Nuage-Page'] = page
 
-    print result
     connection.response = NURESTResponse(status_code=status_code, data=result, headers=headers)
 
     if error:

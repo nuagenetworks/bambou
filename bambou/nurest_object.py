@@ -710,7 +710,6 @@ class NURESTObject(object):
             self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=nurest_object)
         else:
             connection = self.send_request(request=request, async=async, user_info=nurest_object)
-            print connection.response.data
             return handler(connection)
 
     def assign_objects(self, objects, nurest_object_type, async=False, callback=None):
