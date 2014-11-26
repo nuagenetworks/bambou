@@ -4,7 +4,8 @@ from unittest import TestCase
 from mock import patch
 
 from bambou.exceptions import BambouHTTPError
-from bambou.tests.functionnal import get_login_as_user, build_mock_response, get_mock_arg, get_valid_enterprise
+from bambou.tests.utils import MockUtils
+from bambou.tests.functionnal import get_login_as_user, get_valid_enterprise
 
 
 class Delete(TestCase):
@@ -21,29 +22,30 @@ class Delete(TestCase):
     def test_delete(self):
         """ DELETE /enterprises delete enterprise """
 
-        mock = build_mock_response(status_code=204, data=self.enterprise)
+        mock = MockUtils.create_mock_response(status_code=204, data=self.enterprise)
 
-        with patch('bambou.NURESTObject.send_request', mock):
+        with patch('requests.request', mock):
             (obj, connection) = self.enterprise.delete(response_choice=1)
 
-        request = get_mock_arg(mock, 'request')
+        method = MockUtils.get_mock_parameter(mock, 'method')
+        url = MockUtils.get_mock_parameter(mock, 'url')
+        headers = MockUtils.get_mock_parameter(mock, 'headers')
 
-        self.assertEqual(connection.response.status_code, 204)
-        self.assertEqual(request.url, u'https://<host>:<port>/nuage/api/v3_0/enterprises/%s?responseChoice=1' % self.enterprise.id)
-        self.assertEqual(request.method, u'DELETE')
+        self.assertEqual(url, u'https://<host>:<port>/nuage/api/v3_0/enterprises/%s?responseChoice=1' % self.enterprise.id)
+        self.assertEqual(method, u'DELETE')
+        self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
+        self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
+        self.assertEqual(headers['Content-Type'], u'application/json')
 
         self.assertEqual(obj.name, self.enterprise.name)
         self.assertEqual(obj.id, self.enterprise.id)
+        self.assertEqual(connection.response.status_code, 204)
 
     def test_delete_raise_error(self):
         """ DELETE /enterprises delete enterprise raise error """
 
-        mock = build_mock_response(status_code=400, data=self.enterprise, error=u"Internal error")
+        mock = MockUtils.create_mock_response(status_code=400, data=self.enterprise, error=u"Internal error")
 
-        with patch('bambou.NURESTObject.send_request', mock):
+        with patch('requests.request', mock):
             with self.assertRaises(BambouHTTPError):
                 (obj, connection) = self.enterprise.delete(response_choice=1)
-
-        request = get_mock_arg(mock, 'request')
-        self.assertEqual(request.url, u'https://<host>:<port>/nuage/api/v3_0/enterprises/%s?responseChoice=1' % self.enterprise.id)
-        self.assertEqual(request.method, u'DELETE')

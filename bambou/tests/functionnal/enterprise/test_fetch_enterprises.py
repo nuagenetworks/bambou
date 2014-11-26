@@ -3,7 +3,8 @@
 from unittest import TestCase
 from mock import patch
 
-from bambou.tests.functionnal import get_login_as_user, build_mock_response, get_mock_arg, get_valid_enterprise
+from bambou.tests.utils import MockUtils
+from bambou.tests.functionnal import get_login_as_user, get_valid_enterprise
 
 
 class Fetch(TestCase):
@@ -27,20 +28,28 @@ class Fetch(TestCase):
         user = self.user
         enterprises = self.enterprises
 
-        mock = build_mock_response(status_code=200, data=enterprises)
+        mock = MockUtils.create_mock_response(status_code=200, data=enterprises)
 
-        with patch('bambou.NURESTObject.send_request', mock):
+        with patch('requests.request', mock):
             (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects()
 
-        request = get_mock_arg(mock, 'request')
+        d = MockUtils.get_mock_parameter(mock, 'data')
+        print d
 
-        self.assertEqual(connection.response.status_code, 200)
-        self.assertEqual(request.url, u'https://<host>:<port>/nuage/api/v3_0/enterprises')
-        self.assertEqual(request.method, u'GET')
+        method = MockUtils.get_mock_parameter(mock, 'method')
+        url = MockUtils.get_mock_parameter(mock, 'url')
+        headers = MockUtils.get_mock_parameter(mock, 'headers')
+
+        self.assertEqual(url, u'https://<host>:<port>/nuage/api/v3_0/enterprises')
+        self.assertEqual(method, u'GET')
+        self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
+        self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
+        self.assertEqual(headers['Content-Type'], u'application/json')
 
         self.assertEqual(fetcher, self.user.enterprises_fetcher)
         self.assertEqual(user, self.user)
         self.assertEqual(len(enterprises), 4)
+        self.assertEqual(connection.response.status_code, 200)
 
     def test_fetch_with_filter(self):
         """ GET /enterprises retrieve enterprises with filters """
@@ -48,20 +57,21 @@ class Fetch(TestCase):
         user = self.user
         enterprises = self.enterprises
 
-        mock = build_mock_response(status_code=200, data=[enterprises[1]])
+        mock = MockUtils.create_mock_response(status_code=200, data=[enterprises[1]])
 
-        with patch('bambou.NURESTObject.send_request', mock):
+        with patch('requests.request', mock):
             (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(filter=u"name == 'Enterprise 2'")
 
-        request = get_mock_arg(mock, 'request')
+        method = MockUtils.get_mock_parameter(mock, 'method')
+        url = MockUtils.get_mock_parameter(mock, 'url')
+        headers = MockUtils.get_mock_parameter(mock, 'headers')
 
-        self.assertEqual(connection.response.status_code, 200)
-        self.assertEqual(request.url, u'https://<host>:<port>/nuage/api/v3_0/enterprises')
-        self.assertEqual(request.method, u'GET')
-        self.assertEqual(request.headers['X-Nuage-Filter'], u"name == 'Enterprise 2'")
-
-        self.assertEqual(fetcher, self.user.enterprises_fetcher)
-        self.assertEqual(user, self.user)
+        self.assertEqual(url, u'https://<host>:<port>/nuage/api/v3_0/enterprises')
+        self.assertEqual(method, u'GET')
+        self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
+        self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
+        self.assertEqual(headers['Content-Type'], u'application/json')
+        self.assertEqual(headers['X-Nuage-Filter'], u"name == 'Enterprise 2'")
         self.assertEqual(len(enterprises), 1)
         self.assertEqual(enterprises[0].name, u"Enterprise 2")
 
@@ -71,16 +81,15 @@ class Fetch(TestCase):
         user = self.user
         enterprises = self.enterprises
 
-        mock = build_mock_response(status_code=500, data=[], error=u"Internal error")
+        mock = MockUtils.create_mock_response(status_code=500, data=[], error=u"Internal error")
 
-        with patch('bambou.NURESTObject.send_request', mock):
+        with patch('requests.request', mock):
             (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects()
 
-        request = get_mock_arg(mock, 'request')
-        self.assertEqual(connection.response.status_code, 500)
-        self.assertEqual(request.url, u'https://<host>:<port>/nuage/api/v3_0/enterprises')
-        self.assertEqual(request.method, u'GET')
+        method = MockUtils.get_mock_parameter(mock, 'method')
+        url = MockUtils.get_mock_parameter(mock, 'url')
 
-        self.assertEqual(fetcher, self.user.enterprises_fetcher)
-        self.assertEqual(user, self.user)
+        self.assertEqual(url, u'https://<host>:<port>/nuage/api/v3_0/enterprises')
+        self.assertEqual(method, u'GET')
         self.assertEqual(enterprises, None)
+        self.assertEqual(connection.response.status_code, 500)

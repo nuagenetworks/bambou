@@ -2,9 +2,7 @@
 
 import logging
 
-from mock import MagicMock
-
-from bambou import bambou_logger, NURESTLoginController, NURESTConnection, NURESTResponse
+from bambou import bambou_logger, NURESTLoginController
 from bambou.tests import User, Enterprise
 
 bambou_logger.setLevel(logging.INFO)
@@ -44,59 +42,3 @@ def get_valid_enterprise(id, name):
     enterprise.name = name
 
     return enterprise
-
-
-def build_mock_response(status_code, data, filter=None, order_by=None, page=None, error=None):
-    """ Build a fake response
-
-        Args:
-            status_code: the status code
-            data: the NURESTObject
-            filter: a string representing a filter
-            order_by: a string representing an order by
-            page: a page number
-
-    """
-    connection = NURESTConnection(request=None, async=False)
-
-    result = None
-    if type(data) == list:
-        result = list()
-        for obj in data:
-            result.append(obj.to_dict())
-    else:
-        connection.user_info = data
-        result = data.to_dict()
-
-    headers = dict()
-    if filter:
-        headers['X-Nuage-Filter'] = str(filter)
-
-    if order_by:
-        headers['X-Nuage-OrderBy'] = str(order_by)
-
-    if page:
-        headers['X-Nuage-Page'] = page
-
-    connection.response = NURESTResponse(status_code=status_code, data=result, headers=headers)
-
-    if error:
-        connection.response.errors['Error'] = error
-
-    return MagicMock(return_value=connection)
-
-
-def get_mock_arg(mock, name):
-    """ Get the argument of a mock call
-
-        Args:
-            mock: the mock that has been called
-            name: the name of the argument
-
-    """
-    args = mock.call_args[1]
-
-    if name in args:
-        return args[name]
-
-    return None

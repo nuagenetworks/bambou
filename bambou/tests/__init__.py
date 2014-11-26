@@ -4,6 +4,8 @@ from bambou import NURESTObject
 from bambou import NURESTBasicUser
 from bambou import NURESTFetcher
 
+__all__ = ['Enterprise', 'EnterprisesFetcher', 'User']
+
 
 class Enterprise(NURESTObject):
     """ Creates a enterprise object for tests """
