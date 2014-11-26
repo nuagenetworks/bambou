@@ -327,7 +327,6 @@ class NURESTConnection(object):
             self._request.set_header('X-Nuage-ProxyUser', controller.impersonation)
 
         headers = self._request.get_headers()
-        print headers
 
         try:  # TODO : Remove this ugly try/except after fixing Java issue: http://mvjira.mv.usa.alcatel.com/browse/VSD-546
             response = requests.request(method=self._request.method,
