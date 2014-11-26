@@ -5,7 +5,7 @@ import logging
 from bambou import bambou_logger, NURESTLoginController
 from bambou.tests import User, Enterprise
 
-bambou_logger.setLevel(logging.INFO)
+bambou_logger.setLevel(logging.ERROR)
 
 
 def get_login_as_user():

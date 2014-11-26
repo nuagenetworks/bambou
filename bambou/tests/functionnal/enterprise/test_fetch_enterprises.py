@@ -62,18 +62,24 @@ class Fetch(TestCase):
         with patch('requests.request', mock):
             (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(filter=u"name == 'Enterprise 2'")
 
-        method = MockUtils.get_mock_parameter(mock, 'method')
-        url = MockUtils.get_mock_parameter(mock, 'url')
         headers = MockUtils.get_mock_parameter(mock, 'headers')
-
-        self.assertEqual(url, u'https://<host>:<port>/nuage/api/v3_0/enterprises')
-        self.assertEqual(method, u'GET')
-        self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
-        self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
-        self.assertEqual(headers['Content-Type'], u'application/json')
         self.assertEqual(headers['X-Nuage-Filter'], u"name == 'Enterprise 2'")
         self.assertEqual(len(enterprises), 1)
         self.assertEqual(enterprises[0].name, u"Enterprise 2")
+
+    def test_fetch_with_page(self):
+        """ GET /enterprises retrieve enterprises with page """
+
+        user = self.user
+        enterprises = self.enterprises
+
+        mock = MockUtils.create_mock_response(status_code=200, data=enterprises)
+
+        with patch('requests.request', mock):
+            (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(page=2)
+
+        headers = MockUtils.get_mock_parameter(mock, 'headers')
+        self.assertEqual(headers['X-Nuage-Page'], 2)
 
     def test_fetch_all_should_not_raise_exception(self):
         """ GET /enterprises retrieve all enterprises should not raise exception """
