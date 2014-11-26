@@ -12,6 +12,9 @@ Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 from __future__ import print_function
 
 import logging
+import requests
+
+requests.packages.urllib3.disable_warnings()
 
 bambou_logger = logging.getLogger('bambou')
 
