@@ -295,25 +295,7 @@ class NURESTFetcher(object):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def count(self, async=False, callback=None):
-        """ Get the total count of objects that can be fetched
-
-            This method can be asynchronous and trigger the callback method
-            when result is ready.
-
-            Args:
-                async: Boolean to indicate an asynchronous call. Default is False
-                callback: Method that will be triggered if async call is made
-
-            Returns:
-                Returns a transaction ID when asynchronous call is made.
-                Otherwise it will return a tuple of information containing
-                (fetcher, served object, count of fetched objects)
-        """
-
-        self.count_matching(callback=callback)
-
-    def count_matching(self, filter=None, async=False, callback=None):
+    def count(self, filter=None, async=False, callback=None):
         """ Get the total count of objects that can be fetched according to filter
 
             This method can be asynchronous and trigger the callback method
@@ -340,15 +322,21 @@ class NURESTFetcher(object):
             return self._transaction_id
 
         else:
-            self._nurest_object.send_request(request=request, async=async)
-            return self._did_count()
+            connection = self._nurest_object.send_request(request=request, async=async)
+            return self._did_count(connection)
 
-    def _did_count(self, result, connection):
+    def _did_count(self, connection):
         """ Called when count if finished """
 
         response = connection.response
-        count = int(response.headers['X-Nuage-Count'])
-        callback = connection.callbacks['remote']
+        count = 0
+        callback = None
+
+        if 'X-Nuage-Count' in response.headers:
+            count = int(response.headers['X-Nuage-Count'])
+
+        if 'remote' in connection.callbacks:
+            callback = connection.callbacks['remote']
 
         if connection.async:
             if callback:

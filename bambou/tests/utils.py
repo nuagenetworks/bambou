@@ -9,7 +9,7 @@ from mock import MagicMock
 class MockUtils(object):
 
     @classmethod
-    def create_mock_response(cls, status_code, data, filter=None, order_by=None, page=None, error=None):
+    def create_mock_response(cls, status_code, data, filter=None, order_by=None, page=None, error=None, headers=None):
         """ Build a fake response
 
             Args:
@@ -32,6 +32,9 @@ class MockUtils(object):
         response = Response()
         response.status_code = status_code
         response._content = json.dumps(content)
+
+        if headers:
+            response.headers = headers
 
         return MagicMock(return_value=response)
 

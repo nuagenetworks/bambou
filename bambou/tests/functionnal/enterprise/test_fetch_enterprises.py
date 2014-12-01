@@ -33,9 +33,6 @@ class Fetch(TestCase):
         with patch('requests.request', mock):
             (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects()
 
-        d = MockUtils.get_mock_parameter(mock, 'data')
-        print d
-
         method = MockUtils.get_mock_parameter(mock, 'method')
         url = MockUtils.get_mock_parameter(mock, 'url')
         headers = MockUtils.get_mock_parameter(mock, 'headers')
