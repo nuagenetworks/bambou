@@ -34,7 +34,7 @@ class NURESTFetcher(object):
         self.query_string = None
         self.total_count = 0
         self._group_by = []
-        self._last_connnection = None
+        self._current_connection = None
         self._local_name = None
         # self._master_filter = False
         self._nurest_object = None
@@ -144,7 +144,7 @@ class NURESTFetcher(object):
 
             It will clear attribute of the served object
         """
-
+        self._current_connection = None
         setattr(self.nurest_object, self.local_name, [])
 
     def new(self):
@@ -255,7 +255,7 @@ class NURESTFetcher(object):
     def _did_fetch_objects(self, connection):
         """ Fetching objects has been done """
 
-        self._last_connnection = connection
+        self._current_connection = connection
         response = connection.response
 
         if response.status_code != 200:
@@ -360,3 +360,6 @@ class NURESTFetcher(object):
                     callback(self, self._nurest_object, content, connection)
             else:
                 return (self, self._nurest_object, content, connection)
+
+            self._current_connection.reset()
+            self._current_connection = None

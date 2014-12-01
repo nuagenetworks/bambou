@@ -363,3 +363,10 @@ class NURESTConnection(object):
             return
 
         return self._make_request()
+
+    def reset(self):
+        """ Reset the connection
+
+        """
+        self._request = None
+        self._response = None
