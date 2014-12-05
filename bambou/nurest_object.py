@@ -23,6 +23,7 @@ from .nurest_modelcontroller import NURESTModelController
 from .utils import NURemoteAttribute
 
 from bambou import bambou_logger
+from bambou.config import BambouConfig
 
 
 class NURESTObject(object):
@@ -65,7 +66,6 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'last_updated_date', remote_name=u'lastUpdatedDate', attribute_type=time, is_readonly=True)
         self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
-        self.can_delete_children = True
         self._children_registry = dict()
 
         model_controller = NURESTModelController.get_default()
@@ -459,7 +459,7 @@ class NURESTObject(object):
 
         self._children_registry = dict()
 
-        print ("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
+        print("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
 
         del self
 
@@ -575,19 +575,17 @@ class NURESTObject(object):
 
     # HTTP Calls
 
-    def delete(self, async=False, callback=None, response_choice=None):
+    def delete(self, recursive=False, async=False, callback=None, response_choice=None):
         """ Delete object and call given callback in case of async call.
 
-            If can_delete_children is set to True, it will automatically try
-            to delete its children.
-
             Args:
+                recursive: Set to True to try to delete all children.
                 async: Boolean to make an asynchronous call. Default is False
                 callback: Callback method that will be triggered in case of asynchronous call
                 response_choice: Automatically send a response choice when confirmation is needed
         """
 
-        if self.can_delete_children:
+        if recursive:
             self.delete_children()
 
         return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_DELETE, async=async, callback=callback, response_choice=response_choice)
@@ -598,7 +596,6 @@ class NURESTObject(object):
             This method has been developped to try removing all children of a given object.
             For each child, it will try calling delete method.
         """
-
         fetcher_infos = inspect.getmembers(self, lambda o: isinstance(o, NURESTFetcher))
 
         if fetcher_infos:
@@ -606,15 +603,18 @@ class NURESTObject(object):
             for fetcher_info in fetcher_infos:
                 fetcher_name = fetcher_info[0]
                 fetcher = getattr(self, fetcher_name)
+                child_remote_name = fetcher.managed_object_remote_name()
 
-                # Fetch all objects first
-                (fetcher, obj, fetched_objects, connection) = fetcher.fetch_objects()
+                if child_remote_name not in self._ignore_delete_objects():
 
-                # Delete all fetched objects
-                if fetched_objects is not None and len(fetched_objects) > 0:
-                    for nurest_object in fetched_objects:
-                        nurest_object.delete()
-                    setattr(self, fetcher.local_name, [])
+                    # Fetch all objects first
+                    (fetcher, obj, fetched_objects, connection) = fetcher.fetch_objects()
+
+                    # Delete all fetched objects
+                    if fetched_objects is not None and len(fetched_objects) > 0:
+                        for nurest_object in fetched_objects:
+                            nurest_object.delete()
+                        setattr(self, fetcher.local_name, [])
 
     def save(self, async=False, callback=None):
         """ Update object and call given callback in case of async call
@@ -790,8 +790,7 @@ class NURESTObject(object):
             else:
                 callback(self, connection)
         else:
-
-            if connection.response.status_code >= 400:
+            if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
                 raise BambouHTTPError(response=connection.response)
 
             if connection.user_info:

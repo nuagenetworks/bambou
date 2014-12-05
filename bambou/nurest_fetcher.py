@@ -15,6 +15,8 @@ from .exceptions import BambouHTTPError
 from .nurest_request import NURESTRequest
 from .nurest_connection import HTTP_METHOD_GET, HTTP_METHOD_HEAD
 
+from bambou.config import BambouConfig
+
 
 class NURESTFetcher(object):
     """ Object fetcher for childrens
@@ -343,7 +345,7 @@ class NURESTFetcher(object):
                 callback(self, self._nurest_object, count)
         else:
 
-            if connection.response.status_code >= 400:
+            if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
                 raise BambouHTTPError(response=connection.response)
 
             return (self, self._nurest_object, count)

@@ -15,14 +15,16 @@ import logging
 import requests
 
 requests.packages.urllib3.disable_warnings()
-
 bambou_logger = logging.getLogger('bambou')
 
-try:
-    # NullHandler is only available for python >= 2.7
-    bambou_logger.addHandler(logging.NullHandler())
-except:
-    pass
+try:  # Python 2.7+
+    from logging import NullHandler
+except ImportError:
+    class NullHandler(logging.Handler):
+        def emit(self, record):
+            pass
+
+bambou_logger.addHandler(logging.NullHandler())
 
 __all__ = ['NURESTBasicUser', 'NURESTConnection', 'NURESTModelController', 'NURESTFetcher', 'NURESTLoginController', 'NURESTObject', 'NURESTPushCenter', 'NURESTRequest', 'NURESTResponse']
 

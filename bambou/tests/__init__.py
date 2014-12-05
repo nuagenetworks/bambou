@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
 
-from bambou import NURESTObject
-from bambou import NURESTBasicUser
-from bambou import NURESTFetcher
+from bambou import NURESTObject, NURESTBasicUser, NURESTFetcher
+from bambou.config import BambouConfig
+BambouConfig.set_should_raise_bambou_http_error(True)
 
 __all__ = ['Enterprise', 'EnterprisesFetcher', 'User']
 
