@@ -157,6 +157,9 @@ class NURESTLoginController(Singleton):
             Args:
                 url: the url of the API endpoint
         """
+        if url.endswith('/'):
+            url = url[:-1]
+
         self._url = url
 
     url = property(_get_url, _set_url)
