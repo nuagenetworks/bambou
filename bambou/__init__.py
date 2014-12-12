@@ -24,7 +24,7 @@ except ImportError:
         def emit(self, record):
             pass
 
-bambou_logger.addHandler(logging.NullHandler())
+bambou_logger.addHandler(NullHandler())
 
 __all__ = ['NURESTBasicUser', 'NURESTConnection', 'NURESTModelController', 'NURESTFetcher', 'NURESTLoginController', 'NURESTObject', 'NURESTPushCenter', 'NURESTRequest', 'NURESTResponse']
 
