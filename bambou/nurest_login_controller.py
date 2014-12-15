@@ -208,6 +208,9 @@ class NURESTLoginController(Singleton):
         if api_key:
             return "XREST %s" % urlsafe_b64encode("%s:%s" % (user, api_key))
 
+        if isinstance(password, unicode):
+            password = password.encode("utf-8")
+
         return "XREST %s" % urlsafe_b64encode("%s:%s" % (user, password))
 
     def reset(self):
