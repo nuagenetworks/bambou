@@ -549,8 +549,9 @@ class NURESTObject(object):
             if hasattr(self, local_name):
                 value = getattr(self, local_name)
 
-                if isinstance(value, bool):
-                    value = int(value)
+                # Removed to resolve issue http://mvjira.mv.usa.alcatel.com/browse/VSD-5940 (12/15/2014)
+                # if isinstance(value, bool):
+                #     value = int(value)
 
                 dictionary[remote_name] = value
             else:
