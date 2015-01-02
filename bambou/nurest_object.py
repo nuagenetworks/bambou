@@ -318,6 +318,50 @@ class NURESTObject(object):
 
         return "%s (ID=%s)" % (self.__class__, self.id)
 
+    def validate(self):
+        """ Validate the current object attributes.
+
+            Check all attributes and store errors
+
+            Returns:
+                Returns True if all attibutes of the object
+                respect contraints. Returns False otherwise and
+                store error in errors dict.
+
+        """
+        self.errors = dict()
+
+        for local_name, attribute in self._attributes.iteritems():
+
+            value = getattr(self, local_name, None)
+
+            if value is None and attribute.is_required:
+                self.errors[local_name] = 'Attribute %s is required' % (local_name)
+                continue
+
+            if value is None:
+                continue  # without error
+
+            if type(value) != attribute.attribute_type:
+                if attribute.attribute_type != str or type(value) != unicode:
+                    self.errors[local_name] = 'Attribute %s is not of type %s' % (local_name, attribute.attribute_type)
+                    continue
+
+            if attribute.min_length and len(value) < attribute.min_length:
+                self.errors[local_name] = 'Attribute %s length is too short (minimum=%s)' % (local_name, attribute.min_length)
+                continue
+
+            if attribute.max_length and len(value) > attribute.max_length:
+                self.errors[local_name] = 'Attribute %s length is too long (maximum=%s)' % (local_name, attribute.max_length)
+                continue
+
+            if attribute.choices and value not in attribute.choices:
+                self.errors[local_name] = 'Attribute %s is not a valid option (choices=%s)' % (local_name, attribute.choices)
+                continue
+
+        return len(self.errors) == 0
+
+
     def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False):
         """ Expose local_name as remote_name
 

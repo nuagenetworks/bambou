@@ -16,10 +16,12 @@ class Enterprise(NURESTObject):
         self.id = id
         self.name = name
         self.description = None
+        self.allowed_forwarding_classes = None
         self.invisible = True
 
         self.expose_attribute(local_name='name', attribute_type=str, is_required=True)
-        self.expose_attribute(local_name='description', attribute_type=str)
+        self.expose_attribute(local_name='description', attribute_type=str, max_length=255)
+        self.expose_attribute(local_name=u"allowed_forwarding_classes", remote_name=u"allowedForwardingClasses", attribute_type=str, choices=[u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'NONE'])
 
     @classmethod
     def get_remote_name(cls):

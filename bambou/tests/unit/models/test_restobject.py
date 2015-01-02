@@ -109,4 +109,49 @@ class AttributeTests(TestCase):
 
         attributes = enterprise.get_attributes()
 
-        self.assertEqual(len(attributes), 9)
+        self.assertEqual(len(attributes), 10)
+
+    def test_validate_attributes(self):
+        """ Get validate attributes """
+
+        enterprise = Enterprise()
+        enterprise.allowed_forwarding_classes = u'A'
+        is_valid = enterprise.validate()
+
+        print enterprise.errors
+
+        self.assertEqual(is_valid, True)
+        self.assertEqual(len(enterprise.errors), 0)
+
+    def test_validate_without_required_attribute(self):
+        """ Get validate without required attribute """
+
+        enterprise = Enterprise()
+        enterprise.name = None
+        is_valid = enterprise.validate()
+
+        self.assertEqual(is_valid, False)
+        self.assertEqual(len(enterprise.errors), 1)
+        self.assertIn("name", enterprise.errors)
+
+    def test_validate_with_too_long_attribute(self):
+        """ Get validate with too long attribute """
+
+        enterprise = Enterprise()
+        enterprise.description = 'a long description'.zfill(256)
+        is_valid = enterprise.validate()
+
+        self.assertEqual(is_valid, False)
+        self.assertEqual(len(enterprise.errors), 1)
+        self.assertIn("description", enterprise.errors)
+
+    def test_validate_with_attribute_choices(self):
+        """ Get validate with too long attribute """
+
+        enterprise = Enterprise()
+        enterprise.allowed_forwarding_classes = 'NOT_AN_OPTION_FROM_CHOICES'
+        is_valid = enterprise.validate()
+
+        self.assertEqual(is_valid, False)
+        self.assertEqual(len(enterprise.errors), 1)
+        self.assertIn("allowed_forwarding_classes", enterprise.errors)
