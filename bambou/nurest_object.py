@@ -393,6 +393,21 @@ class NURESTObject(object):
 
         self._attributes[local_name] = attribute
 
+    def get_attribute_infos(self, local_name):
+        """ Get exposed attribute information
+
+            Args:
+                local_name: the attribute name
+
+            Returns:
+                A dictionary of all information
+
+        """
+        if local_name in self.attribute:
+            return self._attributes[local_name]
+
+        return None
+
     def is_owned_by_current_user(self):
         """ Check if the current user owns the object """
 
