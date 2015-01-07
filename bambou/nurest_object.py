@@ -403,7 +403,7 @@ class NURESTObject(object):
                 A dictionary of all information
 
         """
-        if local_name in self.attribute:
+        if local_name in self._attributes:
             return self._attributes[local_name]
 
         return None
