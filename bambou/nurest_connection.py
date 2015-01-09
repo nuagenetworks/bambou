@@ -266,12 +266,13 @@ class NURESTConnection(object):
 
     def _print_information(self):
         """ Prints information instead of sending a confirmation """
-
-        if len(self._response.errors) == 0:
-            bambou_logger.error("NURESTConnection ERROR without error message [%s] %s" % (self._response.status_code, self._response.reason))
-
-        else:
-            bambou_logger.error("NURESTConnection (%s %s) ERROR %s:\n%s" % (self._request.method, self._request.url, self._response.status_code, json.dumps(self._response.errors, indent=4)))
+        # TODO-CS: Remove print information because NURESTObject already (01/09/2015)
+        # if len(self._response.errors) == 0:
+        #     bambou_logger.error("NURESTConnection ERROR without error message [%s] %s" % (self._response.status_code, self._response.reason))
+        #
+        # else:
+        #     bambou_logger.error("NURESTConnection (%s %s) ERROR %s:\n%s" % (self._request.method, self._request.url, self._response.status_code, json.dumps(self._response.errors, indent=4)))
+        pass
 
     # HTTP Calls
 
