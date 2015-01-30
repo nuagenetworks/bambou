@@ -100,6 +100,9 @@ class NURESTObject(object):
     def _get_id(self):
         """ Get object id """
 
+        if self._id == "_DIRTY_":
+            raise Exception('[Bambou] Trying to access a discarded object')
+
         return self._id
 
     def _set_id(self, id):
@@ -513,15 +516,13 @@ class NURESTObject(object):
     def discard(self):
         """ Discard the current object and its children """
 
-        print("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
+        bambou_logger.debug("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
 
         self._discard_all_children_list()
         self._parent = None
         self._children_list_registry = dict()
         self._id = u"_DIRTY_"
         self._local_id = u"_DIRTY_"
-
-        print("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
 
     def _discard__children_with_resource_name(self, resource_name):
         """ Discard children with a given resource name
@@ -530,6 +531,7 @@ class NURESTObject(object):
                 resource_name: the resource name
 
         """
+        bambou_logger.debug("[Bambou] Discarding children list %s" % resource_name)
         children = self._children_with_resource_name(resource_name)
 
         for child in children:
@@ -830,7 +832,7 @@ class NURESTObject(object):
         """ Receive a response from the connection """
 
         if connection.has_timeouted:
-            print("NURESTConnection has timeout.")
+            bambou_logger.info("NURESTConnection has timeout.")
             return
 
         has_callbacks = connection.has_callbacks()
