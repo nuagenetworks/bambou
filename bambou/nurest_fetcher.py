@@ -196,7 +196,7 @@ class NURESTFetcher(object):
 
         return url
 
-    def fetch_objects(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
+    def fetch_objects(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
         """ Fetch objects according to given filter and page.
 
             This method fetches all managed class objects and store them
@@ -208,6 +208,7 @@ class NURESTFetcher(object):
                 group_by: list of names for grouping
                 page: number of the page to load
                 page_size: number of results per page
+                commit: boolean to update current object
                 async: Boolean to make a asynchronous call. Default is False
                 callback: Callback that should be called in case of a async request
 
@@ -222,10 +223,10 @@ class NURESTFetcher(object):
         self._transaction_id = uuid.uuid4().hex
 
         if async:
-            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_fetch_objects, remote_callback=callback)
+            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_fetch_objects, remote_callback=callback, user_info={'commit':commit})
             return self._transaction_id
 
-        connection = self._nurest_object.send_request(request=request, async=async)
+        connection = self._nurest_object.send_request(request=request, async=async, user_info={'commit':commit})
         return self._did_fetch_objects(connection=connection)
 
     def _did_fetch_objects(self, connection):
@@ -233,25 +234,32 @@ class NURESTFetcher(object):
 
         self._current_connection = connection
         response = connection.response
+        should_commit = 'commit' not in connection.user_info or connection.user_info['commit']
+        print connection.user_info
+        print should_commit
 
         if response.status_code != 200:
-            self.total_count = 0
-            self.latest_loaded_page = 0
-            self.ordered_by = ''
+
+            if should_commit:
+                self.total_count = 0
+                self.latest_loaded_page = 0
+                self.ordered_by = ''
+
             return self._send_content(content=None, connection=connection)
 
         results = response.data
         destination = getattr(self.nurest_object, self._local_name)
         fetched_objects = list()
 
-        if 'X-Nuage-Count' in response.headers and response.headers['X-Nuage-Count']:
-            self.total_count = int(response.headers['X-Nuage-Count'])
+        if should_commit:
+            if 'X-Nuage-Count' in response.headers and response.headers['X-Nuage-Count']:
+                self.total_count = int(response.headers['X-Nuage-Count'])
 
-        if 'X-Nuage-Page' in response.headers and response.headers['X-Nuage-Page']:
-            self.latest_loaded_page = int(response.headers['X-Nuage-Page'])
+            if 'X-Nuage-Page' in response.headers and response.headers['X-Nuage-Page']:
+                self.latest_loaded_page = int(response.headers['X-Nuage-Page'])
 
-        if 'X-Nuage-OrderBy' in response.headers and response.headers['X-Nuage-OrderBy']:
-            self.ordered_by = response.headers['X-Nuage-OrderBy']
+            if 'X-Nuage-OrderBy' in response.headers and response.headers['X-Nuage-OrderBy']:
+                self.ordered_by = response.headers['X-Nuage-OrderBy']
 
         if results:
             for result in results:
@@ -260,10 +268,15 @@ class NURESTFetcher(object):
                 nurest_object.from_dict(result)
                 nurest_object.parent = self._nurest_object
 
+                fetched_objects.append(nurest_object)
+
+                if not should_commit:
+                    print 'no port'
+                    continue
+
+                print 'port...'
                 if nurest_object not in destination:
                     destination.append(nurest_object)
-
-                fetched_objects.append(nurest_object)
 
         return self._send_content(content=fetched_objects, connection=connection)
 

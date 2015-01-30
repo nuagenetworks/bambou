@@ -9,26 +9,22 @@ from bambou.tests.functionnal import get_login_as_user, get_valid_enterprise
 
 class Fetch(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        cls.user = get_login_as_user()
-        cls.enterprises = list()
-        cls.enterprises.append(get_valid_enterprise(id=1, name=u"Enterprise 1"))
-        cls.enterprises.append(get_valid_enterprise(id=2, name=u"Enterprise 2"))
-        cls.enterprises.append(get_valid_enterprise(id=3, name=u"Enterprise 3"))
-        cls.enterprises.append(get_valid_enterprise(id=4, name=u"Enterprise 4"))
+    def setUp(self):
+        self.user = get_login_as_user()
+        self.enterprises = list()
+        self.enterprises.append(get_valid_enterprise(id=1, name=u"Enterprise 1"))
+        self.enterprises.append(get_valid_enterprise(id=2, name=u"Enterprise 2"))
+        self.enterprises.append(get_valid_enterprise(id=3, name=u"Enterprise 3"))
+        self.enterprises.append(get_valid_enterprise(id=4, name=u"Enterprise 4"))
 
-    @classmethod
-    def tearDownClass(cls):
-        pass
+    def tearDown(self):
+        self.user = None
+        self.enterprises = None
 
     def test_fetch_all(self):
         """ GET /enterprises retrieve all enterprises """
 
-        user = self.user
-        enterprises = self.enterprises
-
-        mock = MockUtils.create_mock_response(status_code=200, data=enterprises)
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
             (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects()
@@ -48,13 +44,23 @@ class Fetch(TestCase):
         self.assertEqual(len(enterprises), 4)
         self.assertEqual(connection.response.status_code, 200)
 
+    def test_fetch_all_without_commit(self):
+        """ GET /enterprises retrieve all enterprises without commit """
+
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
+
+        with patch('requests.request', mock):
+            (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(commit=False)
+
+        self.assertEqual(connection.response.status_code, 200)
+        self.assertEqual(len(enterprises), 4)
+        self.assertEqual(len(self.user.enterprises), 0)
+
+
     def test_fetch_with_filter(self):
         """ GET /enterprises retrieve enterprises with filters """
 
-        user = self.user
-        enterprises = self.enterprises
-
-        mock = MockUtils.create_mock_response(status_code=200, data=[enterprises[1]])
+        mock = MockUtils.create_mock_response(status_code=200, data=[self.enterprises[1]])
 
         with patch('requests.request', mock):
             (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(filter=u"name == 'Enterprise 2'")
@@ -67,10 +73,7 @@ class Fetch(TestCase):
     def test_fetch_with_group_by(self):
         """ GET /enterprises retrieve enterprises with group_by """
 
-        user = self.user
-        enterprises = self.enterprises
-
-        mock = MockUtils.create_mock_response(status_code=200, data=enterprises)
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
             (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(group_by=['field1', 'field2'])
@@ -82,10 +85,7 @@ class Fetch(TestCase):
     def test_fetch_with_order_by(self):
         """ GET /enterprises retrieve enterprises with order_by """
 
-        user = self.user
-        enterprises = self.enterprises
-
-        mock = MockUtils.create_mock_response(status_code=200, data=enterprises)
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
             (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(order_by='name ASC')
@@ -97,10 +97,7 @@ class Fetch(TestCase):
     def test_fetch_with_page(self):
         """ GET /enterprises retrieve enterprises with page """
 
-        user = self.user
-        enterprises = self.enterprises
-
-        mock = MockUtils.create_mock_response(status_code=200, data=enterprises)
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
             (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(page=2)
@@ -111,10 +108,7 @@ class Fetch(TestCase):
     def test_fetch_with_page_size(self):
         """ GET /enterprises retrieve enterprises with page size """
 
-        user = self.user
-        enterprises = self.enterprises
-
-        mock = MockUtils.create_mock_response(status_code=200, data=enterprises)
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
             (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(page_size=10)
@@ -124,9 +118,6 @@ class Fetch(TestCase):
 
     def test_fetch_all_should_not_raise_exception(self):
         """ GET /enterprises retrieve all enterprises should not raise exception """
-
-        user = self.user
-        enterprises = self.enterprises
 
         mock = MockUtils.create_mock_response(status_code=500, data=[], error=u"Internal error")
 
