@@ -531,7 +531,7 @@ class NURESTObject(object):
                 resource_name: the resource name
 
         """
-        bambou_logger.debug("[Bambou] Discarding children list %s" % resource_name)
+        bambou_logger.debug("[Bambou] Object with id %s is discarding children list %s" % (self._id, resource_name))
         children = self._children_with_resource_name(resource_name)
 
         for child in children:
