@@ -54,6 +54,7 @@ class NURESTObject(object):
         self._parent = None
         self._last_updated_by = None
         self._last_updated_date = None
+        self._is_dirty = False
 
         self._children = dict()
         self._attributes = dict()  # Dictionary of attribute name => NURemoteAttribute
@@ -99,9 +100,6 @@ class NURESTObject(object):
 
     def _get_id(self):
         """ Get object id """
-
-        if self._id == "_DIRTY_":
-            raise Exception('[Bambou] Trying to access a discarded object')
 
         return self._id
 
@@ -298,6 +296,9 @@ class NURESTObject(object):
 
     def __eq__(self, rest_object):
         """ Compare with another object """
+
+        if self._is_dirty:
+            return False
 
         if rest_object is None:
             return False
@@ -516,13 +517,16 @@ class NURESTObject(object):
     def discard(self):
         """ Discard the current object and its children """
 
+        if self._is_dirty:
+            return
+
+        self._is_dirty = True
+
         bambou_logger.debug("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
 
         self._discard_all_children_list()
         self._parent = None
         self._children_list_registry = dict()
-        self._id = u"_DIRTY_"
-        self._local_id = u"_DIRTY_"
 
     def _discard__children_with_resource_name(self, resource_name):
         """ Discard children with a given resource name
@@ -531,13 +535,8 @@ class NURESTObject(object):
                 resource_name: the resource name
 
         """
-        bambou_logger.debug("[Bambou] Object with id %s is discarding children list %s" % (self._id, resource_name))
-        children = self._children_with_resource_name(resource_name)
-
-        for child in children:
-            child.discard()
-
-        children = []
+        bambou_logger.debug("[Bambou] %s with id %s is discarding children list %s" % (self.remote_name, self._id, resource_name))
+        self._children_list_registry[resource_name] = []
 
     def _discard_all_children_lists(self):
         """ Discard current object children """
