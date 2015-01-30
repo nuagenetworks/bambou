@@ -9,7 +9,10 @@ in any manner whatsoever without prior written permission from Alcatel.
 Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 """
 
-from .nurest_connection import NURESTConnection
+import json
+
+from .nurest_connection import HTTP_METHOD_PUT
+from .nurest_request import NURESTRequest
 from .nurest_login_controller import NURESTLoginController
 from .nurest_object import NURESTObject
 
@@ -93,7 +96,7 @@ class NURESTBasicUser(NURESTObject):
 
         self._new_password = new_password
 
-    def save(self, callback=None):
+    def save(self, async=False, callback=None):
         """ Updates the user and perform the callback method """
 
         if self._new_password:
@@ -103,13 +106,30 @@ class NURESTBasicUser(NURESTObject):
         controller.password = self._new_password
         controller.api_key = None
 
-        connection = NURESTConnection()
-        connection.save(self, callback=self._did_save)
+        data = json.dumps(self.to_dict())
+        request = NURESTRequest(method=HTTP_METHOD_PUT, url=self.get_resource_url(), data=data)
 
-    def _did_save(self):
+        if async:
+            self.send_request(request=request, async=async, local_callback=self._did_save, remote_callback=callback)
+        else:
+            connection = self.send_request(request=request, async=async)
+            return self._did_save(connection)
+
+    def _did_save(self, connection):
         """ Launched when save has been successfully executed """
 
         self._new_password = None
+
         controller = NURESTLoginController()
         controller.password = None
         controller.api_key = self.api_key
+
+        if connection.async:
+            callback = connection.callbacks['remote']
+
+            if connection.user_info:
+                callback(connection.user_info, connection)
+            else:
+                callback(self, connection)
+        else:
+            return (self, connection)
