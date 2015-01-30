@@ -66,7 +66,7 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'last_updated_date', remote_name=u'lastUpdatedDate', attribute_type=time, is_readonly=True)
         self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
-        self._children_registry = dict()
+        self._children_list_registry = dict()
 
         model_controller = NURESTModelController.get_default()
         model_controller.register_model(self.__class__)
@@ -516,17 +516,15 @@ class NURESTObject(object):
         self.discard_children()
         self._parent = None
 
-        self._children_registry = dict()
+        self._children_list_registry = dict()
 
         print("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
-
-        del self
 
     def discard_children(self):
         """ Discard current object children """
 
-        for child in self._children_registry:
-            child.discard()
+        for child in self._children_list_registry:
+            child = []
 
     def register_children_list(self, children, resource_name):
         """ Register children of the current object
@@ -536,7 +534,7 @@ class NURESTObject(object):
                 resource_name: Name of the children resource
         """
 
-        self._children_registry[resource_name] = children
+        self._children_list_registry[resource_name] = children
 
     def children_with_resource_name(self, resource_name):
         """ Get all children according to the given resource_name
@@ -549,10 +547,10 @@ class NURESTObject(object):
                 returns an empty list.
         """
 
-        if resource_name not in self._children_registry:
+        if resource_name not in self._children_list_registry:
             return []
 
-        return self._children_registry[resource_name]
+        return self._children_list_registry[resource_name]
 
     # Children management
 
