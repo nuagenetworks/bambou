@@ -157,23 +157,20 @@ class NURESTFetcher(object):
         managed_class = self.managed_class()
         return managed_class()
 
-    def _prepare_headers(self, request, filter=None, master_filter=None, order_by=None, group_by=[], page=None, page_size=None):
+    def _prepare_headers(self, request, filter=None, order_by=None, group_by=[], page=None, page_size=None):
         """ Prepare headers for the given request
 
             Args:
                 request: the NURESTRequest to send
                 filter: string
-                master_filter: string
                 order_by: string
                 group_by: list of names
                 page: int
                 page_size: int
         """
 
-        rest_filter = self._rest_filter_from_filter(filter, master_filter)
-
-        if rest_filter:
-            request.set_header('X-Nuage-Filter', rest_filter)
+        if filter:
+            request.set_header('X-Nuage-Filter', filter)
 
         if order_by:
             request.set_header('X-Nuage-OrderBy', order_by)
@@ -199,7 +196,7 @@ class NURESTFetcher(object):
 
         return url
 
-    def fetch_objects(self, filter=None, master_filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
+    def fetch_objects(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
         """ Fetch objects according to given filter and page.
 
             This method fetches all managed class objects and store them
@@ -207,7 +204,6 @@ class NURESTFetcher(object):
 
             Args:
                 filter: string that represents a predicate filter
-                master_filter: string that represents a master filer
                 order_by: string that represents an order by clause
                 group_by: list of names for grouping
                 page: number of the page to load
@@ -222,7 +218,7 @@ class NURESTFetcher(object):
 
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self._prepare_url())
 
-        self._prepare_headers(request=request, filter=filter, master_filter=master_filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
+        self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
         self._transaction_id = uuid.uuid4().hex
 
         if async:
@@ -271,7 +267,7 @@ class NURESTFetcher(object):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def countObjects(self, filter=None, master_filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
+    def countObjects(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
         """ Get the total count of objects that can be fetched according to filter
 
             This method can be asynchronous and trigger the callback method
@@ -279,7 +275,6 @@ class NURESTFetcher(object):
 
             Args:
                 filter: string that represents a predicate fitler (eg. name == 'x')
-                master_filter: string that represents a master filer
                 order_by: string that represents an order by clause
                 group_by: list of names for grouping
                 page: number of the page to load
@@ -295,7 +290,7 @@ class NURESTFetcher(object):
 
         request = NURESTRequest(method=HTTP_METHOD_HEAD, url=self._prepare_url())
 
-        self._prepare_headers(request=request, filter=filter, master_filter=master_filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
+        self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
 
         if async:
             self._transaction_id = uuid.uuid4().hex
@@ -344,26 +339,3 @@ class NURESTFetcher(object):
 
             self._current_connection.reset()
             self._current_connection = None
-
-    def _rest_filter_from_filter(self, filter=None, master_filter=None):
-        """ Computes a REST Filter according to filter and master_filter
-
-            Args:
-                filter: Filter as string
-                master_filter as string
-
-            Returns:
-                A string representing all filters. If no filter has been
-                provided, returns None.
-        """
-
-        if not filter and not master_filter:
-            return None
-
-        if master_filter and not filter:
-            return str(master_filter)
-
-        if filter and not master_filter:
-            return str(filter)
-
-        return "%s AND (%s)" % (master_filter, filter)
