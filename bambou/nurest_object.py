@@ -513,20 +513,37 @@ class NURESTObject(object):
     def discard(self):
         """ Discard the current object and its children """
 
-        self.discard_children()
-        self._parent = None
+        print("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
 
+        self._discard_all_children_list()
+        self._parent = None
         self._children_list_registry = dict()
+        self._id = u"_DIRTY_"
+        self._local_id = u"_DIRTY_"
 
         print("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
 
-    def discard_children(self):
+    def _discard__children_with_resource_name(self, resource_name):
+        """ Discard children with a given resource name
+
+            Args:
+                resource_name: the resource name
+
+        """
+        children = self._children_with_resource_name(resource_name)
+
+        for child in children:
+            child.discard()
+
+        children = []
+
+    def _discard_all_children_lists(self):
         """ Discard current object children """
 
-        for child in self._children_list_registry:
-            child = []
+        for resource_name in self._children_list_registry.keys():
+            self._discard__children_with_resource_name(resource_name)
 
-    def register_children_list(self, children, resource_name):
+    def _register_children_list(self, children, resource_name):
         """ Register children of the current object
 
             Args:
@@ -536,7 +553,7 @@ class NURESTObject(object):
 
         self._children_list_registry[resource_name] = children
 
-    def children_with_resource_name(self, resource_name):
+    def _children_with_resource_name(self, resource_name):
         """ Get all children according to the given resource_name
 
             Args:
