@@ -365,7 +365,6 @@ class NURESTObject(object):
 
         return len(self.errors) == 0
 
-
     def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False):
         """ Expose local_name as remote_name
 
@@ -839,7 +838,7 @@ class NURESTObject(object):
 
         bambou_logger.info('Bambou <<<<< Response for\n%s %s\n%s' % (connection._request.method, connection._request.url, json.dumps(connection._response.data, indent=4)))
 
-        if  connection.has_response_success(should_post=should_post) and has_callbacks:
+        if  connection.handle_response_for_connection(should_post=should_post) and has_callbacks:
             callback = connection.callbacks['local']
             callback(connection)
 

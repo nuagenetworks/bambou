@@ -202,6 +202,24 @@ class NURESTConnection(object):
 
     # Methods
 
+    def has_succeed(self):
+        """ Check if the connection has succeed
+
+            Returns:
+                Returns True if connection has succeed.
+                False otherwise.
+
+        """
+        status_code = self._response.status_code
+
+        if status_code in [HTTP_CODE_ZERO, HTTP_CODE_SUCCESS, HTTP_CODE_CREATED, HTTP_CODE_EMPTY, HTTP_CODE_MULTIPLE_CHOICES]:
+            return True
+
+        if status_code in [HTTP_CODE_BAD_REQUEST, HTTP_CODE_UNAUTHORIZED, HTTP_CODE_PERMISSION_DENIED, HTTP_CODE_NOT_FOUND, HTTP_CODE_METHOD_NOT_ALLOWED, HTTP_CODE_CONNECTION_TIMEOUT, HTTP_CODE_CONFLICT, HTTP_CODE_PRECONDITION_FAILED, HTTP_CODE_INTERNAL_SERVER_ERROR, HTTP_CODE_SERVICE_UNAVAILABLE]:
+            return False
+
+        raise Exception('Unknown status code %s.', status_code)
+
     def has_callbacks(self):
         """  Check if the request has callbacks
 
@@ -211,7 +229,7 @@ class NURESTConnection(object):
 
         return len(self._callbacks) > 0
 
-    def has_response_success(self, should_post=False):
+    def handle_response_for_connection(self, should_post=False):
         """ Check if the response succeed or not.
 
             In case of error, this method also print messages and set
@@ -222,7 +240,6 @@ class NURESTConnection(object):
         """
 
         status_code = self._response.status_code
-
         data = self._response.data
 
         # TODO : Get errors in response data after bug fix : http://mvjira.mv.usa.alcatel.com/browse/VSD-2735
@@ -233,7 +250,6 @@ class NURESTConnection(object):
             return True
 
         if status_code == HTTP_CODE_MULTIPLE_CHOICES:
-            self._print_information()
             return False
 
         if status_code in [HTTP_CODE_PERMISSION_DENIED, HTTP_CODE_UNAUTHORIZED]:
@@ -241,38 +257,24 @@ class NURESTConnection(object):
             if not should_post:
                 return True
 
-            self._print_information()
             return False
 
         if status_code in [HTTP_CODE_CONFLICT, HTTP_CODE_NOT_FOUND, HTTP_CODE_BAD_REQUEST, HTTP_CODE_METHOD_NOT_ALLOWED, HTTP_CODE_PRECONDITION_FAILED, HTTP_CODE_SERVICE_UNAVAILABLE]:
             if not should_post:
                 return True
 
-            self._print_information()
             return False
 
         if status_code == HTTP_CODE_INTERNAL_SERVER_ERROR:
 
-            self._print_information()
             return False
 
         if status_code == HTTP_CODE_ZERO:
             bambou_logger.error("NURESTConnection: Connection error with code 0. Sending NUNURESTConnectionFailureNotification notification and exiting.")
-            self._print_information()
             return False
 
         bambou_logger.error("NURESTConnection: Report this error, because this should not happen: %s" % self._response)
         return False
-
-    def _print_information(self):
-        """ Prints information instead of sending a confirmation """
-        # TODO-CS: Remove print information because NURESTObject already (01/09/2015)
-        # if len(self._response.errors) == 0:
-        #     bambou_logger.error("NURESTConnection ERROR without error message [%s] %s" % (self._response.status_code, self._response.reason))
-        #
-        # else:
-        #     bambou_logger.error("NURESTConnection (%s %s) ERROR %s:\n%s" % (self._request.method, self._request.url, self._response.status_code, json.dumps(self._response.errors, indent=4)))
-        pass
 
     # HTTP Calls
 
