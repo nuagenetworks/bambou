@@ -64,6 +64,36 @@ class Fetch(TestCase):
         self.assertEqual(len(enterprises), 1)
         self.assertEqual(enterprises[0].name, u"Enterprise 2")
 
+    def test_fetch_with_group_by(self):
+        """ GET /enterprises retrieve enterprises with group_by """
+
+        user = self.user
+        enterprises = self.enterprises
+
+        mock = MockUtils.create_mock_response(status_code=200, data=enterprises)
+
+        with patch('requests.request', mock):
+            (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(group_by=['field1', 'field2'])
+
+        headers = MockUtils.get_mock_parameter(mock, 'headers')
+        self.assertEqual(headers['X-Nuage-GroupBy'], 'true')
+        self.assertEqual(headers['X-Nuage-Attributes'], 'field1, field2')
+
+    def test_fetch_with_order_by(self):
+        """ GET /enterprises retrieve enterprises with order_by """
+
+        user = self.user
+        enterprises = self.enterprises
+
+        mock = MockUtils.create_mock_response(status_code=200, data=enterprises)
+
+        with patch('requests.request', mock):
+            (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(order_by='name ASC')
+
+        headers = MockUtils.get_mock_parameter(mock, 'headers')
+        self.assertEqual(headers['X-Nuage-OrderBy'], 'name ASC')
+
+
     def test_fetch_with_page(self):
         """ GET /enterprises retrieve enterprises with page """
 
@@ -77,6 +107,20 @@ class Fetch(TestCase):
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-Page'], 2)
+
+    def test_fetch_with_page_size(self):
+        """ GET /enterprises retrieve enterprises with page size """
+
+        user = self.user
+        enterprises = self.enterprises
+
+        mock = MockUtils.create_mock_response(status_code=200, data=enterprises)
+
+        with patch('requests.request', mock):
+            (fetcher, user, enterprises, connection) = self.user.enterprises_fetcher.fetch_objects(page_size=10)
+
+        headers = MockUtils.get_mock_parameter(mock, 'headers')
+        self.assertEqual(headers['X-Nuage-PageSize'], 10)
 
     def test_fetch_all_should_not_raise_exception(self):
         """ GET /enterprises retrieve all enterprises should not raise exception """

@@ -25,20 +25,18 @@ class NURESTFetcher(object):
         by `managed_class` method
     """
 
+    PAGE_SIZE = 50
+
     def __init__(self):
         """ Initliazes the fetcher """
 
         self.latest_loaded_page = 0
-        self.master_order = None
         self.nurest_object = None
         self.ordered_by = ''
-        self.page_size = 0
         self.query_string = None
         self.total_count = 0
-        self._group_by = []
         self._current_connection = None
         self._local_name = None
-        # self._master_filter = False
         self._nurest_object = None
         self._transaction_id = None
 
@@ -159,14 +157,17 @@ class NURESTFetcher(object):
         managed_class = self.managed_class()
         return managed_class()
 
-    def _prepare_headers(self, request, filter=None, master_filter=None, page=None):
+    def _prepare_headers(self, request, filter=None, master_filter=None, order_by=None, group_by=[], page=None, page_size=None):
         """ Prepare headers for the given request
 
             Args:
                 request: the NURESTRequest to send
                 filter: string
                 master_filter: string
+                order_by: string
+                group_by: list of names
                 page: int
+                page_size: int
         """
 
         rest_filter = self._rest_filter_from_filter(filter, master_filter)
@@ -174,46 +175,19 @@ class NURESTFetcher(object):
         if rest_filter:
             request.set_header('X-Nuage-Filter', rest_filter)
 
-        if self.master_order:
-            request.set_header('X-Nuage-OrderBy', self.master_order)
+        if order_by:
+            request.set_header('X-Nuage-OrderBy', order_by)
 
         if page:
             request.set_header('X-Nuage-Page', page)
 
-        if self._group_by:
-            header = ""
+        if page_size:
+            request.set_header('X-Nuage-PageSize', page_size)
 
-            for index, group in enumerate(self._group_by):
-                header += group
-
-                if index + 1 < len(self._group_by):
-                    header += ", "
-
+        if len(group_by) > 0:
+            header = ", ".join(group_by)
             request.set_header('X-Nuage-GroupBy', 'true')
             request.set_header('X-Nuage-Attributes', header)
-
-    def _rest_filter_from_filter(self, filter=None, master_filter=None):
-        """ Computes a REST Filter according to filter and master_filter
-
-            Args:
-                filter: Filter as string
-                master_filter as string
-
-            Returns:
-                A string representing all filters. If no filter has been
-                provided, returns None.
-        """
-
-        if not filter and not master_filter:
-            return None
-
-        if master_filter and not filter:
-            return str(master_filter)
-
-        if filter and not master_filter:
-            return str(filter)
-
-        return "%s AND (%s)" % (master_filter, filter)
 
     def _prepare_url(self):
         """ Prepare url for request """
@@ -225,7 +199,7 @@ class NURESTFetcher(object):
 
         return url
 
-    def fetch_objects(self, filter=None, page=None, async=False, callback=None):
+    def fetch_objects(self, filter=None, master_filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
         """ Fetch objects according to given filter and page.
 
             This method fetches all managed class objects and store them
@@ -233,7 +207,11 @@ class NURESTFetcher(object):
 
             Args:
                 filter: string that represents a predicate filter
+                master_filter: string that represents a master filer
+                order_by: string that represents an order by clause
+                group_by: list of names for grouping
                 page: number of the page to load
+                page_size: number of results per page
                 async: Boolean to make a asynchronous call. Default is False
                 callback: Callback that should be called in case of a async request
 
@@ -244,7 +222,7 @@ class NURESTFetcher(object):
 
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self._prepare_url())
 
-        self._prepare_headers(request=request, filter=filter, page=page)
+        self._prepare_headers(request=request, filter=filter, master_filter=master_filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
         self._transaction_id = uuid.uuid4().hex
 
         if async:
@@ -262,7 +240,6 @@ class NURESTFetcher(object):
 
         if response.status_code != 200:
             self.total_count = 0
-            self.page_size = 0
             self.latest_loaded_page = 0
             self.ordered_by = ''
             return self._send_content(content=None, connection=connection)
@@ -273,9 +250,6 @@ class NURESTFetcher(object):
 
         if 'X-Nuage-Count' in response.headers and response.headers['X-Nuage-Count']:
             self.total_count = int(response.headers['X-Nuage-Count'])
-
-        if 'X-Nuage-PageSize' in response.headers and response.headers['X-Nuage-PageSize']:
-            self.page_size = int(response.headers['X-Nuage-PageSize'])
 
         if 'X-Nuage-Page' in response.headers and response.headers['X-Nuage-Page']:
             self.latest_loaded_page = int(response.headers['X-Nuage-Page'])
@@ -297,7 +271,7 @@ class NURESTFetcher(object):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def count(self, filter=None, async=False, callback=None):
+    def countObjects(self, filter=None, master_filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
         """ Get the total count of objects that can be fetched according to filter
 
             This method can be asynchronous and trigger the callback method
@@ -305,6 +279,11 @@ class NURESTFetcher(object):
 
             Args:
                 filter: string that represents a predicate fitler (eg. name == 'x')
+                master_filter: string that represents a master filer
+                order_by: string that represents an order by clause
+                group_by: list of names for grouping
+                page: number of the page to load
+                page_size: number of results per page
                 async: Boolean to indicate an asynchronous call. Default is False
                 callback: Method that will be triggered if async call is made
 
@@ -316,7 +295,7 @@ class NURESTFetcher(object):
 
         request = NURESTRequest(method=HTTP_METHOD_HEAD, url=self._prepare_url())
 
-        self._prepare_headers(request=request, filter=filter, page=None)
+        self._prepare_headers(request=request, filter=filter, master_filter=master_filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
 
         if async:
             self._transaction_id = uuid.uuid4().hex
@@ -365,3 +344,26 @@ class NURESTFetcher(object):
 
             self._current_connection.reset()
             self._current_connection = None
+
+    def _rest_filter_from_filter(self, filter=None, master_filter=None):
+        """ Computes a REST Filter according to filter and master_filter
+
+            Args:
+                filter: Filter as string
+                master_filter as string
+
+            Returns:
+                A string representing all filters. If no filter has been
+                provided, returns None.
+        """
+
+        if not filter and not master_filter:
+            return None
+
+        if master_filter and not filter:
+            return str(master_filter)
+
+        if filter and not master_filter:
+            return str(filter)
+
+        return "%s AND (%s)" % (master_filter, filter)

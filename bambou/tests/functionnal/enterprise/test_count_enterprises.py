@@ -27,7 +27,7 @@ class Count(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
         with patch('requests.request', mock):
-            (fetcher, user, count) = self.user.enterprises_fetcher.count()
+            (fetcher, user, count) = self.user.enterprises_fetcher.countObjects()
 
         method = MockUtils.get_mock_parameter(mock, 'method')
         url = MockUtils.get_mock_parameter(mock, 'url')
@@ -52,11 +52,68 @@ class Count(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
         with patch('requests.request', mock):
-            (fetcher, user, count) = self.user.enterprises_fetcher.count(filter=u"name == 'Enterprise 2'")
+            (fetcher, user, count) = self.user.enterprises_fetcher.countObjects(filter=u"name == 'Enterprise 2'")
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-Filter'], u"name == 'Enterprise 2'")
         self.assertEqual(count, 2)
+
+    def test_count_with_order_by(self):
+        """ HEAD /enterprises count enterprises with order_by """
+
+        user = self.user
+        headers = {'X-Nuage-Count': 2}
+
+        mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
+
+        with patch('requests.request', mock):
+            (fetcher, user, count) = self.user.enterprises_fetcher.countObjects(order_by=u'name ASC')
+
+        headers = MockUtils.get_mock_parameter(mock, 'headers')
+        self.assertEqual(headers['X-Nuage-OrderBy'], 'name ASC')
+
+    def test_count_with_group_by(self):
+        """ HEAD /enterprises count enterprises with group_by """
+
+        user = self.user
+        headers = {'X-Nuage-Count': 2}
+
+        mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
+
+        with patch('requests.request', mock):
+            (fetcher, user, count) = self.user.enterprises_fetcher.countObjects(group_by=['field1', 'field2'])
+
+        headers = MockUtils.get_mock_parameter(mock, 'headers')
+        self.assertEqual(headers['X-Nuage-GroupBy'], 'true')
+        self.assertEqual(headers['X-Nuage-Attributes'], 'field1, field2')
+
+    def test_count_with_page(self):
+        """ HEAD /enterprises count enterprises with page """
+
+        user = self.user
+        headers = {'X-Nuage-Count': 2}
+
+        mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
+
+        with patch('requests.request', mock):
+            (fetcher, user, count) = self.user.enterprises_fetcher.countObjects(page=3)
+
+        headers = MockUtils.get_mock_parameter(mock, 'headers')
+        self.assertEqual(headers['X-Nuage-Page'], 3)
+
+    def test_count_with_page_size(self):
+        """ HEAD /enterprises count enterprises with page size """
+
+        user = self.user
+        headers = {'X-Nuage-Count': 2}
+
+        mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
+
+        with patch('requests.request', mock):
+            (fetcher, user, count) = self.user.enterprises_fetcher.countObjects(page_size=10)
+
+        headers = MockUtils.get_mock_parameter(mock, 'headers')
+        self.assertEqual(headers['X-Nuage-PageSize'], 10)
 
     def test_count_all_should_raise_exception(self):
         """ HEAD /enterprises count all enterprises should raise exception """
@@ -66,4 +123,4 @@ class Count(TestCase):
 
         with patch('requests.request', mock):
             with self.assertRaises(BambouHTTPError):
-                (fetcher, user, count) = self.user.enterprises_fetcher.count()
+                (fetcher, user, count) = self.user.enterprises_fetcher.countObjects()
