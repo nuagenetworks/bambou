@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from bambou import NURESTLoginController
-from bambou.tests import Enterprise
+from bambou.tests import Enterprise, Group, User
 
 
 class GetResourceTests(TestCase):
@@ -71,6 +71,20 @@ class CompressionTests(TestCase):
         enterprise = Enterprise()
         enterprise.id = 3
         enterprise.name = u"NewEnterprise"
+
+        # List of objects
+        admingroup = Group()
+        admingroup.name = "Admins"
+        othergroup = Group()
+        othergroup.name = "Others"
+        enterprise.groups = [admingroup, othergroup]
+
+        # Object
+        ceo = User()
+        ceo.firstname = 'John'
+        ceo.lastname = 'Doe'
+        enterprise.ceo = ceo
+
         to_dict = enterprise.to_dict()
 
         self.assertEquals(to_dict['name'], u'NewEnterprise')
@@ -81,6 +95,47 @@ class CompressionTests(TestCase):
         self.assertEquals(to_dict['parentType'], None)
         self.assertEquals(to_dict['owner'], None)
         self.assertEquals(to_dict['creationDate'], None)
+        self.assertEquals(to_dict['ceo'], {
+                                            'APIKey': None,
+                                            'APIKeyExpiry': None,
+                                            u'ID': None,
+                                            'avatarData': None,
+                                            'avatarType': None,
+                                            u'creationDate': None,
+                                            'email': None,
+                                            'enterpriseID': None,
+                                            'enterpriseName': None,
+                                            'firstName': 'John',
+                                            'lastName': 'Doe',
+                                            u'lastUpdatedBy': None,
+                                            u'lastUpdatedDate': None,
+                                            u'owner': None,
+                                            u'parentID': None,
+                                            u'parentType': None,
+                                            'password': None,
+                                            'role': None,
+                                            'userName': None
+                                        })
+        self.assertEquals(to_dict['groups'], [{
+                                                u'ID': None,
+                                                 u'creationDate': None,
+                                                 u'lastUpdatedBy': None,
+                                                 u'lastUpdatedDate': None,
+                                                 'name': 'Admins',
+                                                 u'owner': None,
+                                                 u'parentID': None,
+                                                 u'parentType': None
+                                             },
+                                             {
+                                                u'ID': None,
+                                                u'creationDate': None,
+                                                u'lastUpdatedBy': None,
+                                                u'lastUpdatedDate': None,
+                                                'name': 'Others',
+                                                u'owner': None,
+                                                u'parentID': None,
+                                                u'parentType': None
+                                            }])
 
     def test_from_dict(self):
         """ Fill object from a dictionary """
@@ -109,7 +164,7 @@ class AttributeTests(TestCase):
 
         attributes = enterprise.get_attributes()
 
-        self.assertEqual(len(attributes), 10)
+        self.assertEqual(len(attributes), 12)
 
     def test_validate_attributes(self):
         """ Get validate attributes """
@@ -117,8 +172,6 @@ class AttributeTests(TestCase):
         enterprise = Enterprise()
         enterprise.allowed_forwarding_classes = u'A'
         is_valid = enterprise.validate()
-
-        print enterprise.errors
 
         self.assertEqual(is_valid, True)
         self.assertEqual(len(enterprise.errors), 0)

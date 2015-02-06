@@ -4,7 +4,7 @@ from bambou import NURESTObject, NURESTBasicUser, NURESTFetcher
 from bambou.config import BambouConfig
 BambouConfig.set_should_raise_bambou_http_error(True)
 
-__all__ = ['Enterprise', 'EnterprisesFetcher', 'User']
+__all__ = ['Enterprise', 'EnterprisesFetcher', 'Group', 'User']
 
 
 class Enterprise(NURESTObject):
@@ -17,11 +17,15 @@ class Enterprise(NURESTObject):
         self.name = name
         self.description = None
         self.allowed_forwarding_classes = None
+        self.groups = None
+        self.ceo = None
         self.invisible = True
 
         self.expose_attribute(local_name='name', attribute_type=str, is_required=True)
         self.expose_attribute(local_name='description', attribute_type=str, max_length=255)
         self.expose_attribute(local_name=u"allowed_forwarding_classes", remote_name=u"allowedForwardingClasses", attribute_type=str, choices=[u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'NONE'])
+        self.expose_attribute(local_name='groups', remote_name='groups', attribute_type=list)
+        self.expose_attribute(local_name='ceo', remote_name='ceo', attribute_type=object)
 
     @classmethod
     def get_remote_name(cls):
@@ -43,6 +47,20 @@ class EnterprisesFetcher(NURESTFetcher):
 
         return Enterprise
 
+class Group(NURESTObject):
+
+    def __init__(self):
+        """ Creates a group """
+        super(Group, self).__init__()
+        self.name = None
+
+        self.expose_attribute(local_name='name', remote_name='name', attribute_type=str)
+
+    @classmethod
+    def get_remote_name(cls):
+        """ Provides user classname  """
+
+        return "group"
 
 class User(NURESTBasicUser):
 
@@ -60,6 +78,7 @@ class User(NURESTBasicUser):
         self.avatar_type = None
         self.avatar_data = None
         self.api_key_expiry = None
+
 
         self.enterprises = [];
 

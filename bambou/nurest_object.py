@@ -627,6 +627,16 @@ class NURESTObject(object):
                 # if isinstance(value, bool):
                 #     value = int(value)
 
+                if isinstance(value, NURESTObject):
+                    value = value.to_dict()
+
+                if isinstance(value, list) and len(value) > 0 and isinstance(value[0], NURESTObject):
+                    tmp = list()
+                    for obj in value:
+                        tmp.append(obj.to_dict())
+
+                    value = tmp
+
                 dictionary[remote_name] = value
             else:
                 # print('Attribute %s could not be found for object %s' % (local_name, self))
