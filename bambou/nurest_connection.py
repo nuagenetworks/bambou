@@ -88,6 +88,17 @@ class NURESTConnection(object):
 
     callbacks = property(_get_callbacks, None)
 
+    def _get_request(self):
+        """ Get request. Read-only property
+
+            Returns:
+                Returns the NURESTRequest object
+        """
+
+        return self._request
+
+    request = property(_get_request, None)
+
     def _get_response(self):
         """ Get response
 
