@@ -235,8 +235,6 @@ class NURESTFetcher(object):
         self._current_connection = connection
         response = connection.response
         should_commit = 'commit' not in connection.user_info or connection.user_info['commit']
-        print connection.user_info
-        print should_commit
 
         if response.status_code != 200:
 
@@ -271,10 +269,8 @@ class NURESTFetcher(object):
                 fetched_objects.append(nurest_object)
 
                 if not should_commit:
-                    print 'no port'
                     continue
 
-                print 'port...'
                 if nurest_object not in destination:
                     destination.append(nurest_object)
 
