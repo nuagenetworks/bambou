@@ -37,3 +37,4 @@ from bambou.nurest_push_center import NURESTPushCenter
 from bambou.nurest_request import NURESTRequest
 from bambou.nurest_response import NURESTResponse
 from bambou.nurest_modelcontroller import NURESTModelController
+from bambou.config import BambouConfig
