@@ -14,15 +14,14 @@ class BambouHTTPError(Exception):
     """ Bambou HTTPError
 
     """
-    def __init__(self, response):
+    def __init__(self, connection):
         """ Intializes a BambouHTTPError
 
             Args:
-                response: the NURESTResponse object
+                connection: the Connection object
 
         """
-        super(BambouHTTPError, self).__init__("[HTTP %s(%s)] %s" % (response.status_code, response.reason, response.errors))
+        self.request = connection.request
+        self.response = conneciton.response
 
-        self.status_code = response.status_code
-        self.reason = response.reason
-        self.errors = response.errors
+        super(BambouHTTPError, self).__init__("[HTTP %s(%s)] %s" % (self.response.status_code, self.response.reason, self.response.errors))

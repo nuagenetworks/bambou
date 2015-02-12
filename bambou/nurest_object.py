@@ -876,7 +876,7 @@ class NURESTObject(object):
                 callback(self, connection)
         else:
             if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
-                raise BambouHTTPError(response=connection.response)
+                raise BambouHTTPError(connection=connection)
 
             if connection.user_info:
                 return (connection.user_info, connection)

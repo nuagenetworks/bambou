@@ -329,7 +329,7 @@ class NURESTFetcher(object):
         else:
 
             if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
-                raise BambouHTTPError(response=connection.response)
+                raise BambouHTTPError(connection=connection)
 
             return (self, self._nurest_object, count)
 
