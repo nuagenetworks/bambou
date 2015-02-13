@@ -276,7 +276,7 @@ class NURESTFetcher(object):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def countObjects(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
+    def count_objects(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
         """ Get the total count of objects that can be fetched according to filter
 
             This method can be asynchronous and trigger the callback method
