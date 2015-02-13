@@ -22,6 +22,6 @@ class BambouHTTPError(Exception):
 
         """
         self.request = connection.request
-        self.response = conneciton.response
+        self.response = connection.response
 
         super(BambouHTTPError, self).__init__("[HTTP %s(%s)] %s" % (self.response.status_code, self.response.reason, self.response.errors))
