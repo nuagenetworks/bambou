@@ -660,7 +660,7 @@ class NURESTObject(object):
 
     # HTTP Calls
 
-    def delete(self, recursive=False, async=False, callback=None, response_choice=None):
+    def delete(self, async=False, callback=None, response_choice=None):
         """ Delete object and call given callback in case of async call.
 
             Args:
@@ -668,38 +668,9 @@ class NURESTObject(object):
                 async: Boolean to make an asynchronous call. Default is False
                 callback: Callback method that will be triggered in case of asynchronous call
                 response_choice: Automatically send a response choice when confirmation is needed
+
         """
-
-        if recursive:
-            self.delete_children()
-
         return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_DELETE, async=async, callback=callback, response_choice=response_choice)
-
-    def delete_children(self):
-        """ Removes all children of the current object
-
-            This method has been developped to try removing all children of a given object.
-            For each child, it will try calling delete method.
-        """
-        fetcher_infos = inspect.getmembers(self, lambda o: isinstance(o, NURESTFetcher))
-
-        if fetcher_infos:
-
-            for fetcher_info in fetcher_infos:
-                fetcher_name = fetcher_info[0]
-                fetcher = getattr(self, fetcher_name)
-                child_remote_name = fetcher.managed_object_remote_name()
-
-                if child_remote_name not in self._ignore_delete_objects():
-
-                    # Fetch all objects first
-                    (fetcher, obj, fetched_objects, connection) = fetcher.fetch_objects()
-
-                    # Delete all fetched objects
-                    if fetched_objects is not None and len(fetched_objects) > 0:
-                        for nurest_object in fetched_objects:
-                            nurest_object.delete()
-                        setattr(self, fetcher.local_name, [])
 
     def save(self, async=False, callback=None):
         """ Update object and call given callback in case of async call
@@ -707,8 +678,8 @@ class NURESTObject(object):
             Args:
                 async: Boolean to make an asynchronous call. Default is False
                 callback: Callback method that will be triggered in case of asynchronous call
-        """
 
+        """
         return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_PUT, async=async, callback=callback)
 
     def fetch(self, async=False, callback=None):
@@ -717,8 +688,8 @@ class NURESTObject(object):
             Args:
                 async: Boolean to make an asynchronous call. Default is False
                 callback: Callback method that will be triggered in case of asynchronous call
-        """
 
+        """
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
         if async:
