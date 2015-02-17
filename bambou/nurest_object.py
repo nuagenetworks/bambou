@@ -660,7 +660,7 @@ class NURESTObject(object):
 
     # HTTP Calls
 
-    def delete(self, async=False, callback=None, response_choice=None):
+    def delete(self, response_choice=None, async=False, callback=None):
         """ Delete object and call given callback in case of async call.
 
             Args:
