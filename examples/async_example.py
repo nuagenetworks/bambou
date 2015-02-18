@@ -14,7 +14,7 @@ from bambou import NURESTPushCenter
 from models import Enterprise, NURESTUser
 
 user = NURESTUser()
-push_center = NURESTPushCenter.get_default_instance()
+push_center = NURESTPushCenter()
 ctrl = NURESTLoginController()
 
 

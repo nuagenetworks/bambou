@@ -15,11 +15,12 @@ from time import time
 
 from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
+from bambou.utils.singleton import Singleton
 
 from bambou import bambou_logger
 
 
-class NURESTPushCenter(object):
+class NURESTPushCenter(Singleton):
     """ Push center wait for push notifications.
 
         It has to listen a specific URL.
@@ -28,31 +29,22 @@ class NURESTPushCenter(object):
         and store it into get_last_events method.
     """
 
-    __default_instance = None
-
     def __init__(self):
         """ Initialize push center """
 
-        self._url = None
-        self._is_running = False
-        self._current_connection = None
-        self._last_events = list()
-        self.nb_events_received = 0
-        self.nb_push_received = 0
-        self._thread = None
-        self._user = None
-        self._start_time = None
-        self._timeout = None
-        self._delegate_methods = list()
-
-    @classmethod
-    def get_default_instance(cls):
-        """ Get default push center """
-
-        if not cls.__default_instance:
-            NURESTPushCenter.__default_instance = cls()
-
-        return NURESTPushCenter.__default_instance
+        if not hasattr(self, '_initiliazed') or not self._initiliazed:
+            self._initiliazed = True
+            self._url = None
+            self._is_running = False
+            self._current_connection = None
+            self._last_events = list()
+            self.nb_events_received = 0
+            self.nb_push_received = 0
+            self._thread = None
+            self._user = None
+            self._start_time = None
+            self._timeout = None
+            self._delegate_methods = list()
 
     # Properties
 
@@ -67,6 +59,13 @@ class NURESTPushCenter(object):
         self._url = url
 
     url = property(_get_url, _set_url)
+
+    def _get_is_running(self):
+        """ Get is_running """
+
+        return self._is_running
+
+    is_running = property(_get_is_running, None)
 
     # Control Methods
 
@@ -180,8 +179,7 @@ class NURESTPushCenter(object):
 
         request = NURESTRequest(method='GET', url=events_url)
 
-        # Force async to False so the push center will have only 1 thread running
-        connection = NURESTConnection(request=request, callback=self._did_receive_event, async=False, user=self._user)
+        connection = NURESTConnection(request=request, callback=self._did_receive_event, user=self._user)
 
         if self._timeout:
             if int(time()) - self._start_time >= self._timeout:
