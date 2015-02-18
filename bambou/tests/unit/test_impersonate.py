@@ -35,7 +35,7 @@ class Impersonate(TestCase):
         user = User()
 
         with patch('requests.request', mock):
-            user.enterprises_fetcher.fetch_objects()
+            user.enterprises_fetcher.fetch()
 
         headers = MockUtils.get_mock_parameter(mock=mock, name='headers')
 
@@ -45,7 +45,7 @@ class Impersonate(TestCase):
         ctrl.stop_impersonate()
 
         with patch('requests.request', mock):
-            user.enterprises_fetcher.fetch_objects()
+            user.enterprises_fetcher.fetch()
 
         headers = MockUtils.get_mock_parameter(mock=mock, name='headers')
         self.assertNotIn('X-Nuage-ProxyUser', headers)

@@ -196,7 +196,7 @@ class NURESTFetcher(object):
 
         return url
 
-    def fetch_objects(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, callback=None):
+    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, callback=None):
         """ Fetch objects according to given filter and page.
 
             This method fetches all managed class objects and store them
@@ -222,13 +222,13 @@ class NURESTFetcher(object):
         self._transaction_id = uuid.uuid4().hex
 
         if callback:
-            self._nurest_object.send_request(request=request, local_callback=self._did_fetch_objects, remote_callback=callback, user_info={'commit':commit})
+            self._nurest_object.send_request(request=request, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit':commit})
             return self._transaction_id
 
         connection = self._nurest_object.send_request(request=request, user_info={'commit':commit})
-        return self._did_fetch_objects(connection=connection)
+        return self._did_fetch(connection=connection)
 
-    def _did_fetch_objects(self, connection):
+    def _did_fetch(self, connection):
         """ Fetching objects has been done """
 
         self._current_connection = connection
@@ -275,7 +275,7 @@ class NURESTFetcher(object):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def count_objects(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, callback=None):
+    def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, callback=None):
         """ Get the total count of objects that can be fetched according to filter
 
             This method can be asynchronous and trigger the callback method

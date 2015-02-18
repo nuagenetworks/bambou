@@ -826,11 +826,11 @@ class NURESTObject(object):
 
     # Advanced REST Operations
 
-    def add_child_object(self, nurest_object, callback=None):
+    def create_child_object(self, nurest_object, callback=None):
         """ Add given nurest_object to the current object
 
             For example, to add a NUGroup into a NUEnterprise, you can call
-            enterprise.add_child_object(nurest_object=my_group)
+            parent.create_child_object(nurest_object=child)
 
             Args:
                 nurest_object: the NURESTObject object to add
@@ -843,7 +843,7 @@ class NURESTObject(object):
         return self._manage_child_object(nurest_object=nurest_object,
                                   method=HTTP_METHOD_POST,
                                   callback=callback,
-                                  handler=self._did_add_child_object)
+                                  handler=self._did_create_child_object)
 
     def instantiate_child_object(self, nurest_object, from_template, callback=None):
         """ Instantiate an nurest_object from a template object
@@ -861,9 +861,9 @@ class NURESTObject(object):
         return self._manage_child_object(nurest_object=nurest_object,
                                   method=HTTP_METHOD_POST,
                                   callback=callback,
-                                  handler=self._did_add_child_object)
+                                  handler=self._did_create_child_object)
 
-    def _did_add_child_object(self, connection):
+    def _did_create_child_object(self, connection):
         """ Callback called after adding a new child nurest_object """
 
         response = connection.response
