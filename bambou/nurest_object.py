@@ -829,7 +829,7 @@ class NURESTObject(object):
     def create_child_object(self, nurest_object, callback=None):
         """ Add given nurest_object to the current object
 
-            For example, to add a NUGroup into a NUEnterprise, you can call
+            For example, to add a child into a parent, you can call
             parent.create_child_object(nurest_object=child)
 
             Args:
