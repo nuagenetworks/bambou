@@ -566,7 +566,7 @@ class NURESTObject(object):
 
         return []
 
-    def _add_child(self, child):
+    def add_child(self, child):
         """ Add a child """
 
         rest_name = child.rest_name
@@ -575,14 +575,14 @@ class NURESTObject(object):
         if child not in children:
             children.append(child)
 
-    def _remove_child(self, child):
+    def remove_child(self, child):
         """ Remove a child """
 
         rest_name = child.rest_name
         children = self.get_children(rest_name)
         children.remove(child)
 
-    def _update_child(self, child):
+    def update_child(self, child):
         """ Update child """
 
         rest_name = child.rest_name
