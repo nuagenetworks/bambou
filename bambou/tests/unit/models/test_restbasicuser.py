@@ -6,10 +6,10 @@ from bambou import NURESTLoginController
 from bambou.tests import User, Enterprise
 
 
-class GetResourceTests(TestCase):
+class GetUserTests(TestCase):
 
-    def test_get_name(self):
-        """ Get object name """
+    def test_get_rest_name(self):
+        """ Get user REST name """
 
         controller = NURESTLoginController()
         controller.user = u'user'
@@ -19,24 +19,25 @@ class GetResourceTests(TestCase):
         controller.enterprise = u'Alcatel'
 
         user = User()
-        self.assertEquals(user.get_class_remote_name(), 'me')
+        self.assertEquals(user.rest_name, 'me')
+        self.assertEquals(user.get_resource_url(), 'https://example.com/api/v3_0/me')
 
     def test_get_resource_name(self):
-        """ Get object resource name """
+        """ Get user resource name """
 
         self.assertEquals(User.get_resource_name(), 'me')
 
     def test_get_resource_url(self):
-        """ Get object resource url """
+        """ Get user resource url """
 
         user = User()
-        self.assertEquals(user.get_resource_url(), u'https://example.com/api/v3_0/me')
+        self.assertEquals(user.get_resource_url(), u'https://<host>:<port>/nuage/api/v3_0/me')
 
     def test_get_resource_url_for_child_type(self):
-        """ Get object resources for child type """
+        """ Get user for child type """
 
         user = User()
-        self.assertEquals(user.get_resource_url_for_child_type(Enterprise), u'https://example.com/api/v3_0/enterprises')
+        self.assertEquals(user.get_resource_url_for_child_type(Enterprise), u'https://<host>:<port>/nuage/api/v3_0/enterprises')
 
 
 class CompressionTests(TestCase):

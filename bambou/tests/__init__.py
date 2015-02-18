@@ -2,6 +2,8 @@
 
 from bambou import NURESTObject, NURESTBasicUser, NURESTFetcher
 from bambou.config import BambouConfig
+from bambou.utils.decorators import classproperty
+
 BambouConfig.set_should_raise_bambou_http_error(True)
 
 __all__ = ['Enterprise', 'EnterprisesFetcher', 'Group', 'User']
@@ -27,8 +29,8 @@ class Enterprise(NURESTObject):
         self.expose_attribute(local_name='groups', remote_name='groups', attribute_type=list)
         self.expose_attribute(local_name='ceo', remote_name='ceo', attribute_type=object)
 
-    @classmethod
-    def get_remote_name(cls):
+    @classproperty
+    def rest_name(cls):
         """ Provides enterprise classname  """
 
         return u"enterprise"
@@ -56,8 +58,8 @@ class Group(NURESTObject):
 
         self.expose_attribute(local_name='name', remote_name='name', attribute_type=str)
 
-    @classmethod
-    def get_remote_name(cls):
+    @classproperty
+    def rest_name(cls):
         """ Provides user classname  """
 
         return "group"
@@ -95,8 +97,8 @@ class User(NURESTBasicUser):
         self.enterprises = []
         self.enterprises_fetcher = EnterprisesFetcher.fetcher_with_object(nurest_object=self, local_name=u'enterprises')
 
-    @classmethod
-    def get_remote_name(cls):
+    @classproperty
+    def rest_name(cls):
         """ Provides user classname  """
 
         return "me"

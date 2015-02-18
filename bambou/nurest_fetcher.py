@@ -105,7 +105,7 @@ class NURESTFetcher(object):
         raise NotImplementedError('%s has no managed class. Implements managed_class method first.' % cls)
 
     @classmethod
-    def managed_object_remote_name(cls):
+    def managed_object_rest_name(cls):
         """ Remote name of the managed object
 
             Returns:
@@ -113,7 +113,7 @@ class NURESTFetcher(object):
                 that has to be fetched.
         """
 
-        return cls.managed_class().get_resource_name()
+        return cls.managed_class().rest_name
 
     @classmethod
     def fetcher_with_object(cls, nurest_object, local_name):
@@ -135,7 +135,7 @@ class NURESTFetcher(object):
         fetcher.local_name = local_name
 
         setattr(nurest_object, local_name, [])
-        nurest_object.register_children(getattr(nurest_object, local_name), cls.managed_object_remote_name())
+        nurest_object.register_children(getattr(nurest_object, local_name), cls.managed_object_rest_name())
 
         return fetcher
 

@@ -24,11 +24,11 @@ class GetResourceTests(TestCase):
         """ Removes context """
         pass
 
-    def test_get_name(self):
-        """ Get object name """
+    def test_get_rest_name(self):
+        """ Get object REST name """
 
         enterprise = Enterprise()
-        self.assertEquals(enterprise.get_class_remote_name(), u'enterprise')
+        self.assertEquals(enterprise.rest_name, u'enterprise')
 
     def test_get_resource_name(self):
         """ Get object resource name """

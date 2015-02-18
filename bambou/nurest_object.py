@@ -21,6 +21,7 @@ from .nurest_fetcher import NURESTFetcher
 from .nurest_request import NURESTRequest
 from .nurest_modelcontroller import NURESTModelController
 from .utils import NURemoteAttribute
+from .utils.decorators import classproperty
 
 from bambou import bambou_logger
 from bambou.config import BambouConfig
@@ -56,7 +57,6 @@ class NURESTObject(object):
         self._last_updated_date = None
         self._is_dirty = False
 
-        self._children = dict()
         self._attributes = dict()  # Dictionary of attribute name => NURemoteAttribute
 
         self.expose_attribute(local_name=u'id', remote_name=u'ID', attribute_type=str, is_identifier=True)
@@ -67,7 +67,7 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'last_updated_date', remote_name=u'lastUpdatedDate', attribute_type=time, is_readonly=True)
         self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
-        self._children_list_registry = dict()
+        self._children_registry = dict()
 
         model_controller = NURESTModelController.get_default()
         model_controller.register_model(self.__class__)
@@ -205,8 +205,8 @@ class NURESTObject(object):
 
         return self._attributes.values()
 
-    @classmethod
-    def get_remote_name(cls):
+    @classproperty
+    def rest_name(cls):
         """ Provides the class name used for resource
 
             This method has to be implemented.
@@ -215,12 +215,7 @@ class NURESTObject(object):
                 NotImplementedError
         """
 
-        raise NotImplementedError('%s has no defined name. Implements get_remote_name method first.' % cls)
-
-    def get_class_remote_name(self):
-        """ Provides the resource name of the instance """
-
-        return self.__class__.get_remote_name()
+        raise NotImplementedError('%s has no defined name. Implements rest_name property first.' % cls)
 
     @classmethod
     def is_resource_name_fixed(cls):
@@ -251,25 +246,25 @@ class NURESTObject(object):
                 Returns a string that represents the resouce name of the object
         """
 
-        query_name = cls.get_remote_name()
+        rest_name = cls.rest_name
 
         if cls.is_resource_name_fixed():
-            return query_name
+            return rest_name
 
-        last_letter = query_name[-1]
+        last_letter = rest_name[-1]
 
         if last_letter == "y":
 
             vowels = ['a', 'e', 'i', 'o', 'u', 'y']
 
-            if query_name[-2].lower() not in vowels:
-                query_name = query_name[:len(query_name) - 1]
-                query_name += "ies"
+            if rest_name[-2].lower() not in vowels:
+                rest_name = rest_name[:len(rest_name) - 1]
+                rest_name += "ies"
 
         elif last_letter != "s":
-            query_name += "s"
+            rest_name += "s"
 
-        return query_name
+        return rest_name
 
     def get_resource_url(self):
         """ Get resource complete url """
@@ -306,7 +301,7 @@ class NURESTObject(object):
         if not isinstance(rest_object, NURESTObject):
             raise TypeError('The object is not a NURESTObject %s' % rest_object)
 
-        if self.get_remote_name() != rest_object.get_remote_name():
+        if self.rest_name != rest_object.rest_name:
             return False
 
         if self.id and rest_object.id:
@@ -418,27 +413,14 @@ class NURESTObject(object):
         current_user = NURESTBasicUser.get_default_user()
         return self._owner == current_user.id
 
-    def is_parents_owned_by_current_user(self, remote_names):
-        """ Check if the current user owns one of the parents """
+
+    def parent_with_rest_name_matching(self, rest_names):
+        """ Return parent that matches a rest name """
 
         parent = self
 
         while parent:
-
-            if self.get_class_remote_name() in remote_names and parent.is_owned_by_current_user():
-                return True
-
-            parent = parent.parent
-
-        return False
-
-    def parent_with_remote_name_matching(self, remote_names):
-        """ Return parent that matches a remote name """
-
-        parent = self
-
-        while parent:
-            if parent.get_class_remote_name() in remote_names:
+            if parent.rest_name in rest_names:
                 return parent
 
             parent = parent.parent
@@ -456,7 +438,7 @@ class NURESTObject(object):
         parent = self
 
         while parent:
-            types.push(parent.get_resource_name())
+            types.push(parent.rest_name)
             parent = parent.parent
 
         return types
@@ -521,74 +503,74 @@ class NURESTObject(object):
 
         self._is_dirty = True
 
-        bambou_logger.debug("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
+        bambou_logger.debug("[Bambou] Discarding object %s of type %s" % (self.id, self.rest_name))
 
         self._discard_all_children_list()
         self._parent = None
-        self._children_list_registry = dict()
+        self._children_registry = dict()
 
-    def _discard__children_with_resource_name(self, resource_name):
-        """ Discard children with a given resource name
+    def _discard_children_with_rest_name(self, rest_name):
+        """ Discard children with a given rest name
 
             Args:
-                resource_name: the resource name
+                rest_name: the rest name
 
         """
-        bambou_logger.debug("[Bambou] %s with id %s is discarding children list %s" % (self.remote_name, self._id, resource_name))
-        self._children_list_registry[resource_name] = []
+        bambou_logger.debug("[Bambou] %s with id %s is discarding children %s" % (self.rest_name, self._id, rest_name))
+        self._children_registry[rest_name] = []
 
     def _discard_all_children_lists(self):
         """ Discard current object children """
 
-        for resource_name in self._children_list_registry.keys():
-            self._discard__children_with_resource_name(resource_name)
+        for rest_name in self._children_registry.keys():
+            self._discard_children_with_rest_name(rest_name)
 
-    def _register_children_list(self, children, resource_name):
+    def _register_children_list(self, children, rest_name):
         """ Register children of the current object
 
             Args:
                 children: List of NURESTObject instances
-                resource_name: Name of the children resource
+                rest_name: ReST Name of children
         """
 
-        self._children_list_registry[resource_name] = children
+        self._children_registry[rest_name] = children
 
-    def _children_with_resource_name(self, resource_name):
+    def _children_with_rest_name(self, rest_name):
         """ Get all children according to the given resource_name
 
             Args:
-                resource_name: the name of the resource
+                rest_name: the rest name
 
             Returns:
                 Returns a list of children. If no children has been found,
                 returns an empty list.
         """
 
-        if resource_name not in self._children_list_registry:
+        if rest_name not in self._children_registry:
             return []
 
-        return self._children_list_registry[resource_name]
+        return self._children_registry[rest_name]
 
     # Children management
 
-    def register_children(self, children, local_name):
-        """ Register a list of children to the local name """
+    def register_children(self, children, rest_name):
+        """ Register a list of children to the rest name """
 
-        self._children[local_name] = children
+        self._children_registry[rest_name] = children
 
-    def get_children(self, local_name):
-        """ Retrieve children according to local name """
+    def get_children(self, rest_name):
+        """ Retrieve children according to a rest name """
 
-        if local_name in self._children:
-            return self._children[local_name]
+        if rest_name in self._children_registry:
+            return self._children_registry[rest_name]
 
         return []
 
     def _add_child(self, child):
         """ Add a child """
 
-        local_name = child.get_remote_name()
-        children = self.get_children(local_name)
+        rest_name = child.rest_name
+        children = self.get_children(rest_name)
 
         if child not in children:
             children.append(child)
@@ -596,15 +578,15 @@ class NURESTObject(object):
     def _remove_child(self, child):
         """ Remove a child """
 
-        local_name = child.get_remote_name()
-        children = self.get_children(local_name)
+        rest_name = child.rest_name
+        children = self.get_children(rest_name)
         children.remove(child)
 
     def _update_child(self, child):
         """ Update child """
 
-        local_name = child.get_remote_name()
-        children = self.get_children(local_name)
+        rest_name = child.rest_name
+        children = self.get_children(rest_name)
         index = children.index(child)
         children[index] = child
 
