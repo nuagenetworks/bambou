@@ -46,14 +46,13 @@ HTTP_METHOD_DELETE = 'DELETE'
 class NURESTConnection(object):
     """ Connection that enable HTTP requests """
 
-    def __init__(self, request, async, callback=None, callbacks=dict(), user=None):
+    def __init__(self, request, callback=None, callbacks=dict(), user=None):
         """ Intializes a new connection for a given request
 
             NURESTConnection object is in charge of the HTTP call. It relies on request library
 
             Args:
                 request: the NURESTRequest to send
-                async: A boolean to explain whether or not the call has to be made asynchronously
                 callback: the method that will be fired after sending
                 callbacks: a dictionary of user callbacks. Should contains local and remote callbacks
         """
@@ -67,7 +66,6 @@ class NURESTConnection(object):
         self._error_message = None
 
         self._request = request
-        self._async = async
         self._response = None
         self._callback = callback
         self._callbacks = callbacks
@@ -191,25 +189,16 @@ class NURESTConnection(object):
 
     has_timeouted = property(_has_timeouted, None)
 
-    def _get_async(self):
-        """ Get async
+    def _get_is_async(self):
+        """ Get is_async
 
             Returns:
                 Returns True if the request is asynchronous
         """
 
-        return self._async
+        return len(self._callbacks) > 0
 
-    def _set_async(self, async):
-        """ Set async
-
-            Args:
-                async: boolean to make asynchronous http request
-        """
-
-        self._async = async
-
-    async = property(_get_async, None)
+    is_async = property(_get_is_async, None)
 
     # Methods
 
@@ -309,7 +298,7 @@ class NURESTConnection(object):
         bambou_logger.debug('Bambou %s on %s has timeout (timeout=%ss)..' % (self._request.method, self._request.url, self.timeout))
         self._has_timeouted = True
 
-        if self._async and self._callback:
+        if self.is_async:
             self._callback(self)
         else:
             return self
@@ -369,7 +358,7 @@ class NURESTConnection(object):
         """ Make an HTTP request with a specific method """
 
         # TODO : Use Timeout here and _ignore_request_idle
-        if self._async:
+        if self.is_async:
             thread = threading.Thread(target=self._make_request)
             thread.is_daemon = False
             thread.start()

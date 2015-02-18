@@ -642,52 +642,48 @@ class NURESTObject(object):
 
     # HTTP Calls
 
-    def delete(self, response_choice=None, async=False, callback=None):
-        """ Delete object and call given callback in case of async call.
+    def delete(self, response_choice=None, callback=None):
+        """ Delete object and call given callback in case of call.
 
             Args:
                 recursive: Set to True to try to delete all children.
-                async: Boolean to make an asynchronous call. Default is False
                 callback: Callback method that will be triggered in case of asynchronous call
                 response_choice: Automatically send a response choice when confirmation is needed
 
         """
-        return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_DELETE, async=async, callback=callback, response_choice=response_choice)
+        return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_DELETE, callback=callback, response_choice=response_choice)
 
-    def save(self, async=False, callback=None):
+    def save(self, callback=None):
         """ Update object and call given callback in case of async call
 
             Args:
-                async: Boolean to make an asynchronous call. Default is False
                 callback: Callback method that will be triggered in case of asynchronous call
 
         """
-        return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_PUT, async=async, callback=callback)
+        return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_PUT, callback=callback)
 
-    def fetch(self, async=False, callback=None):
+    def fetch(self, callback=None):
         """ Fetch all information about the current object
 
             Args:
-                async: Boolean to make an asynchronous call. Default is False
                 callback: Callback method that will be triggered in case of asynchronous call
 
         """
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
-        if async:
-            self.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback)
+        if callback:
+            self.send_request(request=request, local_callback=self._did_fetch, remote_callback=callback)
         else:
-            connection = self.send_request(request=request, async=async)
+            connection = self.send_request(request=request)
             return self._did_fetch(connection)
 
     # REST HTTP Calls
 
-    def send_request(self, request, async, local_callback=None, remote_callback=None, user_info=None):
+    def send_request(self, request, local_callback=None, remote_callback=None, user_info=None):
         """ Sends a request, calls the local callback, then the remote callback in case of async call
 
             Args:
                 request: The request to send
-                async: Boolean to make an asynchronous call.
                 local_callback: local method that will be triggered in case of async call
                 remote_callback: remote moethd that will be triggered in case of async call
                 user_info: contains additionnal information to carry during the request
@@ -704,31 +700,25 @@ class NURESTObject(object):
         if remote_callback:
             callbacks['remote'] = remote_callback
 
-        connection = NURESTConnection(request=request, callback=self._did_receive_response, callbacks=callbacks, async=async)
+        connection = NURESTConnection(request=request, callback=self._did_receive_response, callbacks=callbacks)
         connection.user_info = user_info
 
         bambou_logger.info('Bambou Sending >>>>>>\n%s %s with following data:\n%s' % (request.method, request.url, json.dumps(request.data, indent=4)))
 
         return connection.start()
 
-    def _manage_child_object(self, nurest_object, method=HTTP_METHOD_GET, async=False, callback=None, handler=None, response_choice=None):
+    def _manage_child_object(self, nurest_object, method=HTTP_METHOD_GET, callback=None, handler=None, response_choice=None):
         """ Low level child management. Send given HTTP method with given nurest_object to given ressource of current object
 
             Args:
                 nurest_object: the NURESTObject object to manage
                 method: the HTTP method to use (GET, POST, PUT, DELETE)
-                async: True or False to make an asynchronous request
                 callback: the callback to call at the end
                 handler: a custom handler to call when complete, before calling the callback
 
             Returns:
                 Returns the object and connection (object, connection)
         """
-
-        # Force asynchronous request when having a callback
-        if callback:
-            async = True
-
         url = None
 
         if method == HTTP_METHOD_POST:
@@ -744,13 +734,13 @@ class NURESTObject(object):
         if not handler:
             handler = self._did_perform_standard_operation
 
-        if async:
-            self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=nurest_object)
+        if callback:
+            self.send_request(request=request, local_callback=handler, remote_callback=callback, user_info=nurest_object)
         else:
-            connection = self.send_request(request=request, async=async, user_info=nurest_object)
+            connection = self.send_request(request=request, user_info=nurest_object)
             return handler(connection)
 
-    def assign_objects(self, objects, nurest_object_type, async=False, callback=None):
+    def assign_objects(self, objects, nurest_object_type, callback=None):
         """ Reference a list of objects into the current resource
 
             Args:
@@ -774,15 +764,13 @@ class NURESTObject(object):
 
         request = NURESTRequest(method=HTTP_METHOD_PUT, url=url, data=ids)
 
-        if async:
+        if callback:
             self.send_request(request=request,
                               local_callback=self._did_perform_standard_operation,
-                              async=async,
                               remote_callback=callback,
                               user_info=objects)
         else:
             connection = self.send_request(request=request,
-                                           async=async,
                                            user_info=objects)
 
             return self._did_perform_standard_operation(connection)
@@ -820,7 +808,7 @@ class NURESTObject(object):
     def _did_perform_standard_operation(self, connection):
         """ Performs standard opertions """
 
-        if connection.async:
+        if connection.is_async:
             callback = connection.callbacks['remote']
 
             if connection.user_info:
@@ -838,7 +826,7 @@ class NURESTObject(object):
 
     # Advanced REST Operations
 
-    def add_child_object(self, nurest_object, async=False, callback=None):
+    def add_child_object(self, nurest_object, callback=None):
         """ Add given nurest_object to the current object
 
             For example, to add a NUGroup into a NUEnterprise, you can call
@@ -846,7 +834,6 @@ class NURESTObject(object):
 
             Args:
                 nurest_object: the NURESTObject object to add
-                async: should the request be done asynchronously or not
                 callback: callback containing the object and the connection
 
             Returns:
@@ -855,17 +842,15 @@ class NURESTObject(object):
 
         return self._manage_child_object(nurest_object=nurest_object,
                                   method=HTTP_METHOD_POST,
-                                  async=async,
                                   callback=callback,
                                   handler=self._did_add_child_object)
 
-    def instantiate_child_object(self, nurest_object, from_template, async=False, callback=None):
+    def instantiate_child_object(self, nurest_object, from_template, callback=None):
         """ Instantiate an nurest_object from a template object
 
             Args:
                 nurest_object: the NURESTObject object to add
                 from_template: the NURESTObject template object
-                async: should the request be done asynchronously or not
                 callback: callback containing the object and the connection
 
             Returns:
@@ -875,7 +860,6 @@ class NURESTObject(object):
         nurest_object.template_id = from_template.id
         return self._manage_child_object(nurest_object=nurest_object,
                                   method=HTTP_METHOD_POST,
-                                  async=async,
                                   callback=callback,
                                   handler=self._did_add_child_object)
 
