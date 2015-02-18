@@ -289,29 +289,6 @@ class NURESTObject(object):
         controller = NURESTLoginController()
         return controller.url
 
-    def __eq__(self, rest_object):
-        """ Compare with another object """
-
-        if self._is_dirty:
-            return False
-
-        if rest_object is None:
-            return False
-
-        if not isinstance(rest_object, NURESTObject):
-            raise TypeError('The object is not a NURESTObject %s' % rest_object)
-
-        if self.rest_name != rest_object.rest_name:
-            return False
-
-        if self.id and rest_object.id:
-            return self.id == rest_object.id
-
-        if self.local_id and rest_object.local_id:
-            return self.local_id == rest_object.local_id
-
-        return False
-
     def __str__(self):
         """ Prints a NURESTObject """
 
@@ -359,6 +336,40 @@ class NURESTObject(object):
                 continue
 
         return len(self.errors) == 0
+
+    # Comparison
+
+    def rest_equals(self, rest_object):
+        """ Compare objects REST attributes
+
+        """
+        if not self.equals(rest_object):
+            return False
+
+        return self.to_dict() == rest_object.to_dict()
+
+    def equals(self, rest_object):
+        """ Compare with another object """
+
+        if self._is_dirty:
+            return False
+
+        if rest_object is None:
+            return False
+
+        if not isinstance(rest_object, NURESTObject):
+            raise TypeError('The object is not a NURESTObject %s' % rest_object)
+
+        if self.rest_name != rest_object.rest_name:
+            return False
+
+        if self.id and rest_object.id:
+            return self.id == rest_object.id
+
+        if self.local_id and rest_object.local_id:
+            return self.local_id == rest_object.local_id
+
+        return False
 
     def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False):
         """ Expose local_name as remote_name

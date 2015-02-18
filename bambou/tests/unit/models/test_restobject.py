@@ -208,3 +208,41 @@ class AttributeTests(TestCase):
         self.assertEqual(is_valid, False)
         self.assertEqual(len(enterprise.errors), 1)
         self.assertIn("allowed_forwarding_classes", enterprise.errors)
+
+class ComparisonTests(TestCase):
+
+    def test_compare_instance(self):
+        """ Compare python instance """
+
+        enterprise1 = Enterprise(id=u'4', name=u'enterprise')
+        enterprise2 = Enterprise(id=u'4', name=u'enterprise2')
+        enterprise3 = Enterprise(id=u'5', name=u'test')
+
+        self.assertTrue(enterprise1 == enterprise1)
+        self.assertFalse(enterprise1 == enterprise2)
+        self.assertFalse(enterprise1 == enterprise3)
+        self.assertFalse(enterprise1 == None)
+
+    def test_instance_equals(self):
+        """ Compare instance with equals """
+
+        enterprise1 = Enterprise(id=u'4', name=u'enterprise')
+        enterprise2 = Enterprise(id=u'4', name=u'enterprise2')
+        enterprise3 = Enterprise(id=u'5', name=u'test')
+
+        self.assertTrue(enterprise1.equals(enterprise1))
+        self.assertTrue(enterprise1.equals(enterprise2))
+        self.assertFalse(enterprise1.equals(enterprise3))
+        self.assertFalse(enterprise1.equals(None))
+
+    def test_compare_rest_instance(self):
+        """ Compare instance with rest_equals """
+
+        enterprise1 = Enterprise(id=u'4', name=u'enterprise')
+        enterprise2 = Enterprise(id=u'4', name=u'enterprise')
+        enterprise3 = Enterprise(id=u'5', name=u'test')
+
+        self.assertTrue(enterprise1.rest_equals(enterprise1))
+        self.assertTrue(enterprise1.rest_equals(enterprise2))
+        self.assertFalse(enterprise1.rest_equals(enterprise3))
+        self.assertFalse(enterprise1.rest_equals(None))
