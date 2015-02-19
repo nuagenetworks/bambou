@@ -686,9 +686,17 @@ class NURESTObject(object):
         """ Fetch all information about the current object
 
             Args:
-                async: Boolean to make an asynchronous call. Default is False
-                callback: Callback method that will be triggered in case of asynchronous call
+                async (bool): Boolean to make an asynchronous call. Default is False
+                callback (function): Callback method that will be triggered in case of asynchronous call
 
+            Returns:
+                tuple: (current_fetcher, callee_parent, fetched_bjects, connection)
+
+            Example:
+                >>> enterprise = NUEnterprise(id="xxx-xxx-xxx-xxx")
+                >>> enterprise.fetch() # will get the enterprise with id "xxx-xxx-xxx-xxx"
+                >>> print enterprise.name
+                "My Enterprise"
         """
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
