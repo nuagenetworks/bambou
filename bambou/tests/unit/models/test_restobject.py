@@ -154,6 +154,21 @@ class CompressionTests(TestCase):
         self.assertEquals(enterprise.owner, u'Alcatel')
         self.assertEquals(enterprise.name, u'AnotherEnterprise')
 
+    def test_initializes_with_data(self):
+        """ Initializes model with data attribute """
+
+        to_dict = dict()
+        to_dict['ID'] = 3
+        to_dict['owner'] = u'Alcatel'
+        to_dict['name'] = u'AnotherEnterprise'
+        to_dict['unknownField'] = True
+
+        enterprise = Enterprise(data=to_dict)
+
+        self.assertEquals(enterprise.id, 3)
+        self.assertEquals(enterprise.owner, u'Alcatel')
+        self.assertEquals(enterprise.name, u'AnotherEnterprise')
+
 
 class AttributeTests(TestCase):
 

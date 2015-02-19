@@ -31,7 +31,7 @@ class NURESTObject(object):
         Provides basic saving and fetching utilities
     """
 
-    def __init__(self, creation_date=None, external_id=None, id=None, local_id=None, owner=None, parent_id=None, parent_type=None):
+    def __init__(self):
         """ Initializes the object with general information
 
             Args:
@@ -44,19 +44,19 @@ class NURESTObject(object):
                 parent_type: type of the parent
         """
 
-        self._creation_date = creation_date
-        self._external_id = external_id
-        self._id = id
-        self._local_id = local_id
-        self._owner = owner
-        self._parent_id = parent_id
-        self._parent_type = parent_type
+        self._creation_date = None
+        self._external_id = None
+        self._id = None
+        self._local_id = None
+        self._owner = None
+        self._parent_id = None
+        self._parent_type = None
         self._parent = None
         self._last_updated_by = None
         self._last_updated_date = None
         self._is_dirty = False
 
-        self._attributes = dict()  # Dictionary of attribute name => NURemoteAttribute
+        self._attributes = dict()
 
         self.expose_attribute(local_name=u'id', remote_name=u'ID', attribute_type=str, is_identifier=True)
         self.expose_attribute(local_name=u'parent_id', remote_name=u'parentID', attribute_type=str)
@@ -70,6 +70,23 @@ class NURESTObject(object):
 
         model_controller = NURESTModelController.get_default()
         model_controller.register_model(self.__class__)
+
+    def _compute_args(self, data=dict(), **kwargs):
+        """ Compute the arguments
+
+            Try to import attributes from data.
+            Otherwise compute kwargs arguments.
+
+            Args:
+                data: a dict()
+                kwargs: a list of arguments
+        """
+        if len(data) > 0:
+            self.from_dict(data)
+        else:
+            for key, value in kwargs.iteritems():
+                if hasattr(self, key):
+                    setattr(self, key, value)
 
     # Properties
 
@@ -375,8 +392,8 @@ class NURESTObject(object):
 
             An exposed attribute `local_name` will be sent within the HTTP request as
             a `remote_name`
-        """
 
+        """
         if remote_name is None:
             remote_name = local_name
 

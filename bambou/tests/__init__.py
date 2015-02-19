@@ -12,10 +12,13 @@ __all__ = ['Enterprise', 'EnterprisesFetcher', 'Group', 'User']
 class Enterprise(NURESTObject):
     """ Creates a enterprise object for tests """
 
-    def __init__(self, id=None, name='Alcatel-Lucent'):
-        """ Creates a new Enterprise """
+    def __init__(self, name=u'NuageNetworks', **kwargs):
+        """ Creates a new Enterprise
+
+        """
         super(Enterprise, self).__init__()
-        self.id = id
+
+        self.id = None
         self.name = name
         self.description = None
         self.allowed_forwarding_classes = None
@@ -29,16 +32,20 @@ class Enterprise(NURESTObject):
         self.expose_attribute(local_name='groups', remote_name='groups', attribute_type=list)
         self.expose_attribute(local_name='ceo', remote_name='ceo', attribute_type=object)
 
+        self._compute_args(**kwargs)
+
     @classproperty
     def rest_name(cls):
-        """ Provides enterprise classname  """
+        """ Provides enterprise classname
 
+        """
         return u"enterprise"
 
 
 class EnterprisesFetcher(NURESTFetcher):
-    """ Represents a Enterprises fetcher """
+    """ Represents a Enterprises fetcher
 
+    """
     @classmethod
     def managed_class(cls):
         """ This fetcher manages NUEnterprise objects
@@ -51,12 +58,14 @@ class EnterprisesFetcher(NURESTFetcher):
 
 class Group(NURESTObject):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         """ Creates a group """
         super(Group, self).__init__()
-        self.name = None
 
+        self.name = None
         self.expose_attribute(local_name='name', remote_name='name', attribute_type=str)
+
+        self._compute_args(**kwargs)
 
     @classproperty
     def rest_name(cls):
@@ -66,9 +75,10 @@ class Group(NURESTObject):
 
 class User(NURESTBasicUser):
 
-    def __init__(self):
-        """ Creates a new user """
+    def __init__(self, **kwargs):
+        """ Creates a new user
 
+        """
         super(User, self).__init__()
 
         self.email = None
@@ -80,7 +90,6 @@ class User(NURESTBasicUser):
         self.avatar_type = None
         self.avatar_data = None
         self.api_key_expiry = None
-
 
         self.enterprises = [];
 
@@ -96,6 +105,8 @@ class User(NURESTBasicUser):
 
         self.enterprises = []
         self.enterprises_fetcher = EnterprisesFetcher.fetcher_with_object(nurest_object=self, local_name=u'enterprises')
+
+        self._compute_args(**kwargs)
 
     @classproperty
     def rest_name(cls):
