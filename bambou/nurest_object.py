@@ -234,7 +234,7 @@ class NURESTObject(object):
 
         raise NotImplementedError('%s has no defined name. Implements rest_name property first.' % cls)
 
-    @classmethod
+    @classproperty
     def is_resource_name_fixed(cls):
         """ Boolean to say if the resource name should be fixed. Default is False """
 
@@ -265,7 +265,7 @@ class NURESTObject(object):
 
         rest_name = cls.rest_name
 
-        if cls.is_resource_name_fixed():
+        if cls.is_resource_name_fixed:
             return rest_name
 
         last_letter = rest_name[-1]
