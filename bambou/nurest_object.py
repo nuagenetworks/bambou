@@ -672,7 +672,7 @@ class NURESTObject(object):
 
     # HTTP Calls
 
-    def delete(self, response_choice=None, callback=None):
+    def delete(self, response_choice=1, callback=None):
         """ Delete object and call given callback in case of call.
 
             Args:
