@@ -576,6 +576,7 @@ class NURESTObject(object):
         self._discard_all_children_list()
         self._parent = None
         self._children_registry = dict()
+        self._fetchers_registry = dict()
 
     def _discard_children_with_rest_name(self, rest_name):
         """ Discard children with a given rest name
