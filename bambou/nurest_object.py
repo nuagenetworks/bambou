@@ -223,6 +223,13 @@ class NURESTObject(object):
     # Class methods
 
     @classproperty
+    def rest_base_url(cls):
+        """ Override this method to set object base url """
+
+        controller = NURESTLoginController()
+        return controller.url
+
+    @classproperty
     def rest_name(cls):
         """ Provides the class name used for resource
 
@@ -253,8 +260,8 @@ class NURESTObject(object):
 
         return new_object
 
-    @classmethod
-    def get_resource_name(cls):
+    @classproperty
+    def rest_resource_name(cls):
         """ Resource name of the object.
 
             It will compute the plural if needed
@@ -283,20 +290,13 @@ class NURESTObject(object):
 
         return rest_name
 
-    @classmethod
-    def base_url(cls):
-        """ Override this method to set object base url """
-
-        controller = NURESTLoginController()
-        return controller.url
-
     # URL and resource management
 
     def get_resource_url(self):
         """ Get resource complete url """
 
-        name = self.__class__.get_resource_name()
-        url = self.__class__.base_url()
+        name = self.__class__.rest_resource_name
+        url = self.__class__.rest_base_url
 
         if self.id is not None:
             return "%s/%s/%s" % (url, name, self.id)
@@ -306,7 +306,7 @@ class NURESTObject(object):
     def get_resource_url_for_child_type(self, nurest_object_type):
         """ Get the resource url for the nurest_object type """
 
-        return "%s/%s" % (self.get_resource_url(), nurest_object_type.get_resource_name())
+        return "%s/%s" % (self.get_resource_url(), nurest_object_type.rest_resource_name)
 
     def __str__(self):
         """ Prints a NURESTObject """

@@ -22,10 +22,10 @@ class GetUserTests(TestCase):
         self.assertEquals(user.rest_name, 'me')
         self.assertEquals(user.get_resource_url(), 'https://example.com/api/v3_0/me')
 
-    def test_get_resource_name(self):
+    def test_rest_resource_name(self):
         """ Get user resource name """
 
-        self.assertEquals(User.get_resource_name(), 'me')
+        self.assertEquals(User.rest_resource_name, 'me')
 
     def test_get_resource_url(self):
         """ Get user resource url """

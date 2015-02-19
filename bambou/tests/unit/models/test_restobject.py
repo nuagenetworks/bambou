@@ -30,11 +30,11 @@ class GetResourceTests(TestCase):
         enterprise = Enterprise()
         self.assertEquals(enterprise.rest_name, u'enterprise')
 
-    def test_get_resource_name(self):
+    def test_rest_resource_name(self):
         """ Get object resource name """
 
         enterprise = Enterprise()
-        self.assertEquals(Enterprise.get_resource_name(), u'enterprises')
+        self.assertEquals(Enterprise.rest_resource_name, u'enterprises')
 
     def test_get_resource_url(self):
         """ Get object resource url """
@@ -46,7 +46,7 @@ class GetResourceTests(TestCase):
     def test_get_resource_base_url(self):
         """ Get object resource base url """
 
-        self.assertEquals(Enterprise.base_url(), u'http://www.google.fr')
+        self.assertEquals(Enterprise.rest_base_url, u'http://www.google.fr')
 
 
     def test_get_resource_base_url(self):
