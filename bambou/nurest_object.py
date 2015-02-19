@@ -664,11 +664,12 @@ class NURESTObject(object):
         """ Delete object and call given callback in case of async call.
 
             Args:
-                recursive: Set to True to try to delete all children.
-                async: Boolean to make an asynchronous call. Default is False
-                callback: Callback method that will be triggered in case of asynchronous call
-                response_choice: Automatically send a response choice when confirmation is needed
+                async (bool): Boolean to make an asynchronous call. Default is False
+                callback (function): Callback method that will be triggered in case of asynchronous call
+                response_choice (int): Automatically send a response choice when confirmation is needed
 
+            Example:
+                >>> entity.delete() # will delete the enterprise from the server
         """
         return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_DELETE, async=async, callback=callback, response_choice=response_choice)
 
@@ -676,9 +677,12 @@ class NURESTObject(object):
         """ Update object and call given callback in case of async call
 
             Args:
-                async: Boolean to make an asynchronous call. Default is False
-                callback: Callback method that will be triggered in case of asynchronous call
+                async (bool): Boolean to make an asynchronous call. Default is False
+                callback (function): Callback method that will be triggered in case of asynchronous call
 
+            Example:
+                >>> entity.name = "My Super Object"
+                >>> entity.save() # will save the new name in the server
         """
         return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_PUT, async=async, callback=callback)
 
@@ -693,10 +697,10 @@ class NURESTObject(object):
                 tuple: (current_fetcher, callee_parent, fetched_bjects, connection)
 
             Example:
-                >>> enterprise = NUEnterprise(id="xxx-xxx-xxx-xxx")
-                >>> enterprise.fetch() # will get the enterprise with id "xxx-xxx-xxx-xxx"
-                >>> print enterprise.name
-                "My Enterprise"
+                >>> entity = NUEntity(id="xxx-xxx-xxx-xxx")
+                >>> entity.fetch() # will get the entity with id "xxx-xxx-xxx-xxx"
+                >>> print entity.name
+                "My Entity"
         """
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
@@ -780,12 +784,15 @@ class NURESTObject(object):
         """ Reference a list of objects into the current resource
 
             Args:
-                objects: list of NURESTObject to link
-                nurest_object_type: Type of the object to link
-                callback: Callback method that should be fired at the end
+                objects (list): list of NURESTObject to link
+                nurest_object_type (type): Type of the object to link
+                callback (function): Callback method that should be fired at the end
 
             Returns:
                 Returns the current object and the connection (object, connection)
+
+            Example:
+                >>> entity.assign_objects([entity1, entity2, entity3], NUEntity.rest_name) # entity1, entity2 and entity3 are now part of the entity
         """
 
         if len(objects) == 0:
@@ -871,12 +878,16 @@ class NURESTObject(object):
             enterprise.add_child_object(nurest_object=my_group)
 
             Args:
-                nurest_object: the NURESTObject object to add
-                async: should the request be done asynchronously or not
-                callback: callback containing the object and the connection
+                nurest_object (bambou.NURESTObject): the NURESTObject object to add
+                async (bool): should the request be done asynchronously or not
+                callback (function): callback containing the object and the connection
 
             Returns:
                 Returns the object and connection (object, connection)
+
+            Example:
+                >>> entity = NUEntity(name="Super Entity")
+                >>> parent_entity.create_child_object(entity) # the new entity as been created in the parent_entity
         """
 
         return self._manage_child_object(nurest_object=nurest_object,
@@ -896,6 +907,13 @@ class NURESTObject(object):
 
             Returns:
                 Returns the object and connection (object, connection)
+
+            Example:
+                >>> parent_entity = NUParentEntity(id="xxxx-xxxx-xxx-xxxx") # create a NUParentEntity with an existing ID (or retrieve one)
+                >>> other_entity_template = NUOtherEntityTemplate(id="yyyy-yyyy-yyyy-yyyy") # create a NUOtherEntityTemplate with an existing ID (or retrieve one)
+                >>> other_entity_instance = NUOtherEntityInstance(name="my new instance") # create a new NUOtherEntityInstance to be intantiated from other_entity_template
+                >>>
+                >>> parent_entity.instantiate_child_object(other_entity_instance, other_entity_template) # instatiate the new domain in the server
         """
 
         nurest_object.template_id = from_template.id
