@@ -179,7 +179,8 @@ class NURESTPushCenter(Singleton):
 
         request = NURESTRequest(method='GET', url=events_url)
 
-        connection = NURESTConnection(request=request, callback=self._did_receive_event, user=self._user)
+        # Force async to False so the push center will have only 1 thread running
+        connection = NURESTConnection(request=request, async=False, callback=self._did_receive_event, user=self._user)
 
         if self._timeout:
             if int(time()) - self._start_time >= self._timeout:

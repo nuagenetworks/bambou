@@ -199,7 +199,7 @@ class NURESTFetcher(object):
 
         return url
 
-    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, callback=None):
+    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
         """ Fetch objects according to given filter and page.
 
             This method fetches all managed class objects and store them
@@ -224,8 +224,8 @@ class NURESTFetcher(object):
         self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
         self._transaction_id = uuid.uuid4().hex
 
-        if callback:
-            self._nurest_object.send_request(request=request, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit':commit})
+        if async:
+            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit':commit})
             return self._transaction_id
 
         connection = self._nurest_object.send_request(request=request, user_info={'commit':commit})
@@ -278,7 +278,7 @@ class NURESTFetcher(object):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, callback=None):
+    def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
         """ Get the total count of objects that can be fetched according to filter
 
             This method can be asynchronous and trigger the callback method
@@ -302,9 +302,9 @@ class NURESTFetcher(object):
 
         self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
 
-        if callback:
+        if async:
             self._transaction_id = uuid.uuid4().hex
-            self._nurest_object.send_request(request=request, local_callback=self._did_count, remote_callback=callback)
+            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_count, remote_callback=callback)
             return self._transaction_id
 
         else:
@@ -324,7 +324,7 @@ class NURESTFetcher(object):
         if 'remote' in connection.callbacks:
             callback = connection.callbacks['remote']
 
-        if connection.is_async:
+        if connection.async:
             if callback:
                 callback(self, self._nurest_object, count)
         else:
@@ -339,7 +339,7 @@ class NURESTFetcher(object):
 
         if connection:
 
-            if connection.is_async:
+            if connection.async:
                 callback = connection.callbacks['remote']
 
                 if callback:

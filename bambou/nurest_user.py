@@ -95,7 +95,7 @@ class NURESTBasicUser(NURESTObject):
 
         self._new_password = new_password
 
-    def save(self, callback=None):
+    def save(self, async=False, callback=None):
         """ Updates the user and perform the callback method """
 
         if self._new_password:
@@ -108,8 +108,8 @@ class NURESTBasicUser(NURESTObject):
         data = json.dumps(self.to_dict())
         request = NURESTRequest(method=HTTP_METHOD_PUT, url=self.get_resource_url(), data=data)
 
-        if callback:
-            self.send_request(request=request, local_callback=self._did_save, remote_callback=callback)
+        if async:
+            self.send_request(request=request, async=async, local_callback=self._did_save, remote_callback=callback)
         else:
             connection = self.send_request(request=request)
             return self._did_save(connection)
@@ -123,7 +123,7 @@ class NURESTBasicUser(NURESTObject):
         controller.password = None
         controller.api_key = self.api_key
 
-        if connection.is_async:
+        if connection.async:
             callback = connection.callbacks['remote']
 
             if connection.user_info:
