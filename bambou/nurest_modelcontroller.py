@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright (c) 2011-2012 Alcatel, Alcatel-Lucent, Inc. All Rights Reserved.
+# Copyright (c) 2011-2012 Alcatel, Alcatel-Lucent, Inc. All Rights Reserved.
+#
+# This source code contains confidential information which is proprietary to Alcatel.
+# No part of its contents may be used, copied, disclosed or conveyed to any party
+# in any manner whatsoever without prior written permission from Alcatel.
+#
+# Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
-This source code contains confidential information which is proprietary to Alcatel.
-No part of its contents may be used, copied, disclosed or conveyed to any party
-in any manner whatsoever without prior written permission from Alcatel.
-
-Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
-"""
 
 from .utils.singleton import Singleton
 
@@ -39,38 +38,38 @@ class NURESTModelController(Singleton):
                 model: the model to register
         """
 
-        remote_name = model.get_remote_name()
+        rest_name = model.rest_name
 
-        if remote_name not in self._model_registry:
-            self._model_registry[remote_name] = [model]
+        if rest_name not in self._model_registry:
+            self._model_registry[rest_name] = [model]
 
-        elif model not in self._model_registry[remote_name]:
-            self._model_registry[remote_name].append(model)
+        elif model not in self._model_registry[rest_name]:
+            self._model_registry[rest_name].append(model)
 
-    def get_models(self, remote_name):
+    def get_models(self, rest_name):
         """ Retrieve all models from a given remote name
 
             Args:
-                remote_name: the remote name entry
+                rest_name: the remote name entry
 
             Returns:
                 A list of models corresponding to remote name arg.
                 An empty list if no entries found for the remote name
         """
 
-        if remote_name in self._model_registry:
-            return self._model_registry[remote_name]
+        if rest_name in self._model_registry:
+            return self._model_registry[rest_name]
 
         return []
 
-    def get_first_model(self, remote_name):
-        """ Get the first model corresponding to a remote_name
+    def get_first_model(self, rest_name):
+        """ Get the first model corresponding to a rest_name
 
             Args:
-                remote_name: the remote name
+                rest_name: the remote name
         """
 
-        models = self.get_models(remote_name)
+        models = self.get_models(rest_name)
 
         if len(models) > 0:
             return models[0]

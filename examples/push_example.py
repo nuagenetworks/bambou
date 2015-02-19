@@ -52,7 +52,7 @@ if __name__ == '__main__':
     ctrl.api_key = user.api_key
 
     # Then here we get the default push center
-    push_center = NURESTPushCenter.get_default_instance()
+    push_center = NURESTPushCenter()
     push_center.url = ctrl.url
 
     # we register our delegate that will be called on each event

@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from bambou import NURESTLoginController
-from bambou.tests import Enterprise, Group, User
+from bambou.tests import Enterprise, EnterprisesFetcher, Group, GroupsFetcher, User
 
 
 class GetResourceTests(TestCase):
@@ -24,17 +24,17 @@ class GetResourceTests(TestCase):
         """ Removes context """
         pass
 
-    def test_get_name(self):
-        """ Get object name """
+    def test_get_rest_name(self):
+        """ Get object REST name """
 
         enterprise = Enterprise()
-        self.assertEquals(enterprise.get_class_remote_name(), u'enterprise')
+        self.assertEquals(enterprise.rest_name, u'enterprise')
 
-    def test_get_resource_name(self):
+    def test_rest_resource_name(self):
         """ Get object resource name """
 
         enterprise = Enterprise()
-        self.assertEquals(Enterprise.get_resource_name(), u'enterprises')
+        self.assertEquals(Enterprise.rest_resource_name, u'enterprises')
 
     def test_get_resource_url(self):
         """ Get object resource url """
@@ -46,7 +46,7 @@ class GetResourceTests(TestCase):
     def test_get_resource_base_url(self):
         """ Get object resource base url """
 
-        self.assertEquals(Enterprise.base_url(), u'http://www.google.fr')
+        self.assertEquals(Enterprise.rest_base_url, u'http://www.google.fr')
 
 
     def test_get_resource_base_url(self):
@@ -154,6 +154,21 @@ class CompressionTests(TestCase):
         self.assertEquals(enterprise.owner, u'Alcatel')
         self.assertEquals(enterprise.name, u'AnotherEnterprise')
 
+    def test_initializes_with_data(self):
+        """ Initializes model with data attribute """
+
+        to_dict = dict()
+        to_dict['ID'] = 3
+        to_dict['owner'] = u'Alcatel'
+        to_dict['name'] = u'AnotherEnterprise'
+        to_dict['unknownField'] = True
+
+        enterprise = Enterprise(data=to_dict)
+
+        self.assertEquals(enterprise.id, 3)
+        self.assertEquals(enterprise.owner, u'Alcatel')
+        self.assertEquals(enterprise.name, u'AnotherEnterprise')
+
 
 class AttributeTests(TestCase):
 
@@ -208,3 +223,78 @@ class AttributeTests(TestCase):
         self.assertEqual(is_valid, False)
         self.assertEqual(len(enterprise.errors), 1)
         self.assertIn("allowed_forwarding_classes", enterprise.errors)
+
+class ComparisonTests(TestCase):
+
+    def test_compare_instance(self):
+        """ Compare python instance """
+
+        enterprise1 = Enterprise(id=u'4', name=u'enterprise')
+        enterprise2 = Enterprise(id=u'4', name=u'enterprise2')
+        enterprise3 = Enterprise(id=u'5', name=u'test')
+
+        self.assertTrue(enterprise1 == enterprise1)
+        self.assertFalse(enterprise1 == enterprise2)
+        self.assertFalse(enterprise1 == enterprise3)
+        self.assertFalse(enterprise1 == None)
+
+    def test_instance_equals(self):
+        """ Compare instance with equals """
+
+        enterprise1 = Enterprise(id=u'4', name=u'enterprise')
+        enterprise2 = Enterprise(id=u'4', name=u'enterprise2')
+        enterprise3 = Enterprise(id=u'5', name=u'test')
+
+        self.assertTrue(enterprise1.equals(enterprise1))
+        self.assertTrue(enterprise1.equals(enterprise2))
+        self.assertFalse(enterprise1.equals(enterprise3))
+        self.assertFalse(enterprise1.equals(None))
+
+    def test_compare_rest_instance(self):
+        """ Compare instance with rest_equals """
+
+        enterprise1 = Enterprise(id=u'4', name=u'enterprise')
+        enterprise2 = Enterprise(id=u'4', name=u'enterprise')
+        enterprise3 = Enterprise(id=u'5', name=u'test')
+
+        self.assertTrue(enterprise1.rest_equals(enterprise1))
+        self.assertTrue(enterprise1.rest_equals(enterprise2))
+        self.assertFalse(enterprise1.rest_equals(enterprise3))
+        self.assertFalse(enterprise1.rest_equals(None))
+
+
+class ChildrenTests(TestCase):
+
+    def test_children(self):
+        """ test children registry methods """
+
+        user = User()
+
+        rest_names = user.children_rest_names()
+        self.assertEquals(rest_names, ['group', 'enterprise'])
+        self.assertEquals(user.children_with_rest_name('group'), [])
+        self.assertEquals(user.children_with_rest_name('enterprise'), [])
+
+        admins = Group(name=u'Admins')
+        others = Group(name=u'Others')
+        user.groups.append(admins)
+        user.groups.append(others)
+        self.assertEquals(user.children_with_rest_name('group'), [admins, others])
+
+        enterprise = Enterprise()
+        user.enterprises.append(enterprise)
+        self.assertEquals(user.children_with_rest_name('enterprise'), [enterprise])
+
+        self.assertEquals(user.children_list(), [[admins, others], [enterprise]])
+
+class FetchersTests(TestCase):
+
+    def test_fetchers(self):
+        """ test fetchers registry methods """
+
+        user = User()
+
+        rest_names = user.children_rest_names()
+        self.assertEquals(rest_names, ['group', 'enterprise'])
+        self.assertEquals(user.fetcher_with_rest_name('group'), GroupsFetcher)
+        self.assertEquals(user.fetcher_with_rest_name('enterprise'), EnterprisesFetcher)

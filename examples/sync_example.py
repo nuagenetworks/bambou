@@ -40,7 +40,7 @@ def main():
     enterprise.name = 'Christophe Test'
     enterprise.description = 'Hey hey hey'
 
-    (enterprise, connection) = user.add_child_object(nurest_object=enterprise, async=False)
+    (enterprise, connection) = user.create_child_object(nurest_object=enterprise, async=False)
 
     print('Sleeping for... 6 sec')
     sleep(6)

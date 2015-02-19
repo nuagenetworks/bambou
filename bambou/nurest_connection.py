@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright (c) 2011-2012 Alcatel, Alcatel-Lucent, Inc. All Rights Reserved.
+# Copyright (c) 2011-2012 Alcatel, Alcatel-Lucent, Inc. All Rights Reserved.
+#
+# This source code contains confidential information which is proprietary to Alcatel.
+# No part of its contents may be used, copied, disclosed or conveyed to any party
+# in any manner whatsoever without prior written permission from Alcatel.
+#
+# Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
-This source code contains confidential information which is proprietary to Alcatel.
-No part of its contents may be used, copied, disclosed or conveyed to any party
-in any manner whatsoever without prior written permission from Alcatel.
-
-Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
-"""
 
 import json
 import requests
@@ -53,7 +52,6 @@ class NURESTConnection(object):
 
             Args:
                 request: the NURESTRequest to send
-                async: A boolean to explain whether or not the call has to be made asynchronously
                 callback: the method that will be fired after sending
                 callbacks: a dictionary of user callbacks. Should contains local and remote callbacks
         """
@@ -200,15 +198,6 @@ class NURESTConnection(object):
 
         return self._async
 
-    def _set_async(self, async):
-        """ Set async
-
-            Args:
-                async: boolean to make asynchronous http request
-        """
-
-        self._async = async
-
     async = property(_get_async, None)
 
     # Methods
@@ -309,7 +298,7 @@ class NURESTConnection(object):
         bambou_logger.debug('Bambou %s on %s has timeout (timeout=%ss)..' % (self._request.method, self._request.url, self.timeout))
         self._has_timeouted = True
 
-        if self._async and self._callback:
+        if self.async:
             self._callback(self)
         else:
             return self
@@ -369,7 +358,7 @@ class NURESTConnection(object):
         """ Make an HTTP request with a specific method """
 
         # TODO : Use Timeout here and _ignore_request_idle
-        if self._async:
+        if self.async:
             thread = threading.Thread(target=self._make_request)
             thread.is_daemon = False
             thread.start()

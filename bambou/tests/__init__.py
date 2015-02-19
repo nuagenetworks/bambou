@@ -2,6 +2,8 @@
 
 from bambou import NURESTObject, NURESTBasicUser, NURESTFetcher
 from bambou.config import BambouConfig
+from bambou.utils.decorators import classproperty
+
 BambouConfig.set_should_raise_bambou_http_error(True)
 
 __all__ = ['Enterprise', 'EnterprisesFetcher', 'Group', 'User']
@@ -10,10 +12,13 @@ __all__ = ['Enterprise', 'EnterprisesFetcher', 'Group', 'User']
 class Enterprise(NURESTObject):
     """ Creates a enterprise object for tests """
 
-    def __init__(self, id=None, name='Alcatel-Lucent'):
-        """ Creates a new Enterprise """
+    def __init__(self, name=u'NuageNetworks', **kwargs):
+        """ Creates a new Enterprise
+
+        """
         super(Enterprise, self).__init__()
-        self.id = id
+
+        self.id = None
         self.name = name
         self.description = None
         self.allowed_forwarding_classes = None
@@ -27,16 +32,20 @@ class Enterprise(NURESTObject):
         self.expose_attribute(local_name='groups', remote_name='groups', attribute_type=list)
         self.expose_attribute(local_name='ceo', remote_name='ceo', attribute_type=object)
 
-    @classmethod
-    def get_remote_name(cls):
-        """ Provides enterprise classname  """
+        self._compute_args(**kwargs)
 
+    @classproperty
+    def rest_name(cls):
+        """ Provides enterprise classname
+
+        """
         return u"enterprise"
 
 
 class EnterprisesFetcher(NURESTFetcher):
-    """ Represents a Enterprises fetcher """
+    """ Represents a Enterprises fetcher
 
+    """
     @classmethod
     def managed_class(cls):
         """ This fetcher manages NUEnterprise objects
@@ -49,24 +58,43 @@ class EnterprisesFetcher(NURESTFetcher):
 
 class Group(NURESTObject):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         """ Creates a group """
         super(Group, self).__init__()
-        self.name = None
 
+        self.name = None
         self.expose_attribute(local_name='name', remote_name='name', attribute_type=str)
 
-    @classmethod
-    def get_remote_name(cls):
+        self._compute_args(**kwargs)
+
+    @classproperty
+    def rest_name(cls):
         """ Provides user classname  """
 
         return "group"
 
+
+class GroupsFetcher(NURESTFetcher):
+    """ Represents a Groups fetcher
+
+    """
+    @classmethod
+    def managed_class(cls):
+        """ This fetcher manages Group objects
+
+            Returns:
+                Returns the Group class
+        """
+
+        return Group
+
+
 class User(NURESTBasicUser):
 
-    def __init__(self):
-        """ Creates a new user """
+    def __init__(self, **kwargs):
+        """ Creates a new user
 
+        """
         super(User, self).__init__()
 
         self.email = None
@@ -78,7 +106,6 @@ class User(NURESTBasicUser):
         self.avatar_type = None
         self.avatar_data = None
         self.api_key_expiry = None
-
 
         self.enterprises = [];
 
@@ -95,8 +122,13 @@ class User(NURESTBasicUser):
         self.enterprises = []
         self.enterprises_fetcher = EnterprisesFetcher.fetcher_with_object(nurest_object=self, local_name=u'enterprises')
 
-    @classmethod
-    def get_remote_name(cls):
+        self.groups = []
+        self.groups_fetcher = GroupsFetcher.fetcher_with_object(nurest_object=self, local_name=u'groups')
+
+        self._compute_args(**kwargs)
+
+    @classproperty
+    def rest_name(cls):
         """ Provides user classname  """
 
         return "me"
@@ -110,11 +142,11 @@ class User(NURESTBasicUser):
     def get_resource_url(self):
         """ Get resource complete url """
 
-        name = self.__class__.get_resource_name()
-        url = self.__class__.base_url()
+        name = self.__class__.rest_resource_name
+        url = self.__class__.rest_base_url
         return "%s/%s" % (url, name)
 
     def get_resource_url_for_child_type(self, nurest_object_type):
         """ Get the resource url for the nurest_object type """
 
-        return "%s/%s" % (self.__class__.base_url(), nurest_object_type.get_resource_name())
+        return "%s/%s" % (self.__class__.rest_base_url, nurest_object_type.rest_resource_name)

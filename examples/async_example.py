@@ -14,12 +14,12 @@ from bambou import NURESTPushCenter
 from models import Enterprise, NURESTUser
 
 user = NURESTUser()
-push_center = NURESTPushCenter.get_default_instance()
+push_center = NURESTPushCenter()
 ctrl = NURESTLoginController()
 
 
 def _did_add_enterprise(enterprise, connection):
-    """ Callback after user.add_child_object(nurest_object=enterprise...) """
+    """ Callback after user.create_child_object(nurest_object=enterprise...) """
 
     if connection.response.status_code < 300:
         print("Enterprise saved with ID=%s" % enterprise.id)
@@ -59,7 +59,7 @@ def _did_user_fetch(user, connection):
     enterprise = Enterprise()
     enterprise.name = 'Async Enterprise test'
     enterprise.description = 'Description of test enterprise'
-    user.add_child_object(nurest_object=enterprise, callback=_did_add_enterprise, async=True)
+    user.create_child_object(nurest_object=enterprise, callback=_did_add_enterprise, async=True)
 
 
 def main():

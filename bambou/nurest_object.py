@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright (c) 2011-2012 Alcatel, Alcatel-Lucent, Inc. All Rights Reserved.
+# Copyright (c) 2011-2012 Alcatel, Alcatel-Lucent, Inc. All Rights Reserved.
+#
+# This source code contains confidential information which is proprietary to Alcatel.
+# No part of its contents may be used, copied, disclosed or conveyed to any party
+# in any manner whatsoever without prior written permission from Alcatel.
+#
+# Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
-This source code contains confidential information which is proprietary to Alcatel.
-No part of its contents may be used, copied, disclosed or conveyed to any party
-in any manner whatsoever without prior written permission from Alcatel.
-
-Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
-"""
 
 import inspect
 import json
@@ -21,6 +20,7 @@ from .nurest_fetcher import NURESTFetcher
 from .nurest_request import NURESTRequest
 from .nurest_modelcontroller import NURESTModelController
 from .utils import NURemoteAttribute
+from .utils.decorators import classproperty
 
 from bambou import bambou_logger
 from bambou.config import BambouConfig
@@ -31,7 +31,7 @@ class NURESTObject(object):
         Provides basic saving and fetching utilities
     """
 
-    def __init__(self, creation_date=None, external_id=None, id=None, local_id=None, owner=None, parent_id=None, parent_type=None):
+    def __init__(self):
         """ Initializes the object with general information
 
             Args:
@@ -44,20 +44,19 @@ class NURESTObject(object):
                 parent_type: type of the parent
         """
 
-        self._creation_date = creation_date
-        self._external_id = external_id
-        self._id = id
-        self._local_id = local_id
-        self._owner = owner
-        self._parent_id = parent_id
-        self._parent_type = parent_type
+        self._creation_date = None
+        self._external_id = None
+        self._id = None
+        self._local_id = None
+        self._owner = None
+        self._parent_id = None
+        self._parent_type = None
         self._parent = None
         self._last_updated_by = None
         self._last_updated_date = None
         self._is_dirty = False
 
-        self._children = dict()
-        self._attributes = dict()  # Dictionary of attribute name => NURemoteAttribute
+        self._attributes = dict()
 
         self.expose_attribute(local_name=u'id', remote_name=u'ID', attribute_type=str, is_identifier=True)
         self.expose_attribute(local_name=u'parent_id', remote_name=u'parentID', attribute_type=str)
@@ -67,10 +66,28 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'last_updated_date', remote_name=u'lastUpdatedDate', attribute_type=time, is_readonly=True)
         self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
-        self._children_list_registry = dict()
+        self._children_registry = dict()
+        self._fetchers_registry = dict()
 
         model_controller = NURESTModelController.get_default()
         model_controller.register_model(self.__class__)
+
+    def _compute_args(self, data=dict(), **kwargs):
+        """ Compute the arguments
+
+            Try to import attributes from data.
+            Otherwise compute kwargs arguments.
+
+            Args:
+                data: a dict()
+                kwargs: a list of arguments
+        """
+        if len(data) > 0:
+            self.from_dict(data)
+        else:
+            for key, value in kwargs.iteritems():
+                if hasattr(self, key):
+                    setattr(self, key, value)
 
     # Properties
 
@@ -194,8 +211,6 @@ class NURESTObject(object):
 
     last_updated_date = property(_get_last_updated_date, _set_last_updated_date)
 
-    # Methods
-
     def get_attributes(self):
         """ Get all attributes information
 
@@ -205,8 +220,17 @@ class NURESTObject(object):
 
         return self._attributes.values()
 
-    @classmethod
-    def get_remote_name(cls):
+    # Class methods
+
+    @classproperty
+    def rest_base_url(cls):
+        """ Override this method to set object base url """
+
+        controller = NURESTLoginController()
+        return controller.url
+
+    @classproperty
+    def rest_name(cls):
         """ Provides the class name used for resource
 
             This method has to be implemented.
@@ -215,14 +239,9 @@ class NURESTObject(object):
                 NotImplementedError
         """
 
-        raise NotImplementedError('%s has no defined name. Implements get_remote_name method first.' % cls)
+        raise NotImplementedError('%s has no defined name. Implements rest_name property first.' % cls)
 
-    def get_class_remote_name(self):
-        """ Provides the resource name of the instance """
-
-        return self.__class__.get_remote_name()
-
-    @classmethod
+    @classproperty
     def is_resource_name_fixed(cls):
         """ Boolean to say if the resource name should be fixed. Default is False """
 
@@ -241,8 +260,8 @@ class NURESTObject(object):
 
         return new_object
 
-    @classmethod
-    def get_resource_name(cls):
+    @classproperty
+    def rest_resource_name(cls):
         """ Resource name of the object.
 
             It will compute the plural if needed
@@ -251,31 +270,33 @@ class NURESTObject(object):
                 Returns a string that represents the resouce name of the object
         """
 
-        query_name = cls.get_remote_name()
+        rest_name = cls.rest_name
 
-        if cls.is_resource_name_fixed():
-            return query_name
+        if cls.is_resource_name_fixed:
+            return rest_name
 
-        last_letter = query_name[-1]
+        last_letter = rest_name[-1]
 
         if last_letter == "y":
 
             vowels = ['a', 'e', 'i', 'o', 'u', 'y']
 
-            if query_name[-2].lower() not in vowels:
-                query_name = query_name[:len(query_name) - 1]
-                query_name += "ies"
+            if rest_name[-2].lower() not in vowels:
+                rest_name = rest_name[:len(rest_name) - 1]
+                rest_name += "ies"
 
         elif last_letter != "s":
-            query_name += "s"
+            rest_name += "s"
 
-        return query_name
+        return rest_name
+
+    # URL and resource management
 
     def get_resource_url(self):
         """ Get resource complete url """
 
-        name = self.__class__.get_resource_name()
-        url = self.__class__.base_url()
+        name = self.__class__.rest_resource_name
+        url = self.__class__.rest_base_url
 
         if self.id is not None:
             return "%s/%s/%s" % (url, name, self.id)
@@ -285,37 +306,7 @@ class NURESTObject(object):
     def get_resource_url_for_child_type(self, nurest_object_type):
         """ Get the resource url for the nurest_object type """
 
-        return "%s/%s" % (self.get_resource_url(), nurest_object_type.get_resource_name())
-
-    @classmethod
-    def base_url(cls):
-        """ Override this method to set object base url """
-
-        controller = NURESTLoginController()
-        return controller.url
-
-    def __eq__(self, rest_object):
-        """ Compare with another object """
-
-        if self._is_dirty:
-            return False
-
-        if rest_object is None:
-            return False
-
-        if not isinstance(rest_object, NURESTObject):
-            raise TypeError('The object is not a NURESTObject %s' % rest_object)
-
-        if self.get_remote_name() != rest_object.get_remote_name():
-            return False
-
-        if self.id and rest_object.id:
-            return self.id == rest_object.id
-
-        if self.local_id and rest_object.local_id:
-            return self.local_id == rest_object.local_id
-
-        return False
+        return "%s/%s" % (self.get_resource_url(), nurest_object_type.rest_resource_name)
 
     def __str__(self):
         """ Prints a NURESTObject """
@@ -370,8 +361,8 @@ class NURESTObject(object):
 
             An exposed attribute `local_name` will be sent within the HTTP request as
             a `remote_name`
-        """
 
+        """
         if remote_name is None:
             remote_name = local_name
 
@@ -418,27 +409,14 @@ class NURESTObject(object):
         current_user = NURESTBasicUser.get_default_user()
         return self._owner == current_user.id
 
-    def is_parents_owned_by_current_user(self, remote_names):
-        """ Check if the current user owns one of the parents """
+
+    def parent_with_rest_name_matching(self, rest_names):
+        """ Return parent that matches a rest name """
 
         parent = self
 
         while parent:
-
-            if self.get_class_remote_name() in remote_names and parent.is_owned_by_current_user():
-                return True
-
-            parent = parent.parent
-
-        return False
-
-    def parent_with_remote_name_matching(self, remote_names):
-        """ Return parent that matches a remote name """
-
-        parent = self
-
-        while parent:
-            if parent.get_class_remote_name() in remote_names:
+            if parent.rest_name in rest_names:
                 return parent
 
             parent = parent.parent
@@ -456,7 +434,7 @@ class NURESTObject(object):
         parent = self
 
         while parent:
-            types.push(parent.get_resource_name())
+            types.push(parent.rest_name)
             parent = parent.parent
 
         return types
@@ -511,6 +489,78 @@ class NURESTObject(object):
 
         return self._creation_date.strftime('mmm dd yyyy HH:MM:ss')
 
+    # Children management
+
+    def register_children(self, children, rest_name):
+        """ Register children of the current object
+
+            Args:
+                children: List of NURESTObject instances
+                rest_name: ReST Name of children
+        """
+        self._children_registry[rest_name] = children
+
+    def children_with_rest_name(self, rest_name):
+        """ Get all children according to the given resource_name
+
+            Args:
+                rest_name: the rest name
+
+            Returns:
+                Returns a list of children. If no children has been found,
+                returns an empty list.
+        """
+
+        if rest_name not in self._children_registry:
+            return []
+
+        return self._children_registry[rest_name]
+
+    def children_list(self):
+        """ Return all children
+
+            Returns:
+                Returns all children of the current object
+
+        """
+        return self._children_registry.values()
+
+    def children_rest_names(self):
+        """ Get children REST names
+
+        """
+        return self._children_registry.keys()
+
+    # Fetchers registry
+
+    def register_fetcher(self, fetcher, rest_name):
+        """ Register a children fetcher
+
+        """
+        self._fetchers_registry[rest_name] = fetcher
+
+    def fetcher_with_rest_name(self, rest_name):
+        """ Returne the children fetcher for the given name
+
+            Args:
+                rest_name: the children rest name
+
+            Returns:
+                Returns the corresponding fetcher
+        """
+        if rest_name not in self._fetchers_registry:
+            return None
+
+        return self._fetchers_registry[rest_name]
+
+    def fetchers_list(self):
+        """ Return all fetchers
+
+            Returns:
+                Returns a list of all fetchers
+        """
+        return self._fetchers_registry.values()
+
     # Memory management
 
     def discard(self):
@@ -521,90 +571,52 @@ class NURESTObject(object):
 
         self._is_dirty = True
 
-        bambou_logger.debug("[Bambou] Discarding object %s of type %s" % (self.id, self.get_remote_name()))
+        bambou_logger.debug("[Bambou] Discarding object %s of type %s" % (self.id, self.rest_name))
 
         self._discard_all_children_list()
         self._parent = None
-        self._children_list_registry = dict()
+        self._children_registry = dict()
+        self._fetchers_registry = dict()
 
-    def _discard__children_with_resource_name(self, resource_name):
-        """ Discard children with a given resource name
+    def _discard_children_with_rest_name(self, rest_name):
+        """ Discard children with a given rest name
 
             Args:
-                resource_name: the resource name
+                rest_name: the rest name
 
         """
-        bambou_logger.debug("[Bambou] %s with id %s is discarding children list %s" % (self.remote_name, self._id, resource_name))
-        self._children_list_registry[resource_name] = []
+        bambou_logger.debug("[Bambou] %s with id %s is discarding children %s" % (self.rest_name, self._id, rest_name))
+        self._children_registry[rest_name] = []
 
     def _discard_all_children_lists(self):
         """ Discard current object children """
 
-        for resource_name in self._children_list_registry.keys():
-            self._discard__children_with_resource_name(resource_name)
-
-    def _register_children_list(self, children, resource_name):
-        """ Register children of the current object
-
-            Args:
-                children: List of NURESTObject instances
-                resource_name: Name of the children resource
-        """
-
-        self._children_list_registry[resource_name] = children
-
-    def _children_with_resource_name(self, resource_name):
-        """ Get all children according to the given resource_name
-
-            Args:
-                resource_name: the name of the resource
-
-            Returns:
-                Returns a list of children. If no children has been found,
-                returns an empty list.
-        """
-
-        if resource_name not in self._children_list_registry:
-            return []
-
-        return self._children_list_registry[resource_name]
+        for rest_name in self._children_registry.keys():
+            self._discard_children_with_rest_name(rest_name)
 
     # Children management
 
-    def register_children(self, children, local_name):
-        """ Register a list of children to the local name """
-
-        self._children[local_name] = children
-
-    def get_children(self, local_name):
-        """ Retrieve children according to local name """
-
-        if local_name in self._children:
-            return self._children[local_name]
-
-        return []
-
-    def _add_child(self, child):
+    def add_child(self, child):
         """ Add a child """
 
-        local_name = child.get_remote_name()
-        children = self.get_children(local_name)
+        rest_name = child.rest_name
+        children = self.children_with_rest_name(rest_name)
 
         if child not in children:
             children.append(child)
 
-    def _remove_child(self, child):
+    def remove_child(self, child):
         """ Remove a child """
 
-        local_name = child.get_remote_name()
-        children = self.get_children(local_name)
+        rest_name = child.rest_name
+        children = self.children_with_rest_name(rest_name)
         children.remove(child)
 
-    def _update_child(self, child):
+    def update_child(self, child):
         """ Update child """
 
-        local_name = child.get_remote_name()
-        children = self.get_children(local_name)
+        rest_name = child.rest_name
+        children = self.children_with_rest_name(rest_name)
         index = children.index(child)
         children[index] = child
 
@@ -677,8 +689,8 @@ class NURESTObject(object):
 
     # HTTP Calls
 
-    def delete(self, response_choice=None, async=False, callback=None):
-        """ Delete object and call given callback in case of async call.
+    def delete(self, response_choice=1, async=False, callback=None):
+        """ Delete object and call given callback in case of call.
 
             Args:
                 async (bool): Boolean to make an asynchronous call. Default is False
@@ -724,17 +736,16 @@ class NURESTObject(object):
         if async:
             self.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback)
         else:
-            connection = self.send_request(request=request, async=async)
+            connection = self.send_request(request=request)
             return self._did_fetch(connection)
 
     # REST HTTP Calls
 
-    def send_request(self, request, async, local_callback=None, remote_callback=None, user_info=None):
+    def send_request(self, request, async=False, local_callback=None, remote_callback=None, user_info=None):
         """ Sends a request, calls the local callback, then the remote callback in case of async call
 
             Args:
                 request: The request to send
-                async: Boolean to make an asynchronous call.
                 local_callback: local method that will be triggered in case of async call
                 remote_callback: remote moethd that will be triggered in case of async call
                 user_info: contains additionnal information to carry during the request
@@ -751,7 +762,7 @@ class NURESTObject(object):
         if remote_callback:
             callbacks['remote'] = remote_callback
 
-        connection = NURESTConnection(request=request, callback=self._did_receive_response, callbacks=callbacks, async=async)
+        connection = NURESTConnection(request=request, async=async, callback=self._did_receive_response, callbacks=callbacks)
         connection.user_info = user_info
 
         bambou_logger.info('Bambou Sending >>>>>>\n%s %s with following data:\n%s' % (request.method, request.url, json.dumps(request.data, indent=4)))
@@ -764,18 +775,12 @@ class NURESTObject(object):
             Args:
                 nurest_object: the NURESTObject object to manage
                 method: the HTTP method to use (GET, POST, PUT, DELETE)
-                async: True or False to make an asynchronous request
                 callback: the callback to call at the end
                 handler: a custom handler to call when complete, before calling the callback
 
             Returns:
                 Returns the object and connection (object, connection)
         """
-
-        # Force asynchronous request when having a callback
-        if callback:
-            async = True
-
         url = None
 
         if method == HTTP_METHOD_POST:
@@ -794,7 +799,7 @@ class NURESTObject(object):
         if async:
             self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=nurest_object)
         else:
-            connection = self.send_request(request=request, async=async, user_info=nurest_object)
+            connection = self.send_request(request=request, user_info=nurest_object)
             return handler(connection)
 
     def assign_objects(self, objects, nurest_object_type, async=False, callback=None):
@@ -826,13 +831,12 @@ class NURESTObject(object):
 
         if async:
             self.send_request(request=request,
-                              local_callback=self._did_perform_standard_operation,
                               async=async,
+                              local_callback=self._did_perform_standard_operation,
                               remote_callback=callback,
                               user_info=objects)
         else:
             connection = self.send_request(request=request,
-                                           async=async,
                                            user_info=objects)
 
             return self._did_perform_standard_operation(connection)
@@ -888,11 +892,11 @@ class NURESTObject(object):
 
     # Advanced REST Operations
 
-    def add_child_object(self, nurest_object, async=False, callback=None):
+    def create_child_object(self, nurest_object, async=False, callback=None):
         """ Add given nurest_object to the current object
 
-            For example, to add a NUGroup into a NUEnterprise, you can call
-            enterprise.add_child_object(nurest_object=my_group)
+            For example, to add a child into a parent, you can call
+            parent.create_child_object(nurest_object=child)
 
             Args:
                 nurest_object (bambou.NURESTObject): the NURESTObject object to add
@@ -908,10 +912,10 @@ class NURESTObject(object):
         """
 
         return self._manage_child_object(nurest_object=nurest_object,
-                                  method=HTTP_METHOD_POST,
-                                  async=async,
-                                  callback=callback,
-                                  handler=self._did_add_child_object)
+                                         async=async,
+                                         method=HTTP_METHOD_POST,
+                                         callback=callback,
+                                         handler=self._did_create_child_object)
 
     def instantiate_child_object(self, nurest_object, from_template, async=False, callback=None):
         """ Instantiate an nurest_object from a template object
@@ -919,7 +923,6 @@ class NURESTObject(object):
             Args:
                 nurest_object: the NURESTObject object to add
                 from_template: the NURESTObject template object
-                async: should the request be done asynchronously or not
                 callback: callback containing the object and the connection
 
             Returns:
@@ -935,12 +938,12 @@ class NURESTObject(object):
 
         nurest_object.template_id = from_template.id
         return self._manage_child_object(nurest_object=nurest_object,
-                                  method=HTTP_METHOD_POST,
-                                  async=async,
-                                  callback=callback,
-                                  handler=self._did_add_child_object)
+                                         async=async,
+                                         method=HTTP_METHOD_POST,
+                                         callback=callback,
+                                         handler=self._did_create_child_object)
 
-    def _did_add_child_object(self, connection):
+    def _did_create_child_object(self, connection):
         """ Callback called after adding a new child nurest_object """
 
         response = connection.response
@@ -950,3 +953,37 @@ class NURESTObject(object):
             pass
 
         return self._did_perform_standard_operation(connection)
+
+    # Comparison
+
+    def rest_equals(self, rest_object):
+        """ Compare objects REST attributes
+
+        """
+        if not self.equals(rest_object):
+            return False
+
+        return self.to_dict() == rest_object.to_dict()
+
+    def equals(self, rest_object):
+        """ Compare with another object """
+
+        if self._is_dirty:
+            return False
+
+        if rest_object is None:
+            return False
+
+        if not isinstance(rest_object, NURESTObject):
+            raise TypeError('The object is not a NURESTObject %s' % rest_object)
+
+        if self.rest_name != rest_object.rest_name:
+            return False
+
+        if self.id and rest_object.id:
+            return self.id == rest_object.id
+
+        if self.local_id and rest_object.local_id:
+            return self.local_id == rest_object.local_id
+
+        return False

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright (c) 2011-2012 Alcatel, Alcatel-Lucent, Inc. All Rights Reserved.
 
-This source code contains confidential information which is proprietary to Alcatel.
-No part of its contents may be used, copied, disclosed or conveyed to any party
-in any manner whatsoever without prior written permission from Alcatel.
+# Copyright (c) 2011-2012 Alcatel, Alcatel-Lucent, Inc. All Rights Reserved.
+#
+# This source code contains confidential information which is proprietary to Alcatel.
+# No part of its contents may be used, copied, disclosed or conveyed to any party
+# in any manner whatsoever without prior written permission from Alcatel.
+#
+# Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
-Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
-"""
 
 import uuid
 
@@ -105,7 +105,7 @@ class NURESTFetcher(object):
         raise NotImplementedError('%s has no managed class. Implements managed_class method first.' % cls)
 
     @classmethod
-    def managed_object_remote_name(cls):
+    def managed_object_rest_name(cls):
         """ Remote name of the managed object
 
             Returns:
@@ -113,7 +113,7 @@ class NURESTFetcher(object):
                 that has to be fetched.
         """
 
-        return cls.managed_class().get_resource_name()
+        return cls.managed_class().rest_name
 
     @classmethod
     def fetcher_with_object(cls, nurest_object, local_name):
@@ -134,8 +134,11 @@ class NURESTFetcher(object):
         fetcher.nurest_object = nurest_object
         fetcher.local_name = local_name
 
+        rest_name = cls.managed_object_rest_name()
+
         setattr(nurest_object, local_name, [])
-        nurest_object.register_children(getattr(nurest_object, local_name), cls.managed_object_remote_name())
+        nurest_object.register_children(getattr(nurest_object, local_name), rest_name)
+        nurest_object.register_fetcher(cls, rest_name)
 
         return fetcher
 
@@ -196,10 +199,11 @@ class NURESTFetcher(object):
 
         return url
 
-    def fetch_objects(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
-        """ Fetch managed children objects.
+    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
+        """ Fetch objects according to given filter and page.
 
-            This method fetches all managed class objects and store them in local_name of the served object.
+            This method fetches all managed class objects and store them
+            in local_name of the served object.
 
             Args:
                 filter (string): string that represents a predicate filter
@@ -225,13 +229,13 @@ class NURESTFetcher(object):
         self._transaction_id = uuid.uuid4().hex
 
         if async:
-            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_fetch_objects, remote_callback=callback, user_info={'commit':commit})
+            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit':commit})
             return self._transaction_id
 
-        connection = self._nurest_object.send_request(request=request, async=async, user_info={'commit':commit})
-        return self._did_fetch_objects(connection=connection)
+        connection = self._nurest_object.send_request(request=request, user_info={'commit':commit})
+        return self._did_fetch(connection=connection)
 
-    def _did_fetch_objects(self, connection):
+    def _did_fetch(self, connection):
         """ Fetching objects has been done """
 
         self._current_connection = connection
@@ -278,20 +282,19 @@ class NURESTFetcher(object):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def count_objects(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
+    def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
         """ Get the total count of objects that can be fetched according to filter
 
             This method can be asynchronous and trigger the callback method
             when result is ready.
 
             Args:
-                filter: string that represents a predicate fitler (eg. name == 'x')
-                order_by: string that represents an order by clause
-                group_by: list of names for grouping
-                page: number of the page to load
-                page_size: number of results per page
-                async: Boolean to indicate an asynchronous call. Default is False
-                callback: Method that will be triggered if async call is made
+                filter (string): string that represents a predicate fitler (eg. name == 'x')
+                order_by (string): string that represents an order by clause
+                group_by (string): list of names for grouping
+                page (int): number of the page to load
+                page_size (int): number of results per page
+                callback (function): Method that will be triggered asynchronously
 
             Returns:
                 Returns a transaction ID when asynchronous call is made.
@@ -309,7 +312,7 @@ class NURESTFetcher(object):
             return self._transaction_id
 
         else:
-            connection = self._nurest_object.send_request(request=request, async=async)
+            connection = self._nurest_object.send_request(request=request)
             return self._did_count(connection)
 
     def _did_count(self, connection):
