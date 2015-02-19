@@ -611,8 +611,14 @@ class NURESTObject(object):
     # Compression / Decompression
 
     def to_dict(self):
-        """ Returns a dictionnary of attributes to use for rest calls
-            Overrides this method to add your own attributes
+        """ Converts the current object into a Dictionary using all exposed ReST attributes.
+
+            Returns:
+                dict: the dictionary containing all the exposed ReST attributes and their values.
+
+            Example::
+                >>> print entity.to_dict()
+                {"name": "my entity", "description": "Hello World", "ID": "xxxx-xxx-xxxx-xxx", ...}
         """
 
         dictionary = dict()
@@ -645,7 +651,18 @@ class NURESTObject(object):
         return dictionary
 
     def from_dict(self, dictionary):
-        """ Fill the current object from dictionary """
+        """ Sets all the exposed ReST attribues from the given dictionary
+
+            Args:
+                dictionary (dict): dictionnary containing the raw object attributes and their values.
+
+            Example:
+                >>> info = {"name": "my group", "private": False}
+                >>> group = NUGroup()
+                >>> group.from_dict(info)
+                >>> print "name: %s - private: %s" % (group.name, group.private)
+                "name: my group - private: False"
+        """
 
         for remote_name, remote_value in dictionary.iteritems():
             # Check if a local attribute is exposed with the remote_name

@@ -197,24 +197,26 @@ class NURESTFetcher(object):
         return url
 
     def fetch_objects(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
-        """ Fetch objects according to given filter and page.
+        """ Fetch managed children objects.
 
-            This method fetches all managed class objects and store them
-            in local_name of the served object.
+            This method fetches all managed class objects and store them in local_name of the served object.
 
             Args:
-                filter: string that represents a predicate filter
-                order_by: string that represents an order by clause
-                group_by: list of names for grouping
-                page: number of the page to load
-                page_size: number of results per page
-                commit: boolean to update current object
-                async: Boolean to make a asynchronous call. Default is False
-                callback: Callback that should be called in case of a async request
+                filter (string): string that represents a predicate filter
+                order_by (string): string that represents an order by clause
+                group_by (string): list of names for grouping
+                page (int): number of the page to load
+                page_size (int): number of results per page
+                commit (bool): boolean to update current object
+                callback (function): Callback that should be called in case of a async request
 
             Returns:
-                It returns a transaction ID in case of an asynchronous call.
-                Otherwise, it returns a tuple of information (fetcher, served object, fetched objects, connection)
+                tuple: Returns a tuple of information (fetcher, served object, fetched objects, connection)
+
+            Example:
+                >>> entity.children_fetcher.fetch() # fetch children in the entity
+                >>> print entity.children_fetcher # print the list of fetched objects
+                [<NUChildren at xxx>, <NUChildren at yyyy>, <NUChildren at zzz>]
         """
 
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self._prepare_url())

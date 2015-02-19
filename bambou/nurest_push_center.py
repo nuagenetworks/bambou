@@ -72,11 +72,11 @@ class NURESTPushCenter(object):
     # Control Methods
 
     def start(self, timeout=None, user=None):
-        """ Start push center
+        """ Starts listening to events.
 
             Args:
-                timeout: number of seconds before timeout. Used for testing purpose only.
-                user: NURESTUser object that is listening. Used for testing purpose only.
+                timeout (int): number of seconds before timeout. Used for testing purpose only.
+                user (bambou.NURESTBasicUser): NURESTBasicUser object that is listening. Used for testing purpose only.
         """
 
         if self._is_running:
@@ -94,7 +94,7 @@ class NURESTPushCenter(object):
         self._thread.start()
 
     def stop(self):
-        """ Stop the current thread """
+        """ Stops listening for events. """
 
         if not self._is_running:
             return
@@ -198,12 +198,12 @@ class NURESTPushCenter(object):
         connection.start()
 
     def add_delegate(self, callback):
-        """ Registers a new delegate
+        """ Registers a new delegate callback
 
             The prototype should be function(data), where data will be the decoded json push
 
             Args:
-                callback: method to trigger when push center receives events
+                callback (function): method to trigger when push center receives events
         """
 
         if callback in self._delegate_methods:
@@ -212,12 +212,10 @@ class NURESTPushCenter(object):
         self._delegate_methods.append(callback)
 
     def remove_delegate(self, callback):
-        """ Removes a delegate
-
-            The prototype should be function(data), where data will be the decoded json push
+        """ Unregisters a registered delegate function or a method.
 
             Args:
-                callback: method to trigger when push center receives events
+                callback(function): method to trigger when push center receives events
         """
 
         if not callback in self._delegate_methods:
