@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from bambou import NURESTLoginController
-from bambou.tests import Enterprise, Group, User
+from bambou.tests import Enterprise, EnterprisesFetcher, Group, GroupsFetcher, User
 
 
 class GetResourceTests(TestCase):
@@ -261,3 +261,40 @@ class ComparisonTests(TestCase):
         self.assertTrue(enterprise1.rest_equals(enterprise2))
         self.assertFalse(enterprise1.rest_equals(enterprise3))
         self.assertFalse(enterprise1.rest_equals(None))
+
+
+class ChildrenTests(TestCase):
+
+    def test_children(self):
+        """ test children registry methods """
+
+        user = User()
+
+        rest_names = user.children_rest_names()
+        self.assertEquals(rest_names, ['group', 'enterprise'])
+        self.assertEquals(user.children_with_rest_name('group'), [])
+        self.assertEquals(user.children_with_rest_name('enterprise'), [])
+
+        admins = Group(name=u'Admins')
+        others = Group(name=u'Others')
+        user.groups.append(admins)
+        user.groups.append(others)
+        self.assertEquals(user.children_with_rest_name('group'), [admins, others])
+
+        enterprise = Enterprise()
+        user.enterprises.append(enterprise)
+        self.assertEquals(user.children_with_rest_name('enterprise'), [enterprise])
+
+        self.assertEquals(user.children_list(), [[admins, others], [enterprise]])
+
+class FetchersTests(TestCase):
+
+    def test_fetchers(self):
+        """ test fetchers registry methods """
+
+        user = User()
+
+        rest_names = user.children_rest_names()
+        self.assertEquals(rest_names, ['group', 'enterprise'])
+        self.assertEquals(user.fetcher_with_rest_name('group'), GroupsFetcher)
+        self.assertEquals(user.fetcher_with_rest_name('enterprise'), EnterprisesFetcher)

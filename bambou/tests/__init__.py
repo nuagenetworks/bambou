@@ -73,6 +73,22 @@ class Group(NURESTObject):
 
         return "group"
 
+
+class GroupsFetcher(NURESTFetcher):
+    """ Represents a Groups fetcher
+
+    """
+    @classmethod
+    def managed_class(cls):
+        """ This fetcher manages Group objects
+
+            Returns:
+                Returns the Group class
+        """
+
+        return Group
+
+
 class User(NURESTBasicUser):
 
     def __init__(self, **kwargs):
@@ -105,6 +121,9 @@ class User(NURESTBasicUser):
 
         self.enterprises = []
         self.enterprises_fetcher = EnterprisesFetcher.fetcher_with_object(nurest_object=self, local_name=u'enterprises')
+
+        self.groups = []
+        self.groups_fetcher = GroupsFetcher.fetcher_with_object(nurest_object=self, local_name=u'groups')
 
         self._compute_args(**kwargs)
 

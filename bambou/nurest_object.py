@@ -67,6 +67,7 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
         self._children_registry = dict()
+        self._fetchers_registry = dict()
 
         model_controller = NURESTModelController.get_default()
         model_controller.register_model(self.__class__)
@@ -210,8 +211,6 @@ class NURESTObject(object):
 
     last_updated_date = property(_get_last_updated_date, _set_last_updated_date)
 
-    # Methods
-
     def get_attributes(self):
         """ Get all attributes information
 
@@ -220,6 +219,8 @@ class NURESTObject(object):
         """
 
         return self._attributes.values()
+
+    # Class methods
 
     @classproperty
     def rest_name(cls):
@@ -282,6 +283,15 @@ class NURESTObject(object):
 
         return rest_name
 
+    @classmethod
+    def base_url(cls):
+        """ Override this method to set object base url """
+
+        controller = NURESTLoginController()
+        return controller.url
+
+    # URL and resource management
+
     def get_resource_url(self):
         """ Get resource complete url """
 
@@ -297,13 +307,6 @@ class NURESTObject(object):
         """ Get the resource url for the nurest_object type """
 
         return "%s/%s" % (self.get_resource_url(), nurest_object_type.get_resource_name())
-
-    @classmethod
-    def base_url(cls):
-        """ Override this method to set object base url """
-
-        controller = NURESTLoginController()
-        return controller.url
 
     def __str__(self):
         """ Prints a NURESTObject """
@@ -352,40 +355,6 @@ class NURESTObject(object):
                 continue
 
         return len(self.errors) == 0
-
-    # Comparison
-
-    def rest_equals(self, rest_object):
-        """ Compare objects REST attributes
-
-        """
-        if not self.equals(rest_object):
-            return False
-
-        return self.to_dict() == rest_object.to_dict()
-
-    def equals(self, rest_object):
-        """ Compare with another object """
-
-        if self._is_dirty:
-            return False
-
-        if rest_object is None:
-            return False
-
-        if not isinstance(rest_object, NURESTObject):
-            raise TypeError('The object is not a NURESTObject %s' % rest_object)
-
-        if self.rest_name != rest_object.rest_name:
-            return False
-
-        if self.id and rest_object.id:
-            return self.id == rest_object.id
-
-        if self.local_id and rest_object.local_id:
-            return self.local_id == rest_object.local_id
-
-        return False
 
     def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False):
         """ Expose local_name as remote_name
@@ -520,6 +489,78 @@ class NURESTObject(object):
 
         return self._creation_date.strftime('mmm dd yyyy HH:MM:ss')
 
+    # Children management
+
+    def register_children(self, children, rest_name):
+        """ Register children of the current object
+
+            Args:
+                children: List of NURESTObject instances
+                rest_name: ReST Name of children
+        """
+        self._children_registry[rest_name] = children
+
+    def children_with_rest_name(self, rest_name):
+        """ Get all children according to the given resource_name
+
+            Args:
+                rest_name: the rest name
+
+            Returns:
+                Returns a list of children. If no children has been found,
+                returns an empty list.
+        """
+
+        if rest_name not in self._children_registry:
+            return []
+
+        return self._children_registry[rest_name]
+
+    def children_list(self):
+        """ Return all children
+
+            Returns:
+                Returns all children of the current object
+
+        """
+        return self._children_registry.values()
+
+    def children_rest_names(self):
+        """ Get children REST names
+
+        """
+        return self._children_registry.keys()
+
+    # Fetchers registry
+
+    def register_fetcher(self, fetcher, rest_name):
+        """ Register a children fetcher
+
+        """
+        self._fetchers_registry[rest_name] = fetcher
+
+    def fetcher_with_rest_name(self, rest_name):
+        """ Returne the children fetcher for the given name
+
+            Args:
+                rest_name: the children rest name
+
+            Returns:
+                Returns the corresponding fetcher
+        """
+        if rest_name not in self._fetchers_registry:
+            return None
+
+        return self._fetchers_registry[rest_name]
+
+    def fetchers_list(self):
+        """ Return all fetchers
+
+            Returns:
+                Returns a list of all fetchers
+        """
+        return self._fetchers_registry.values()
+
     # Memory management
 
     def discard(self):
@@ -552,52 +593,13 @@ class NURESTObject(object):
         for rest_name in self._children_registry.keys():
             self._discard_children_with_rest_name(rest_name)
 
-    def _register_children_list(self, children, rest_name):
-        """ Register children of the current object
-
-            Args:
-                children: List of NURESTObject instances
-                rest_name: ReST Name of children
-        """
-
-        self._children_registry[rest_name] = children
-
-    def _children_with_rest_name(self, rest_name):
-        """ Get all children according to the given resource_name
-
-            Args:
-                rest_name: the rest name
-
-            Returns:
-                Returns a list of children. If no children has been found,
-                returns an empty list.
-        """
-
-        if rest_name not in self._children_registry:
-            return []
-
-        return self._children_registry[rest_name]
-
     # Children management
-
-    def register_children(self, children, rest_name):
-        """ Register a list of children to the rest name """
-
-        self._children_registry[rest_name] = children
-
-    def get_children(self, rest_name):
-        """ Retrieve children according to a rest name """
-
-        if rest_name in self._children_registry:
-            return self._children_registry[rest_name]
-
-        return []
 
     def add_child(self, child):
         """ Add a child """
 
         rest_name = child.rest_name
-        children = self.get_children(rest_name)
+        children = self.children_with_rest_name(rest_name)
 
         if child not in children:
             children.append(child)
@@ -606,14 +608,14 @@ class NURESTObject(object):
         """ Remove a child """
 
         rest_name = child.rest_name
-        children = self.get_children(rest_name)
+        children = self.children_with_rest_name(rest_name)
         children.remove(child)
 
     def update_child(self, child):
         """ Update child """
 
         rest_name = child.rest_name
-        children = self.get_children(rest_name)
+        children = self.children_with_rest_name(rest_name)
         index = children.index(child)
         children[index] = child
 
@@ -900,3 +902,37 @@ class NURESTObject(object):
             pass
 
         return self._did_perform_standard_operation(connection)
+
+    # Comparison
+
+    def rest_equals(self, rest_object):
+        """ Compare objects REST attributes
+
+        """
+        if not self.equals(rest_object):
+            return False
+
+        return self.to_dict() == rest_object.to_dict()
+
+    def equals(self, rest_object):
+        """ Compare with another object """
+
+        if self._is_dirty:
+            return False
+
+        if rest_object is None:
+            return False
+
+        if not isinstance(rest_object, NURESTObject):
+            raise TypeError('The object is not a NURESTObject %s' % rest_object)
+
+        if self.rest_name != rest_object.rest_name:
+            return False
+
+        if self.id and rest_object.id:
+            return self.id == rest_object.id
+
+        if self.local_id and rest_object.local_id:
+            return self.local_id == rest_object.local_id
+
+        return False
