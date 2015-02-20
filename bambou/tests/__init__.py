@@ -11,6 +11,8 @@ __all__ = ['Enterprise', 'EnterprisesFetcher', 'Group', 'User']
 class Enterprise(NURESTObject):
     """ Creates a enterprise object for tests """
 
+    __rest_name__ = "enterprise"
+
     def __init__(self, name=u'NuageNetworks', **kwargs):
         """ Creates a new Enterprise
 
@@ -33,13 +35,6 @@ class Enterprise(NURESTObject):
 
         self._compute_args(**kwargs)
 
-    @property
-    def rest_name(cls):
-        """ Provides enterprise classname
-
-        """
-        return u"enterprise"
-
 
 class EnterprisesFetcher(NURESTFetcher):
     """ Represents a Enterprises fetcher
@@ -57,6 +52,8 @@ class EnterprisesFetcher(NURESTFetcher):
 
 class Group(NURESTObject):
 
+    __rest_name__ = "group"
+
     def __init__(self, **kwargs):
         """ Creates a group """
         super(Group, self).__init__()
@@ -65,12 +62,6 @@ class Group(NURESTObject):
         self.expose_attribute(local_name='name', remote_name='name', attribute_type=str)
 
         self._compute_args(**kwargs)
-
-    @property
-    def rest_name(cls):
-        """ Provides user classname  """
-
-        return "group"
 
 
 class GroupsFetcher(NURESTFetcher):
@@ -89,6 +80,8 @@ class GroupsFetcher(NURESTFetcher):
 
 
 class User(NURESTBasicUser):
+
+    __rest_name__ = "me"
 
     def __init__(self, **kwargs):
         """ Creates a new user
@@ -125,12 +118,6 @@ class User(NURESTBasicUser):
         self.groups_fetcher = GroupsFetcher.fetcher_with_object(nurest_object=self, local_name=u'groups')
 
         self._compute_args(**kwargs)
-
-    @property
-    def rest_name(cls):
-        """ Provides user classname  """
-
-        return "me"
 
     @classmethod
     def is_resource_name_fixed(cls):
