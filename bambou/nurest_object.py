@@ -526,7 +526,7 @@ class NURESTObject(object):
 
             Example:
                 >>> entity = NUEntity(id="xxx-xxx-xxx")
-                >>> entity.subentities_fetcher.fetch()
+                >>> entity.subentities_fetcher.retrieve()
                 >>> print entity.children_for_rest_name(NUSubEntity.rest_name)
                 [<NUSubEntity at xxx>, <NUSubEntity at yyy>]
         """
@@ -778,7 +778,7 @@ class NURESTObject(object):
             self.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback)
         else:
             connection = self.send_request(request=request)
-            return self._did_fetch(connection)
+            return self._did_retrieve(connection)
 
     # REST HTTP Calls
 
@@ -900,7 +900,7 @@ class NURESTObject(object):
             callback = connection.callbacks['local']
             callback(connection)
 
-    def _did_fetch(self, connection):
+    def _did_retrieve(self, connection):
         """ Callback called after fetching the object """
 
         response = connection.response

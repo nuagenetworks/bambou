@@ -200,11 +200,15 @@ class NURESTFetcher(object):
 
         return url
 
-    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
+    def retrieve(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
         """ Fetch objects according to given filter and page.
 
-            This method fetches all managed class objects and store them
-            in local_name of the served object.
+            Note:
+                This method fetches all managed class objects and store them
+                in local_name of the served object. which means that the parent
+                object will hold them in a list. You can prevent this behavior
+                by setting commit to False. In that case, the fetched children
+                won't be added in the parent object cache.
 
             Args:
                 filter (string): string that represents a predicate filter
@@ -219,9 +223,8 @@ class NURESTFetcher(object):
                 tuple: Returns a tuple of information (fetcher, served object, fetched objects, connection)
 
             Example:
-                >>> entity.children_fetcher.fetch() # fetch children in the entity
-                >>> print entity.children_fetcher # print the list of fetched objects
-                [<NUChildren at xxx>, <NUChildren at yyyy>, <NUChildren at zzz>]
+                >>> entity.children_fetcher.retrieve()
+                (<NUChildrenFetcher at aaaa>, <NUEntity at bbbb>, [<NUChildren at ccc>, <NUChildren at ddd>], <NURESTConnection at zzz>)
         """
 
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self._prepare_url())
@@ -234,9 +237,9 @@ class NURESTFetcher(object):
             return self._transaction_id
 
         connection = self._nurest_object.send_request(request=request, user_info={'commit':commit})
-        return self._did_fetch(connection=connection)
+        return self._did_retrieve(connection=connection)
 
-    def _did_fetch(self, connection):
+    def _did_retrieve(self, connection):
         """ Fetching objects has been done """
 
         self._current_connection = connection
@@ -284,7 +287,13 @@ class NURESTFetcher(object):
         return self._send_content(content=fetched_objects, connection=connection)
 
     def fetch_many(self, filter=None, order_by=None, group_by=[], page=None, page_size=None):
-        """ Fetch object and directly return the first one
+        """ Fetch object and directly return them
+
+            Note:
+                fetch_many won't put the fetched objects in the parent's children list.
+                You cannot override this behavior. If you want to commit them in the parent
+                you can use :method:vsdk.NURESTFetcher.fetch or manually add the list with
+                :method:vsdk.NURESTObject.add_child
 
             Args:
                 filter (string): string that represents a predicate filter
@@ -292,18 +301,38 @@ class NURESTFetcher(object):
                 group_by (string): list of names for grouping
                 page (int): number of the page to load
                 page_size (int): number of results per page
+
+            Returns:
+                list: list of vsdk.NURESTObject if any
+
+            Example:
+                >>> print entity.children_fetcher.fetch_many()
+                [<NUChildren at xxx>, <NUChildren at yyyy>, <NUChildren at zzz>]
         """
-        return self.fetch(filter, order_by, group_by, page, page_size, commit=False)[2]
+        return self.retrieve(filter, order_by, group_by, page, page_size, commit=False)[2]
 
     def fetch_one(self, filter=None, order_by=None, group_by=[], page=None, page_size=None):
         """ Fetch object and directly return the first one
 
+            Note:
+                fetch_one won't put the fetched object in the parent's children list.
+                You cannot override this behavior. If you want to commit it in the parent
+                you can use :method:vsdk.NURESTFetcher.fetch or manually add it with
+                :method:vsdk.NURESTObject.add_child
+
             Args:
                 filter (string): string that represents a predicate filter
                 order_by (string): string that represents an order by clause
                 group_by (string): list of names for grouping
                 page (int): number of the page to load
                 page_size (int): number of results per page
+
+            Returns:
+                vsdk.NURESTObject: the first object if any, or None
+
+            Example:
+                >>> print entity.children_fetcher.fetch_one(filter="name == 'My Entity'")
+                <NUChildren at xxx>
         """
         objects = self.fetch_many(filter, order_by, group_by, page, page_size, commit=False)
         return objects[0] if len(objects) else None

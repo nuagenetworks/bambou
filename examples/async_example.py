@@ -44,7 +44,7 @@ def _did_remove_enterprise(enterprise, connection):
     push_center.stop()
 
 
-def _did_user_fetch(user, connection):
+def _did_user_retrieve(user, connection):
     """ Callback method after user.fetch """
 
     print("** User did fetch in thread")
