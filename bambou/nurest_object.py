@@ -37,7 +37,7 @@ class NUMetaRESTObject(type):
     def rest_resource_name(cls):
         rest_name = cls.rest_name
 
-        if cls.is_resource_name_fixed:
+        if cls.is_resource_name_fixed():
             return rest_name
 
         last_letter = rest_name[-1]
@@ -307,7 +307,7 @@ class NURESTObject(object):
         """ Get resource complete url """
 
         name = self.__class__.rest_resource_name
-        url = self.__class__.rest_base_url
+        url = self.__class__.rest_base_url()
 
         if self.id is not None:
             return "%s/%s/%s" % (url, name, self.id)
