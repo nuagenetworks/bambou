@@ -272,20 +272,20 @@ class ChildrenTests(TestCase):
 
         rest_names = user.children_rest_names()
         self.assertEquals(rest_names, ['group', 'enterprise'])
-        self.assertEquals(user.children_with_rest_name('group'), [])
-        self.assertEquals(user.children_with_rest_name('enterprise'), [])
+        self.assertEquals(user.children_for_rest_name('group'), [])
+        self.assertEquals(user.children_for_rest_name('enterprise'), [])
 
         admins = Group(name=u'Admins')
         others = Group(name=u'Others')
         user.groups.append(admins)
         user.groups.append(others)
-        self.assertEquals(user.children_with_rest_name('group'), [admins, others])
+        self.assertEquals(user.children_for_rest_name('group'), [admins, others])
 
         enterprise = Enterprise()
         user.enterprises.append(enterprise)
-        self.assertEquals(user.children_with_rest_name('enterprise'), [enterprise])
+        self.assertEquals(user.children_for_rest_name('enterprise'), [enterprise])
 
-        self.assertEquals(user.children_list(), [[admins, others], [enterprise]])
+        self.assertEquals(user.children_lists(), [[admins, others], [enterprise]])
 
 class FetchersTests(TestCase):
 
@@ -296,5 +296,5 @@ class FetchersTests(TestCase):
 
         rest_names = user.children_rest_names()
         self.assertEquals(rest_names, ['group', 'enterprise'])
-        self.assertEquals(user.fetcher_with_rest_name('group'), GroupsFetcher)
-        self.assertEquals(user.fetcher_with_rest_name('enterprise'), EnterprisesFetcher)
+        self.assertEquals(user.children_fetcher_for_rest_name('group'), GroupsFetcher)
+        self.assertEquals(user.children_fetcher_for_rest_name('enterprise'), EnterprisesFetcher)

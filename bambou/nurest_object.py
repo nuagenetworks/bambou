@@ -512,15 +512,20 @@ class NURESTObject(object):
         """
         self._children_registry[rest_name] = children
 
-    def children_with_rest_name(self, rest_name):
+    def children_for_rest_name(self, rest_name):
         """ Get all children according to the given resource_name
 
             Args:
                 rest_name: the rest name
 
             Returns:
-                Returns a list of children. If no children has been found,
-                returns an empty list.
+                Returns a list of children. If no children has been found, returns an empty list.
+
+            Example:
+                >>> entity = NUEntity(id="xxx-xxx-xxx")
+                >>> entity.subentities_fetcher.fetch()
+                >>> print entity.children_for_rest_name(NUSubEntity.rest_name)
+                [<NUSubEntity at xxx>, <NUSubEntity at yyy>]
         """
 
         if rest_name not in self._children_registry:
@@ -528,19 +533,32 @@ class NURESTObject(object):
 
         return self._children_registry[rest_name]
 
-    def children_list(self):
-        """ Return all children
+    def children_lists(self):
+        """ Returns a list of all children lists
 
             Returns:
-                Returns all children of the current object
+                list: list containing lists of children
+
+            Example:
+                >>> entity = NUEntity(id="xxx-xxx-xxx")
+                >>> print entity.children_lists()
+                [[<NUSubEntity at xxx>, <NUSubEntity at yyy>], [<NUOtherEntity at aaaa>, <NUOtherEntity at bbbb>, <NUOtherEntity at cccc>]]
 
         """
         return self._children_registry.values()
 
     def children_rest_names(self):
-        """ Get children REST names
+        """ Gets the list of all possible children ReST names.
 
+            Returns:
+                list: list containing all possible rest names as string
+
+            Example:
+                >>> entity = NUEntity()
+                >>> entity.children_rest_names()
+                ["foo", "bar"]
         """
+
         return self._children_registry.keys()
 
     # Fetchers registry
@@ -551,25 +569,33 @@ class NURESTObject(object):
         """
         self._fetchers_registry[rest_name] = fetcher
 
-    def fetcher_with_rest_name(self, rest_name):
-        """ Returne the children fetcher for the given name
+    def children_fetcher_for_rest_name(self, rest_name):
+        """ Returns the children fetcher for the given rest name
 
             Args:
-                rest_name: the children rest name
+                rest_name (string): the children rest name
 
             Returns:
-                Returns the corresponding fetcher
+                list: Returns the corresponding fetcher
+
+            Example:
+                >>> print entity.children_fetcher_for_rest_name(NUSubEntity.rest_name)
+                <NUSubEntitiesFetcher at yyyy>
         """
         if rest_name not in self._fetchers_registry:
             return None
 
         return self._fetchers_registry[rest_name]
 
-    def fetchers_list(self):
+    def children_fetchers(self):
         """ Return all fetchers
 
             Returns:
-                Returns a list of all fetchers
+                list: list of all fetchers
+
+            Example:
+                >>> print entity.children_fetchers()
+                [<NUSubEntitiesFetcher at xxxx>, <NUOtherEntitiesFetcher at yyyy>]
         """
         return self._fetchers_registry.values()
 
@@ -590,7 +616,7 @@ class NURESTObject(object):
         self._children_registry = dict()
         self._fetchers_registry = dict()
 
-    def _discard_children_with_rest_name(self, rest_name):
+    def _discard_children_for_rest_name(self, rest_name):
         """ Discard children with a given rest name
 
             Args:
@@ -604,7 +630,7 @@ class NURESTObject(object):
         """ Discard current object children """
 
         for rest_name in self._children_registry.keys():
-            self._discard_children_with_rest_name(rest_name)
+            self._discard_children_for_rest_name(rest_name)
 
     # Children management
 
@@ -612,7 +638,7 @@ class NURESTObject(object):
         """ Add a child """
 
         rest_name = child.rest_name
-        children = self.children_with_rest_name(rest_name)
+        children = self.children_for_rest_name(rest_name)
 
         if child not in children:
             children.append(child)
@@ -621,14 +647,14 @@ class NURESTObject(object):
         """ Remove a child """
 
         rest_name = child.rest_name
-        children = self.children_with_rest_name(rest_name)
+        children = self.children_for_rest_name(rest_name)
         children.remove(child)
 
     def update_child(self, child):
         """ Update child """
 
         rest_name = child.rest_name
-        children = self.children_with_rest_name(rest_name)
+        children = self.children_for_rest_name(rest_name)
         index = children.index(child)
         children[index] = child
 
