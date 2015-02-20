@@ -20,16 +20,49 @@ from .nurest_fetcher import NURESTFetcher
 from .nurest_request import NURESTRequest
 from .nurest_modelcontroller import NURESTModelController
 from .utils import NURemoteAttribute
-from .utils.decorators import classproperty
 
 from bambou import bambou_logger
 from bambou.config import BambouConfig
+
+
+class NUMetaRESTObject(type):
+
+    @property
+    def rest_name(cls):
+        if cls.__rest_name__ is None:
+            raise NotImplementedError('%s has no defined name. Implements rest_name property first.' % cls)
+        return cls.__rest_name__
+
+    @property
+    def rest_resource_name(cls):
+        rest_name = cls.rest_name
+
+        if cls.is_resource_name_fixed:
+            return rest_name
+
+        last_letter = rest_name[-1]
+
+        if last_letter == "y":
+
+            vowels = ['a', 'e', 'i', 'o', 'u', 'y']
+
+            if rest_name[-2].lower() not in vowels:
+                rest_name = rest_name[:len(rest_name) - 1]
+                rest_name += "ies"
+
+        elif last_letter != "s":
+            rest_name += "s"
+
+        return rest_name
 
 
 class NURESTObject(object):
     """ Determines an object as a NURESTObject one
         Provides basic saving and fetching utilities
     """
+
+    __metaclass__ = NUMetaRESTObject
+    __rest_name__ = None
 
     def __init__(self):
         """ Initializes the object with general information
@@ -220,28 +253,36 @@ class NURESTObject(object):
 
         return self._attributes.values()
 
+    @property
+    def rest_name(self):
+        """ Returns the current ReST name of the object.
+
+            Returns:
+                Returns a dictionnary containing attribute information
+        """
+        return self.__class__.rest_name
+
+    @property
+    def rest_resource_name(self):
+        """ Resource name of the object.
+
+            It will compute the plural if needed
+
+            Returns:
+                Returns a string that represents the resouce name of the object
+        """
+        return self.__class__.rest_resource_name
+
     # Class methods
 
-    @classproperty
+    @classmethod
     def rest_base_url(cls):
         """ Override this method to set object base url """
 
         controller = NURESTLoginController()
         return controller.url
 
-    @classproperty
-    def rest_name(cls):
-        """ Provides the class name used for resource
-
-            This method has to be implemented.
-
-            Raises:
-                NotImplementedError
-        """
-
-        raise NotImplementedError('%s has no defined name. Implements rest_name property first.' % cls)
-
-    @classproperty
+    @classmethod
     def is_resource_name_fixed(cls):
         """ Boolean to say if the resource name should be fixed. Default is False """
 
@@ -259,36 +300,6 @@ class NURESTObject(object):
         new_object.id = id
 
         return new_object
-
-    @classproperty
-    def rest_resource_name(cls):
-        """ Resource name of the object.
-
-            It will compute the plural if needed
-
-            Returns:
-                Returns a string that represents the resouce name of the object
-        """
-
-        rest_name = cls.rest_name
-
-        if cls.is_resource_name_fixed:
-            return rest_name
-
-        last_letter = rest_name[-1]
-
-        if last_letter == "y":
-
-            vowels = ['a', 'e', 'i', 'o', 'u', 'y']
-
-            if rest_name[-2].lower() not in vowels:
-                rest_name = rest_name[:len(rest_name) - 1]
-                rest_name += "ies"
-
-        elif last_letter != "s":
-            rest_name += "s"
-
-        return rest_name
 
     # URL and resource management
 

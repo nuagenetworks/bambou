@@ -2,7 +2,6 @@
 
 from bambou import NURESTObject, NURESTBasicUser, NURESTFetcher
 from bambou.config import BambouConfig
-from bambou.utils.decorators import classproperty
 
 BambouConfig.set_should_raise_bambou_http_error(True)
 
@@ -34,7 +33,7 @@ class Enterprise(NURESTObject):
 
         self._compute_args(**kwargs)
 
-    @classproperty
+    @property
     def rest_name(cls):
         """ Provides enterprise classname
 
@@ -67,7 +66,7 @@ class Group(NURESTObject):
 
         self._compute_args(**kwargs)
 
-    @classproperty
+    @property
     def rest_name(cls):
         """ Provides user classname  """
 
@@ -127,7 +126,7 @@ class User(NURESTBasicUser):
 
         self._compute_args(**kwargs)
 
-    @classproperty
+    @property
     def rest_name(cls):
         """ Provides user classname  """
 
