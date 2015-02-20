@@ -46,7 +46,7 @@ class GetResourceTests(TestCase):
     def test_get_resource_base_url(self):
         """ Get object resource base url """
 
-        self.assertEquals(Enterprise.rest_base_url, u'http://www.google.fr')
+        self.assertEquals(Enterprise.rest_base_url(), u'http://www.google.fr')
 
 
     def test_get_resource_base_url(self):
