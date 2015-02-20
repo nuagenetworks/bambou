@@ -75,7 +75,8 @@ class NURESTConnection(object):
 
     # Properties
 
-    def _get_callbacks(self):
+    @property
+    def callbacks(self):
         """ Get callbacks
 
             Returns:
@@ -84,9 +85,8 @@ class NURESTConnection(object):
 
         return self._callbacks
 
-    callbacks = property(_get_callbacks, None)
-
-    def _get_request(self):
+    @property
+    def request(self):
         """ Get request. Read-only property
 
             Returns:
@@ -95,9 +95,8 @@ class NURESTConnection(object):
 
         return self._request
 
-    request = property(_get_request, None)
-
-    def _get_response(self):
+    @property
+    def response(self):
         """ Get response
 
             Returns:
@@ -106,7 +105,8 @@ class NURESTConnection(object):
 
         return self._response
 
-    def _set_response(self, response):
+    @response.setter
+    def response(self, response):
         """ Set response
 
             Args:
@@ -116,9 +116,8 @@ class NURESTConnection(object):
 
         self._response = response
 
-    response = property(_get_response, _set_response)
-
-    def _get_user_info(self):
+    @property
+    def user_info(self):
         """ Get user info
 
             Returns:
@@ -127,7 +126,8 @@ class NURESTConnection(object):
 
         return self._user_info
 
-    def _set_user_info(self, info):
+    @user_info.setter
+    def user_info(self, info):
         """ Set user info
 
             Args:
@@ -136,9 +136,8 @@ class NURESTConnection(object):
 
         self._user_info = info
 
-    user_info = property(_get_user_info, _set_user_info)
-
-    def _get_timeout(self):
+    @property
+    def timeout(self):
         """ Get timeout
 
             Returns:
@@ -147,7 +146,8 @@ class NURESTConnection(object):
 
         return self._xhr_timeout
 
-    def _set_timeout(self, timeout):
+    @timeout.setter
+    def timeout(self, timeout):
         """ Set timeout
 
             Args:
@@ -156,9 +156,8 @@ class NURESTConnection(object):
 
         self._xhr_timeout = timeout
 
-    timeout = property(_get_timeout, _set_timeout)
-
-    def _get_ignore_request_idle(self):
+    @property
+    def ignore_request_idle(self):
         """ Get ignore request idle
 
             Returns:
@@ -167,7 +166,8 @@ class NURESTConnection(object):
 
         return self._ignore_request_idle
 
-    def _set_ignore_request_idle(self, ignore):
+    @ignore_request_idle.setter
+    def ignore_request_idle(self, ignore):
         """ Set ignore request idle
 
             Args:
@@ -176,9 +176,8 @@ class NURESTConnection(object):
 
         self._ignore_request_idle = ignore
 
-    ignore_request_idle = property(_get_ignore_request_idle, _set_ignore_request_idle)
-
-    def _has_timeouted(self):
+    @property
+    def has_timeouted(self):
         """ Get has timouted
 
             Returns:
@@ -187,9 +186,8 @@ class NURESTConnection(object):
 
         return self._has_timeouted
 
-    has_timeouted = property(_has_timeouted, None)
-
-    def _get_async(self):
+    @property
+    def async(self):
         """ Get async
 
             Returns:
@@ -198,7 +196,6 @@ class NURESTConnection(object):
 
         return self._async
 
-    async = property(_get_async, None)
 
     # Methods
 
@@ -329,7 +326,7 @@ class NURESTConnection(object):
         if controller.is_impersonating:
             self._request.set_header('X-Nuage-ProxyUser', controller.impersonation)
 
-        headers = self._request.get_headers()
+        headers = self._request.headers
 
         try:  # TODO : Remove this ugly try/except after fixing Java issue: http://mvjira.mv.usa.alcatel.com/browse/VSD-546
             response = requests.request(method=self._request.method,

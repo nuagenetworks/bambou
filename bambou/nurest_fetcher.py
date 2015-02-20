@@ -31,7 +31,7 @@ class NURESTFetcher(object):
         """ Initliazes the fetcher """
 
         self.latest_loaded_page = 0
-        self.nurest_object = None
+        self.parent_object = None
         self.ordered_by = ''
         self.query_string = None
         self.total_count = 0
@@ -42,7 +42,8 @@ class NURESTFetcher(object):
 
     # Properties
 
-    def _get_object(self):
+    @property
+    def parent_object(self):
         """ Get served object
 
             The fetcher will fill the served object with fetched objects
@@ -53,7 +54,8 @@ class NURESTFetcher(object):
 
         return self._nurest_object
 
-    def _set_object(self, nurest_object):
+    @parent_object.setter
+    def parent_object(self, nurest_object):
         """ Set the served object
 
             Args:
@@ -62,9 +64,8 @@ class NURESTFetcher(object):
 
         self._nurest_object = nurest_object
 
-    nurest_object = property(_get_object, _set_object)
-
-    def _get_local_name(self):
+    @property
+    def local_name(self):
         """ Get the name of the attribute that has to be filled
 
             Returns:
@@ -74,7 +75,8 @@ class NURESTFetcher(object):
 
         return self._local_name
 
-    def _set_local_name(self, local_name):
+    @local_name.setter
+    def local_name(self, local_name):
         """ Set the name of the attribut that has to be filled
 
             Args:
@@ -83,7 +85,6 @@ class NURESTFetcher(object):
 
         self._local_name = local_name
 
-    local_name = property(_get_local_name, _set_local_name)
 
     # Methods
 
@@ -131,7 +132,7 @@ class NURESTFetcher(object):
         """
 
         fetcher = cls()
-        fetcher.nurest_object = nurest_object
+        fetcher.parent_object = nurest_object
         fetcher.local_name = local_name
 
         rest_name = cls.managed_object_rest_name()
@@ -148,7 +149,7 @@ class NURESTFetcher(object):
             It will clear attribute of the served object
         """
         self._current_connection = None
-        setattr(self.nurest_object, self.local_name, [])
+        setattr(self.parent_object, self.local_name, [])
 
     def new(self):
         """ Create an instance of the managed class
@@ -192,7 +193,7 @@ class NURESTFetcher(object):
     def _prepare_url(self):
         """ Prepare url for request """
 
-        url = self.nurest_object.get_resource_url_for_child_type(self.__class__.managed_class())
+        url = self.parent_object.get_resource_url_for_child_type(self.__class__.managed_class())
 
         if self.query_string:
             url += "?%s", self.query_string
@@ -252,7 +253,7 @@ class NURESTFetcher(object):
             return self._send_content(content=None, connection=connection)
 
         results = response.data
-        destination = getattr(self.nurest_object, self._local_name)
+        destination = getattr(self.parent_object, self._local_name)
         fetched_objects = list()
 
         if should_commit:

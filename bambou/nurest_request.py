@@ -39,64 +39,68 @@ class NURESTRequest(object):
 
     # Properties
 
-    def _get_method(self):
+    @property
+    def method(self):
         """ Get method """
 
         return self._method
 
-    def _set_method(self, method):
+    @method.setter
+    def method(self, method):
         """ Set method """
 
         self._method = method
 
-    method = property(_get_method, _set_method)
-
-    def _get_url(self):
+    @property
+    def url(self):
         """ Get url """
 
         return self._url
 
-    def _set_url(self, url):
+    @url.setter
+    def url(self, url):
         """ Set url """
 
         self._url = url
 
-    url = property(_get_url, _set_url)
-
-    def _get_data(self):
+    @property
+    def data(self):
         """ Get data """
 
         return self._data
 
-    def _set_data(self, data):
+    @data.setter
+    def data(self, data):
         """ Set data """
 
         self._data = data
 
-    data = property(_get_data, _set_data)
-
-    def _get_params(self):
+    @property
+    def params(self):
         """ Get url """
 
         return self._params
 
-    def _set_params(self, params):
+    @params.setter
+    def params(self, params):
         """ Set params """
 
         self._params = params
 
-    params = property(_get_params, _set_params)
-
-    # Methods
-
-    def get_headers(self):
+    @property
+    def headers(self):
         """ Prepare headers to send """
 
         return self._headers
+
+    @headers.setter
+    def headers(self, value):
+        """ Set header value """
+
+        self._headers = value
 
     def set_header(self, header, value):
         """ Set header value """
 
         self._headers[header] = value
 
-    headers = property(get_headers, set_header)

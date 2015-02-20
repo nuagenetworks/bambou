@@ -28,30 +28,26 @@ class NURESTResponse(object):
 
     # Properties
 
-    def _get_status_code(self):
+    @property
+    def status_code(self):
         """ Get method """
 
         return self._status_code
 
-    status_code = property(_get_status_code, None)
-
-    def _get_data(self):
+    @property
+    def data(self):
         """ Get data """
 
         return self._data
 
-    data = property(_get_data, None)
-
-    def _get_reason(self):
+    @property
+    def reason(self):
         """ Get error reason """
 
         return self._reason
 
-    reason = property(_get_reason, None)
-
-    def _get_headers(self):
+    @property
+    def headers(self):
         """ Get headers """
 
         return self._headers
-
-    headers = property(_get_headers, None)

@@ -39,12 +39,14 @@ class NURemoteAttribute(object):
 
     # Properties
 
-    def _get_is_identifier(self):
+    @property
+    def is_identifier(self):
         """ Getter for is_identifier """
 
         return self._is_identifier
 
-    def _set_is_identifier(self, is_identifier):
+    @is_identifier.setter
+    def is_identifier(self, is_identifier):
         """ Setter for is_identifier """
 
         if is_identifier:
@@ -52,22 +54,20 @@ class NURemoteAttribute(object):
 
         self._is_identifier = is_identifier
 
-    is_identifier = property(_get_is_identifier, _set_is_identifier)
-
-    def _get_is_password(self):
+    @property
+    def is_password(self):
         """ Getter for is_identifier """
 
         return self._is_password
 
-    def _set_is_identifier(self, is_password):
+    @is_password.setter
+    def is_password(self, is_password):
         """ Setter for is_identifier """
 
         if is_password:
             self.is_forgetable = True
 
         self._is_password = is_password
-
-    is_password = property(_get_is_password, _set_is_identifier)
 
     # Methods
 

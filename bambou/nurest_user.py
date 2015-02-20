@@ -43,41 +43,43 @@ class NURESTBasicUser(NURESTObject):
 
     # Properties
 
-    def _get_user_name(self):
+    @property
+    def user_name(self):
         """ Get user_name """
 
         return self._user_name
 
-    def _set_user_name(self, user_name):
+    @user_name.setter
+    def user_name(self, user_name):
         """ Set user_name """
 
         self._user_name = user_name
 
-    user_name = property(_get_user_name, _set_user_name)
-
-    def _get_password(self):
+    @property
+    def password(self):
         """ Get password """
 
         return self._password
 
-    def _set_password(self, password):
+    @password.setter
+    def password(self, password):
         """ Set password """
 
         self._password = password
 
-    password = property(_get_password, _set_password)
-
-    def _get_api_key(self):
+    @property
+    def api_key(self):
         """ Get API Key """
 
         return self._api_key
 
-    def _set_api_key(self, api_key):
+    @api_key.setter
+    def api_key(self, api_key):
         """ Set API Key """
 
         self._api_key = api_key
 
-    api_key = property(_get_api_key, _set_api_key)
+    # Class Methods
 
     @classmethod
     def get_default_user(cls):

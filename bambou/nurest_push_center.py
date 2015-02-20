@@ -48,24 +48,23 @@ class NURESTPushCenter(Singleton):
 
     # Properties
 
-    def _get_url(self):
+    @property
+    def url(self):
         """ Get url """
 
         return self._url
 
-    def _set_url(self, url):
+    @url.setter
+    def url(self, url):
         """ Set url """
 
         self._url = url
 
-    url = property(_get_url, _set_url)
-
-    def _get_is_running(self):
+    @property
+    def is_running(self):
         """ Get is_running """
 
         return self._is_running
-
-    is_running = property(_get_is_running, None)
 
     # Control Methods
 

@@ -37,7 +37,8 @@ class NURESTLoginController(Singleton):
 
     # Properties
 
-    def _get_is_impersonating(self):
+    @property
+    def is_impersonating(self):
         """ Check if we are currently using impersonation
 
             Returns:
@@ -46,9 +47,9 @@ class NURESTLoginController(Singleton):
 
         return self._is_impersonating
 
-    is_impersonating = property(_get_is_impersonating, None)
 
-    def _get_impersonation(self):
+    @property
+    def impersonation(self):
         """ Get impersonation information
 
             Returns:
@@ -56,9 +57,8 @@ class NURESTLoginController(Singleton):
         """
         return self._impersonation
 
-    impersonation = property(_get_impersonation, None)
-
-    def _get_user(self):
+    @property
+    def user(self):
         """ Get the user name
 
             Returns:
@@ -67,7 +67,8 @@ class NURESTLoginController(Singleton):
 
         return self._user
 
-    def _set_user(self, user):
+    @user.setter
+    def user(self, user):
         """ Set the user name to connect with
 
             Args:
@@ -76,9 +77,8 @@ class NURESTLoginController(Singleton):
 
         self._user = user
 
-    user = property(_get_user, _set_user)
-
-    def _get_password(self):
+    @property
+    def password(self):
         """ Get user password
 
             Returns:
@@ -87,7 +87,8 @@ class NURESTLoginController(Singleton):
 
         return self._password
 
-    def _set_password(self, password):
+    @password.setter
+    def password(self, password):
         """ Set user password to connect with
 
             Args:
@@ -96,9 +97,8 @@ class NURESTLoginController(Singleton):
 
         self._password = password
 
-    password = property(_get_password, _set_password)
-
-    def _get_api_key(self):
+    @property
+    def api_key(self):
         """ Get API Key
 
             API Key is available when NURESTUser has been fetched.
@@ -109,7 +109,8 @@ class NURESTLoginController(Singleton):
 
         return self._api_key
 
-    def _set_api_key(self, api_key):
+    @api_key.setter
+    def api_key(self, api_key):
         """ Set the API Key
 
             When set, the API key will be used to make all HTTP calls
@@ -120,9 +121,8 @@ class NURESTLoginController(Singleton):
 
         self._api_key = api_key
 
-    api_key = property(_get_api_key, _set_api_key)
-
-    def _get_enterprise(self):
+    @property
+    def enterprise(self):
         """ Get the enterprise name
 
             Returns:
@@ -131,7 +131,8 @@ class NURESTLoginController(Singleton):
 
         return self._enterprise
 
-    def _set_enterprise(self, enterprise):
+    @enterprise.setter
+    def enterprise(self, enterprise):
         """ Set the enterprise name
 
             Args:
@@ -140,9 +141,8 @@ class NURESTLoginController(Singleton):
 
         self._enterprise = enterprise
 
-    enterprise = property(_get_enterprise, _set_enterprise)
-
-    def _get_url(self):
+    @property
+    def url(self):
         """ Get API URL endpoint
 
             Returns:
@@ -150,7 +150,8 @@ class NURESTLoginController(Singleton):
         """
         return self._url
 
-    def _set_url(self, url):
+    @url.setter
+    def url(self, url):
         """ Set API URL endpoint
 
             Args:
@@ -161,9 +162,8 @@ class NURESTLoginController(Singleton):
 
         self._url = url
 
-    url = property(_get_url, _set_url)
-
-    def _get_async(self):
+    @property
+    def async(self):
         """ Is asynchronous controller
 
             Returns:
@@ -172,7 +172,8 @@ class NURESTLoginController(Singleton):
 
         return self._async
 
-    def _set_async(self, async):
+    @async.setter
+    def async(self, async):
         """ Set asynchronous controller
 
             Args:
@@ -180,7 +181,6 @@ class NURESTLoginController(Singleton):
         """
         self._async = async
 
-    async = property(_get_async, _set_async)
 
     # Methods
 

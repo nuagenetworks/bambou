@@ -124,134 +124,126 @@ class NURESTObject(object):
 
     # Properties
 
-    def _get_creation_date(self):
+    @property
+    def creation_date(self):
         """ Get creation date """
 
         return self._creation_date
 
-    def _set_creation_date(self, creation_date):
+    @creation_date.setter
+    def creation_date(self, creation_date):
         """ Set creation date """
 
         self._creation_date = creation_date
 
-    creation_date = property(_get_creation_date, _set_creation_date)
-
-    def _get_external_id(self):
+    @property
+    def external_id(self):
         """ Get external id """
 
         return self._external_id
 
-    def _set_external_id(self, external_id):
+    @external_id.setter
+    def external_id(self, external_id):
         """ Set external id """
 
         self._external_id = external_id
 
-    external_id = property(_get_external_id, _set_external_id)
-
-    def _get_id(self):
+    @property
+    def id(self):
         """ Get object id """
 
         return self._id
 
-    def _set_id(self, id):
+    @id.setter
+    def id(self, id):
         """ Set object id """
 
         self._id = id
 
-    id = property(_get_id, _set_id)
-
-    def _get_local_id(self):
+    @property
+    def local_id(self):
         """ Get local id """
 
         return self._local_id
 
-    def _set_local_id(self, local_id):
+    @local_id.setter
+    def local_id(self, local_id):
         """ Set local id """
 
         self._local_id = local_id
 
-    local_id = property(_get_local_id, _set_local_id)
-
-    def _get_owner(self):
+    @property
+    def owner(self):
         """ Get owner """
 
         return self._owner
 
-    def _set_owner(self, owner):
+    @owner.setter
+    def owner(self, owner):
         """ Set owner """
 
         self._owner = owner
 
-    owner = property(_get_owner, _set_owner)
-
-    def _get_parent_id(self):
+    @property
+    def parent_id(self):
         """ Get parent id """
 
         return self._parent_id
 
-    def _set_parent_id(self, parent_id):
+    @parent_id.setter
+    def parent_id(self, parent_id):
         """ Set parent id """
 
         self._parent_id = parent_id
 
-    parent_id = property(_get_parent_id, _set_parent_id)
-
-    def _get_parent_type(self):
+    @property
+    def parent_type(self):
         """ Get parent type """
 
         return self._parent_type
 
-    def _set_parent_type(self, parent_type):
+    @parent_type.setter
+    def parent_type(self, parent_type):
         """ Set parent type """
 
         self._parent_type = parent_type
 
-    parent_type = property(_get_parent_type, _set_parent_type)
-
-    def _get_parent(self):
+    @property
+    def parent_object(self):
         """ Get parent """
 
         return self._parent
 
-    def _set_parent(self, parent):
+    @parent_object.setter
+    def parent_object(self, parent):
         """ Set parent id """
 
         self._parent = parent
 
-    parent = property(_get_parent, _set_parent)
-
-    def _get_last_updated_by(self):
+    @property
+    def last_updated_by(self):
         """ Get last updated by user id info """
 
         return self._last_updated_by
 
-    def _set_last_updated_by(self, user_id):
+    @last_updated_by.setter
+    def last_updated_by(self, user_id):
         """ Set last updated by user id info """
 
         self._last_updated_by = user_id
 
-    last_updated_by = property(_get_last_updated_by, _set_last_updated_by)
-
-    def _get_last_updated_date(self):
+    @property
+    def last_updated_date(self):
         """ Get last updated date """
 
         return self._last_updated_date
 
-    def _set_last_updated_date(self, update_date):
+    @last_updated_date.setter
+    def last_updated_date(self, update_date):
         """ Set last updated by user id info """
 
         self._last_updated_date = update_date
 
-    last_updated_date = property(_get_last_updated_date, _set_last_updated_date)
-
-    def get_attributes(self):
-        """ Get all attributes information
-
-            Returns:
-                Returns a dictionnary containing attribute information
-        """
-
-        return self._attributes.values()
 
     @property
     def rest_name(self):
@@ -397,6 +389,15 @@ class NURESTObject(object):
         attribute.can_search = can_search
 
         self._attributes[local_name] = attribute
+
+    def get_attributes(self):
+        """ Get all attributes information
+
+            Returns:
+                Returns a dictionnary containing attribute information
+        """
+
+        return self._attributes.values()
 
     def get_attribute_infos(self, local_name):
         """ Get exposed attribute information
