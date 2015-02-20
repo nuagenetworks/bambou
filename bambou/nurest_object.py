@@ -29,6 +29,9 @@ class NUMetaRESTObject(type):
 
     @property
     def rest_name(cls):
+        if cls.__name__ == "NURESTBasicUser" or cls.__name__ == "NURESTObject":
+            return "Not Implemented"
+
         if cls.__rest_name__ is None:
             raise NotImplementedError('%s has no defined name. Implements rest_name property first.' % cls)
         return cls.__rest_name__
