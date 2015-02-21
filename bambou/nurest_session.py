@@ -9,15 +9,29 @@ from bambou import bambou_logger
 
 class NURESTSession(object):
 
-    """ REST User Session
+    """ Authenticated sessions used for sending ReST calls
 
-        Session can be started and stopped whenever its needed
+        The session holds the credential information for a particular
+        user. It is used by :class:`bambou.NURESTConnection` to get
+        the authentication information needed to send the request.
+
+        NURESTSession supports the `with` statetement.
+
+        Note:
+            NURESTSession *must* be subclassed, and the subclass *must* implement :class:`bambou.NURESTSession.create_rest_user`
+
+        Example:
+            >>> mainsession =  NUMySession(username="csproot", password="csproot", enterprise="csp", api_url="https://vsd:8443", version="3.2")
+            >>> mainsession.start()
+            >>> mainsession.user.entities.get()
+            [<NUEntity at 1>, <NUEntity at 2>, <NUEntity at 3>]
+
+            >>> with NUMySession(username="user", password="password", enterprise="ent", api_url="https://vsd:8443", version="3.2") as session:
+            >>>     mainsession.user.entities.get()
+            [<NUEntity at 2>]
     """
 
     def __init__(self, username, password, enterprise, api_url):
-        """
-            @todo
-        """
 
         self._user = None
 
@@ -43,6 +57,15 @@ class NURESTSession(object):
     # Class Methods
 
     def create_rest_user(self):
+        """
+            Create a :class:`bambou.NURESTBasicUser`.
+
+            This method *MUST* be overriden by subclasses in order to provide
+            a valid :class:`bambou.NURESTBasicUser`.
+
+            Returns:
+                A instance of a subclass of :class:`bambou.NURESTBasicUser`
+        """
         raise NotImplementedError('%s must define method def create_rest_user(self).' % self)
 
     # Properties
@@ -50,21 +73,29 @@ class NURESTSession(object):
     @property
     def login_controller(self):
         """
-            @TODO
+            Returns the :class:`bambou.NURESTLoginController` of the current session
+
+            Note:
+                You should not need to use this method. It's used automatically when needed
         """
         return self._login_controller
 
     @property
     def user(self):
         """
-            @todo
+            Returns the user of the session
+
+            Returns:
+                (bambou.NURESTBasicUser): the REST user
         """
         return self._user
 
 
     def start(self):
         """
-            @todo
+            Starts the session.
+
+            Starting the session will actually get the API key of the current user
         """
 
         if self._started:
@@ -89,7 +120,9 @@ class NURESTSession(object):
 
     def stop(self):
         """
-            @TODO
+            Stops the session.
+
+            Stopping the session will reset the API stored API key. Subsequent calls will need to start it again
         """
         if not self._started:
             return;
@@ -102,7 +135,3 @@ class NURESTSession(object):
 class _NURESTSessionCurrentContext (Service):
 
     session = None
-
-
-
-_NURESTSessionCurrentContext.new()
