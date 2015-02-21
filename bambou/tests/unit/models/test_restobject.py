@@ -262,31 +262,6 @@ class ComparisonTests(TestCase):
         self.assertFalse(enterprise1.rest_equals(enterprise3))
         self.assertFalse(enterprise1.rest_equals(None))
 
-
-class ChildrenTests(TestCase):
-
-    def test_children(self):
-        """ test children registry methods """
-
-        user = User()
-
-        rest_names = user.children_rest_names()
-        self.assertEquals(rest_names, ['group', 'enterprise'])
-        self.assertEquals(user.children_for_rest_name('group'), [])
-        self.assertEquals(user.children_for_rest_name('enterprise'), [])
-
-        admins = Group(name=u'Admins')
-        others = Group(name=u'Others')
-        user.groups.append(admins)
-        user.groups.append(others)
-        self.assertEquals(user.children_for_rest_name('group'), [admins, others])
-
-        enterprise = Enterprise()
-        user.enterprises.append(enterprise)
-        self.assertEquals(user.children_for_rest_name('enterprise'), [enterprise])
-
-        self.assertEquals(user.children_lists(), [[admins, others], [enterprise]])
-
 class FetchersTests(TestCase):
 
     def test_fetchers(self):
@@ -296,5 +271,5 @@ class FetchersTests(TestCase):
 
         rest_names = user.children_rest_names()
         self.assertEquals(rest_names, ['group', 'enterprise'])
-        self.assertEquals(user.children_fetcher_for_rest_name('group'), GroupsFetcher)
-        self.assertEquals(user.children_fetcher_for_rest_name('enterprise'), EnterprisesFetcher)
+        self.assertEquals(user.fetcher_for_rest_name('group'), [])
+        self.assertEquals(user.fetcher_for_rest_name('enterprise'), [])

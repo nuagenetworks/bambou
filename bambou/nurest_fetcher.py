@@ -18,7 +18,7 @@ from .nurest_connection import HTTP_METHOD_GET, HTTP_METHOD_HEAD
 from bambou.config import BambouConfig
 
 
-class NURESTFetcher(object):
+class NURESTFetcher(list):
     """ Object fetcher for childrens
 
         This object is intended to fetch a specific type of object declared
@@ -30,14 +30,14 @@ class NURESTFetcher(object):
     def __init__(self):
         """ Initliazes the fetcher """
 
+        super(NURESTFetcher, self).__init__()
+
         self.latest_loaded_page = 0
-        self.parent_object = None
+        self._parent_object = None
         self.ordered_by = ''
         self.query_string = None
         self.total_count = 0
         self._current_connection = None
-        self._local_name = None
-        self._nurest_object = None
         self._transaction_id = None
 
     # Properties
@@ -52,39 +52,17 @@ class NURESTFetcher(object):
                 Returns the object it is serving.
         """
 
-        return self._nurest_object
+        return self._parent_object
 
     @parent_object.setter
-    def parent_object(self, nurest_object):
+    def parent_object(self, parent_object):
         """ Set the served object
 
             Args:
-                nurest_object: the objec to serve
+                parent_object: the object to serve
         """
 
-        self._nurest_object = nurest_object
-
-    @property
-    def local_name(self):
-        """ Get the name of the attribute that has to be filled
-
-            Returns:
-                Returns the name of the attribute in the served object
-                that will be filled
-        """
-
-        return self._local_name
-
-    @local_name.setter
-    def local_name(self, local_name):
-        """ Set the name of the attribut that has to be filled
-
-            Args:
-                local_name: the attribute name of the served object
-        """
-
-        self._local_name = local_name
-
+        self._parent_object = parent_object
 
     # Methods
 
@@ -117,29 +95,23 @@ class NURESTFetcher(object):
         return cls.managed_class().rest_name
 
     @classmethod
-    def fetcher_with_object(cls, nurest_object, local_name):
+    def fetcher_with_object(cls, parent_object):
         """ Register the fetcher for a served object.
 
-            This method will fill the attribute indicated by `local_name` of
-            the given object `nurest_object` with fetched objects of type `managed_class`
+            This method will fill the fetcher with `managed_class` instances
 
             Args:
-                nurest_object: the instance of the object to serve
-                local_name: the name of the attribute to fill when objects will be fetched
+                parent_object: the instance of the parent object to serve
 
             Returns:
                 It returns the fetcher instance.
         """
 
         fetcher = cls()
-        fetcher.parent_object = nurest_object
-        fetcher.local_name = local_name
+        fetcher.parent_object = parent_object
 
         rest_name = cls.managed_object_rest_name()
-
-        setattr(nurest_object, local_name, [])
-        nurest_object.register_children(getattr(nurest_object, local_name), rest_name)
-        nurest_object.register_fetcher(cls, rest_name)
+        parent_object.register_fetcher(fetcher, rest_name)
 
         return fetcher
 
@@ -149,7 +121,7 @@ class NURESTFetcher(object):
             It will clear attribute of the served object
         """
         self._current_connection = None
-        setattr(self.parent_object, self.local_name, [])
+        self = list()
 
     def new(self):
         """ Create an instance of the managed class
@@ -200,7 +172,7 @@ class NURESTFetcher(object):
 
         return url
 
-    def retrieve(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
+    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
         """ Fetch objects according to given filter and page.
 
             Note:
@@ -223,7 +195,7 @@ class NURESTFetcher(object):
                 tuple: Returns a tuple of information (fetcher, served object, fetched objects, connection)
 
             Example:
-                >>> entity.children_fetcher.retrieve()
+                >>> entity.children_fetcher.fetch()
                 (<NUChildrenFetcher at aaaa>, <NUEntity at bbbb>, [<NUChildren at ccc>, <NUChildren at ddd>], <NURESTConnection at zzz>)
         """
 
@@ -233,13 +205,13 @@ class NURESTFetcher(object):
         self._transaction_id = uuid.uuid4().hex
 
         if async:
-            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit':commit})
+            self.parent_object.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit': commit})
             return self._transaction_id
 
-        connection = self._nurest_object.send_request(request=request, user_info={'commit':commit})
-        return self._did_retrieve(connection=connection)
+        connection = self.parent_object.send_request(request=request, user_info={'commit': commit})
+        return self._did_fetch(connection=connection)
 
-    def _did_retrieve(self, connection):
+    def _did_fetch(self, connection):
         """ Fetching objects has been done """
 
         self._current_connection = connection
@@ -256,7 +228,6 @@ class NURESTFetcher(object):
             return self._send_content(content=None, connection=connection)
 
         results = response.data
-        destination = getattr(self.parent_object, self._local_name)
         fetched_objects = list()
 
         if should_commit:
@@ -274,23 +245,23 @@ class NURESTFetcher(object):
 
                 nurest_object = self.new()
                 nurest_object.from_dict(result)
-                nurest_object.parent = self._nurest_object
+                nurest_object.parent = self.parent_object
 
                 fetched_objects.append(nurest_object)
 
                 if not should_commit:
                     continue
 
-                if nurest_object not in destination:
-                    destination.append(nurest_object)
+                if nurest_object not in self:
+                    self.append(nurest_object)
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def fetch_many(self, filter=None, order_by=None, group_by=[], page=None, page_size=None):
+    def get(self, filter=None, order_by=None, group_by=[], page=None, page_size=None):
         """ Fetch object and directly return them
 
             Note:
-                fetch_many won't put the fetched objects in the parent's children list.
+                `get` won't put the fetched objects in the parent's children list.
                 You cannot override this behavior. If you want to commit them in the parent
                 you can use :method:vsdk.NURESTFetcher.fetch or manually add the list with
                 :method:vsdk.NURESTObject.add_child
@@ -309,13 +280,13 @@ class NURESTFetcher(object):
                 >>> print entity.children_fetcher.fetch_many()
                 [<NUChildren at xxx>, <NUChildren at yyyy>, <NUChildren at zzz>]
         """
-        return self.retrieve(filter, order_by, group_by, page, page_size, commit=False)[2]
+        return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, commit=False)[2]
 
-    def fetch_one(self, filter=None, order_by=None, group_by=[], page=None, page_size=None):
+    def get_first(self, filter=None, order_by=None, group_by=[], page=None, page_size=None):
         """ Fetch object and directly return the first one
 
             Note:
-                fetch_one won't put the fetched object in the parent's children list.
+                `get_first` won't put the fetched object in the parent's children list.
                 You cannot override this behavior. If you want to commit it in the parent
                 you can use :method:vsdk.NURESTFetcher.fetch or manually add it with
                 :method:vsdk.NURESTObject.add_child
@@ -334,7 +305,7 @@ class NURESTFetcher(object):
                 >>> print entity.children_fetcher.fetch_one(filter="name == 'My Entity'")
                 <NUChildren at xxx>
         """
-        objects = self.fetch_many(filter, order_by, group_by, page, page_size, commit=False)
+        objects = self.get(filter=filter, order_by=order_by, group_by=group_by, page=0, page_size=1, commit=False)
         return objects[0] if len(objects) else None
 
     def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
@@ -363,11 +334,11 @@ class NURESTFetcher(object):
 
         if async:
             self._transaction_id = uuid.uuid4().hex
-            self._nurest_object.send_request(request=request, async=async, local_callback=self._did_count, remote_callback=callback)
+            self.parent_object.send_request(request=request, async=async, local_callback=self._did_count, remote_callback=callback)
             return self._transaction_id
 
         else:
-            connection = self._nurest_object.send_request(request=request)
+            connection = self.parent_object.send_request(request=request)
             return self._did_count(connection)
 
     def _did_count(self, connection):
@@ -385,13 +356,13 @@ class NURESTFetcher(object):
 
         if connection.async:
             if callback:
-                callback(self, self._nurest_object, count)
+                callback(self, self.parent_object, count)
         else:
 
             if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
                 raise BambouHTTPError(connection=connection)
 
-            return (self, self._nurest_object, count)
+            return (self, self.parent_object, count)
 
     def _send_content(self, content, connection):
         """ Send a content array from the connection """
@@ -402,9 +373,9 @@ class NURESTFetcher(object):
                 callback = connection.callbacks['remote']
 
                 if callback:
-                    callback(self, self._nurest_object, content, connection)
+                    callback(self, self.parent_object, content, connection)
             else:
-                return (self, self._nurest_object, content, connection)
+                return (self, self.parent_object, content, connection)
 
             self._current_connection.reset()
             self._current_connection = None

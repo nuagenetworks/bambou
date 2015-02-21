@@ -11,6 +11,8 @@
 import inspect
 import json
 
+from copy import deepcopy
+
 from time import time
 
 from .exceptions import BambouHTTPError
@@ -102,7 +104,6 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'last_updated_date', remote_name=u'lastUpdatedDate', attribute_type=time, is_readonly=True)
         self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
-        self._children_registry = dict()
         self._fetchers_registry = dict()
 
         model_controller = NURESTModelController.get_default()
@@ -425,7 +426,7 @@ class NURESTObject(object):
         return self._owner == current_user.id
 
 
-    def parent_with_rest_name_matching(self, rest_names):
+    def parent_for_matching_rest_name(self, rest_names):
         """ Return parent that matches a rest name """
 
         parent = self
@@ -504,51 +505,45 @@ class NURESTObject(object):
 
         return self._creation_date.strftime('mmm dd yyyy HH:MM:ss')
 
-    # Children management
+    # Fetchers registry
 
-    def register_children(self, children, rest_name):
-        """ Register children of the current object
+    def register_fetcher(self, fetcher, rest_name):
+        """ Register a children fetcher
+
+        """
+        self._fetchers_registry[rest_name] = fetcher
+
+    def fetcher_for_rest_name(self, rest_name):
+        """ Returns the children fetcher for the given rest name
 
             Args:
-                children: List of NURESTObject instances
-                rest_name: ReST Name of children
-        """
-        self._children_registry[rest_name] = children
-
-    def children_for_rest_name(self, rest_name):
-        """ Get all children according to the given resource_name
-
-            Args:
-                rest_name: the rest name
+                rest_name (string): the children rest name
 
             Returns:
-                Returns a list of children. If no children has been found, returns an empty list.
+                list: Returns the corresponding fetcher
 
             Example:
-                >>> entity = NUEntity(id="xxx-xxx-xxx")
-                >>> entity.subentities_fetcher.retrieve()
-                >>> print entity.children_for_rest_name(NUSubEntity.rest_name)
-                [<NUSubEntity at xxx>, <NUSubEntity at yyy>]
+                >>> print entity.fetcher_for_rest_name(NUSubEntity.rest_name)
+                <NUSubEntitiesFetcher at yyyy>
         """
+        if rest_name not in self._fetchers_registry:
+            return None
 
-        if rest_name not in self._children_registry:
-            return []
+        return self._fetchers_registry[rest_name]
 
-        return self._children_registry[rest_name]
-
-    def children_lists(self):
-        """ Returns a list of all children lists
+    def fetchers(self):
+        """ Return a copy of all fetchers
 
             Returns:
-                list: list containing lists of children
+                list: list of all fetchers
 
             Example:
-                >>> entity = NUEntity(id="xxx-xxx-xxx")
-                >>> print entity.children_lists()
-                [[<NUSubEntity at xxx>, <NUSubEntity at yyy>], [<NUOtherEntity at aaaa>, <NUOtherEntity at bbbb>, <NUOtherEntity at cccc>]]
-
+                >>> print entity.children_fetchers()
+                [<NUSubEntitiesFetcher at xxxx>, <NUOtherEntitiesFetcher at yyyy>]
         """
-        return self._children_registry.values()
+        return deepcopy(self._fetchers_registry.values())
+
+    # Children
 
     def children_rest_names(self):
         """ Gets the list of all possible children ReST names.
@@ -562,45 +557,13 @@ class NURESTObject(object):
                 ["foo", "bar"]
         """
 
-        return self._children_registry.keys()
+        names = []
+        fetchers = self.fetchers()
 
-    # Fetchers registry
+        for fetcher in self.fetchers():
+            names.append(fetcher.__class__.managed_object_rest_name())
 
-    def register_fetcher(self, fetcher, rest_name):
-        """ Register a children fetcher
-
-        """
-        self._fetchers_registry[rest_name] = fetcher
-
-    def children_fetcher_for_rest_name(self, rest_name):
-        """ Returns the children fetcher for the given rest name
-
-            Args:
-                rest_name (string): the children rest name
-
-            Returns:
-                list: Returns the corresponding fetcher
-
-            Example:
-                >>> print entity.children_fetcher_for_rest_name(NUSubEntity.rest_name)
-                <NUSubEntitiesFetcher at yyyy>
-        """
-        if rest_name not in self._fetchers_registry:
-            return None
-
-        return self._fetchers_registry[rest_name]
-
-    def children_fetchers(self):
-        """ Return all fetchers
-
-            Returns:
-                list: list of all fetchers
-
-            Example:
-                >>> print entity.children_fetchers()
-                [<NUSubEntitiesFetcher at xxxx>, <NUOtherEntitiesFetcher at yyyy>]
-        """
-        return self._fetchers_registry.values()
+        return names
 
     # Memory management
 
@@ -611,15 +574,20 @@ class NURESTObject(object):
             return
 
         self._is_dirty = True
+        self.will_discard()
 
         bambou_logger.debug("[Bambou] Discarding object %s of type %s" % (self.id, self.rest_name))
 
-        self._discard_all_children_list()
+        self.discard_all_fetchers()
+
         self._parent = None
-        self._children_registry = dict()
         self._fetchers_registry = dict()
 
-    def _discard_children_for_rest_name(self, rest_name):
+    def will_discard(self):
+        """ """
+        pass
+
+    def discard_fetcher_for_rest_name(self, rest_name):
         """ Discard children with a given rest name
 
             Args:
@@ -627,12 +595,12 @@ class NURESTObject(object):
 
         """
         bambou_logger.debug("[Bambou] %s with id %s is discarding children %s" % (self.rest_name, self._id, rest_name))
-        self._children_registry[rest_name] = []
+        self._fetchers_registry[rest_name] = []
 
-    def _discard_all_children_lists(self):
+    def discard_all_fetchers(self):
         """ Discard current object children """
 
-        for rest_name in self._children_registry.keys():
+        for rest_name in self._fetchers_registry.keys():
             self._discard_children_for_rest_name(rest_name)
 
     # Children management

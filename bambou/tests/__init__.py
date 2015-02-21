@@ -111,11 +111,8 @@ class User(NURESTBasicUser):
         self.expose_attribute(local_name='avatar_data', remote_name='avatarData', attribute_type=str)
         self.expose_attribute(local_name='api_key_expiry', remote_name='APIKeyExpiry', attribute_type=str)
 
-        self.enterprises = []
-        self.enterprises_fetcher = EnterprisesFetcher.fetcher_with_object(nurest_object=self, local_name=u'enterprises')
-
-        self.groups = []
-        self.groups_fetcher = GroupsFetcher.fetcher_with_object(nurest_object=self, local_name=u'groups')
+        self.enterprises = EnterprisesFetcher.fetcher_with_object(parent_object=self)
+        self.groups = GroupsFetcher.fetcher_with_object(parent_object=self)
 
         self._compute_args(**kwargs)
 

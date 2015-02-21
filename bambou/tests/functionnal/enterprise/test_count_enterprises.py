@@ -27,7 +27,7 @@ class Count(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
         with patch('requests.request', mock):
-            (fetcher, user, count) = self.user.enterprises_fetcher.count()
+            (fetcher, user, count) = self.user.enterprises.count()
 
         method = MockUtils.get_mock_parameter(mock, 'method')
         url = MockUtils.get_mock_parameter(mock, 'url')
@@ -39,7 +39,7 @@ class Count(TestCase):
         self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
         self.assertEqual(headers['Content-Type'], u'application/json')
 
-        self.assertEqual(fetcher, self.user.enterprises_fetcher)
+        self.assertEqual(fetcher, self.user.enterprises)
         self.assertEqual(user, self.user)
         self.assertEqual(count, 4)
 
@@ -52,7 +52,7 @@ class Count(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
         with patch('requests.request', mock):
-            (fetcher, user, count) = self.user.enterprises_fetcher.count(filter=u"name == 'Enterprise 2'")
+            (fetcher, user, count) = self.user.enterprises.count(filter=u"name == 'Enterprise 2'")
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-Filter'], u"name == 'Enterprise 2'")
@@ -67,7 +67,7 @@ class Count(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
         with patch('requests.request', mock):
-            (fetcher, user, count) = self.user.enterprises_fetcher.count(order_by=u'name ASC')
+            (fetcher, user, count) = self.user.enterprises.count(order_by=u'name ASC')
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-OrderBy'], 'name ASC')
@@ -81,7 +81,7 @@ class Count(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
         with patch('requests.request', mock):
-            (fetcher, user, count) = self.user.enterprises_fetcher.count(group_by=['field1', 'field2'])
+            (fetcher, user, count) = self.user.enterprises.count(group_by=['field1', 'field2'])
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-GroupBy'], 'true')
@@ -96,7 +96,7 @@ class Count(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
         with patch('requests.request', mock):
-            (fetcher, user, count) = self.user.enterprises_fetcher.count(page=3)
+            (fetcher, user, count) = self.user.enterprises.count(page=3)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-Page'], 3)
@@ -110,7 +110,7 @@ class Count(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
         with patch('requests.request', mock):
-            (fetcher, user, count) = self.user.enterprises_fetcher.count(page_size=10)
+            (fetcher, user, count) = self.user.enterprises.count(page_size=10)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-PageSize'], 10)
@@ -123,4 +123,4 @@ class Count(TestCase):
 
         with patch('requests.request', mock):
             with self.assertRaises(BambouHTTPError):
-                (fetcher, user, count) = self.user.enterprises_fetcher.count()
+                (fetcher, user, count) = self.user.enterprises.count()
