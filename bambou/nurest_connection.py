@@ -14,6 +14,7 @@ import threading
 
 from .nurest_login_controller import NURESTLoginController
 from .nurest_response import NURESTResponse
+from .nurest_session import _NURESTSessionCurrentContext
 
 from bambou import bambou_logger
 
@@ -306,7 +307,7 @@ class NURESTConnection(object):
         self._has_timeouted = False
 
         # Add specific headers
-        controller = NURESTLoginController()
+        controller = _NURESTSessionCurrentContext.session.login_controller
 
         enterprise = controller.enterprise
         user_name = controller.user

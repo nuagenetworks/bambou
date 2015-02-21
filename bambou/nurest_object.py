@@ -21,6 +21,7 @@ from .nurest_connection import NURESTConnection, HTTP_METHOD_DELETE, HTTP_METHOD
 from .nurest_fetcher import NURESTFetcher
 from .nurest_request import NURESTRequest
 from .nurest_modelcontroller import NURESTModelController
+from .nurest_session import _NURESTSessionCurrentContext
 from .utils import NURemoteAttribute
 
 from bambou import bambou_logger
@@ -275,7 +276,7 @@ class NURESTObject(object):
     def rest_base_url(cls):
         """ Override this method to set object base url """
 
-        controller = NURESTLoginController()
+        controller = _NURESTSessionCurrentContext.session.login_controller
         return controller.url
 
     @classmethod
