@@ -4,8 +4,9 @@
 # Copyright 2014 Alcatel-Lucent USA Inc.
 
 from .nurest_login_controller import NURESTLoginController
-from peak.context import Service, manager
+from peak.context import Service
 from bambou import bambou_logger
+
 
 class NURESTSession(object):
 
@@ -27,11 +28,11 @@ class NURESTSession(object):
             [<NUEntity at 1>, <NUEntity at 2>, <NUEntity at 3>]
 
             >>> with NUMySession(username="user", password="password", enterprise="ent", api_url="https://vsd:8443", version="3.2") as session:
-            >>>     mainsession.user.entities.get()
+            >>>     session.user.entities.get()
             [<NUEntity at 2>]
     """
 
-    def __init__(self, username, password, enterprise, api_url):
+    def __init__(self, username, password, enterprise, api_url, version):
 
         self._user = None
 
@@ -40,9 +41,8 @@ class NURESTSession(object):
         self._login_controller.password = password
         self._login_controller.user_name = username
         self._login_controller.enterprise = enterprise
-        self._login_controller.url = api_url
+        self._login_controller.url = '%s/nuage/api/v%s' % (api_url, str(version).replace('.', '_'))
         self._started = False
-
 
     # Contexts
 
@@ -52,21 +52,20 @@ class NURESTSession(object):
         return self
 
     def __exit__(self, type, value, traceback):
-        pass
+        self.stop()
 
     # Class Methods
 
-    def create_rest_user(self):
+    @classmethod
+    def get_current_session(cls):
         """
-            Create a :class:`bambou.NURESTBasicUser`.
-
-            This method *MUST* be overriden by subclasses in order to provide
-            a valid :class:`bambou.NURESTBasicUser`.
+            Get the current session
 
             Returns:
-                A instance of a subclass of :class:`bambou.NURESTBasicUser`
+                (bambou.NURESTSession): the current session
+
         """
-        raise NotImplementedError('%s must define method def create_rest_user(self).' % self)
+        return _NURESTSessionCurrentContext.session
 
     # Properties
 
@@ -90,6 +89,30 @@ class NURESTSession(object):
         """
         return self._user
 
+    @property
+    def is_impersonating(self):
+        """ Returns True if the session is currently impersonating
+            a user
+
+            Returns:
+                (bool): a boolean that indicate if the session is impersonating a user
+
+        """
+        return self._login_controller.is_impersonating
+
+    # Methods
+
+    def create_rest_user(self):
+        """
+            Create a :class:`bambou.NURESTBasicUser`.
+
+            This method *MUST* be overriden by subclasses in order to provide
+            a valid :class:`bambou.NURESTBasicUser`.
+
+            Returns:
+                A instance of a subclass of :class:`bambou.NURESTBasicUser`
+        """
+        raise NotImplementedError('%s must define method def create_rest_user(self).' % self)
 
     def start(self):
         """
@@ -130,8 +153,24 @@ class NURESTSession(object):
         self._started = False;
         self._login_controller.api_key = None
 
+    def impersonate(self, username, enterprise):
+        """
+            Change the session to impersonate a user within an enterprise
+
+            Args:
+                username (string): name of the user to impersonate
+                enterprise (string): name of the enterprise
+        """
+        self._login_controller.impersonate(username, enterprise)
+
+    def stop_impersonate(self):
+        """
+            Stop impersonating a user
+
+        """
+        self._login_controller.stop_impersonate()
 
 
-class _NURESTSessionCurrentContext (Service):
+class _NURESTSessionCurrentContext(Service):
 
     session = None

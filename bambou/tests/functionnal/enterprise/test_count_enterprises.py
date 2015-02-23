@@ -5,14 +5,14 @@ from mock import patch
 
 from bambou.exceptions import BambouHTTPError
 from bambou.tests.utils import MockUtils
-from bambou.tests.functionnal import get_login_as_user
+from bambou.tests.functionnal import start_session
 
 
 class Count(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.user = get_login_as_user()
+        cls.user = start_session()
 
     @classmethod
     def tearDownClass(cls):
@@ -33,7 +33,7 @@ class Count(TestCase):
         url = MockUtils.get_mock_parameter(mock, 'url')
         headers = MockUtils.get_mock_parameter(mock, 'headers')
 
-        self.assertEqual(url, u'https://<host>:<port>/nuage/api/v3_0/enterprises')
+        self.assertEqual(url, u'https://vsd:8443/nuage/api/v3_2/enterprises')
         self.assertEqual(method, u'HEAD')
         self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
         self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')

@@ -5,14 +5,14 @@ from mock import patch
 
 from bambou.exceptions import BambouHTTPError
 from bambou.tests.utils import MockUtils
-from bambou.tests.functionnal import get_login_as_user, get_valid_enterprise
+from bambou.tests.functionnal import start_session, get_valid_enterprise
 
 
 class Delete(TestCase):
 
     @classmethod
     def setUp(cls):
-        cls.user = get_login_as_user()
+        cls.user = start_session()
         cls.enterprise = get_valid_enterprise(id=1, name=u"Enterprise")
 
     @classmethod
@@ -31,7 +31,7 @@ class Delete(TestCase):
         url = MockUtils.get_mock_parameter(mock, 'url')
         headers = MockUtils.get_mock_parameter(mock, 'headers')
 
-        self.assertEqual(url, u'https://<host>:<port>/nuage/api/v3_0/enterprises/%s?responseChoice=1' % self.enterprise.id)
+        self.assertEqual(url, u'https://vsd:8443/nuage/api/v3_2/enterprises/%s?responseChoice=1' % self.enterprise.id)
         self.assertEqual(method, u'DELETE')
         self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
         self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')

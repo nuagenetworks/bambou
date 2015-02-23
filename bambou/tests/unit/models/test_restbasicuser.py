@@ -2,25 +2,24 @@
 
 from unittest import TestCase
 
-from bambou import NURESTLoginController
-from bambou.tests import User, Enterprise
+from bambou.tests import start_session
+from bambou.tests.models import User, Enterprise
 
 
 class GetUserTests(TestCase):
 
+    @classmethod
+    def setUpClass(self):
+        """ Initialize context """
+        start_session()
+
     def test_get_rest_name(self):
         """ Get user REST name """
-
-        controller = NURESTLoginController()
-        controller.user = u'user'
-        controller.password = u'password'
-        controller.url = u'https://example.com/api/v3_0'
-        controller.api_key = u'12345'
-        controller.enterprise = u'Alcatel'
+        session = start_session(username="user", password="password", enterprise="Alcatel", api_url="https://example.com", version="3.0")
 
         user = User()
         self.assertEquals(user.rest_name, 'me')
-        self.assertEquals(user.get_resource_url(), 'https://example.com/api/v3_0/me')
+        self.assertEquals(user.get_resource_url(), 'https://example.com/nuage/api/v3_0/me')
 
     def test_rest_resource_name(self):
         """ Get user resource name """
@@ -31,19 +30,16 @@ class GetUserTests(TestCase):
         """ Get user resource url """
 
         user = User()
-        self.assertEquals(user.get_resource_url(), u'https://<host>:<port>/nuage/api/v3_0/me')
+        self.assertEquals(user.get_resource_url(), u'https://vsd:8443/nuage/api/v3_2/me')
 
     def test_get_resource_url_for_child_type(self):
         """ Get user for child type """
 
         user = User()
-        self.assertEquals(user.get_resource_url_for_child_type(Enterprise), u'https://<host>:<port>/nuage/api/v3_0/enterprises')
+        self.assertEquals(user.get_resource_url_for_child_type(Enterprise), u'https://vsd:8443/nuage/api/v3_2/enterprises')
 
 
 class CompressionTests(TestCase):
-
-    def setUp(self):
-        """ Set up the context """
 
     def test_to_dict(self):
         """ Get object as dictionary """
