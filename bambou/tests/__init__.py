@@ -25,6 +25,7 @@ def start_session(username="user", password="password", enterprise="enterprise",
     user.role = u"ROLE"
 
     # Set API KEY
+    session._user = user
     session._login_controller.api_key = user.api_key
 
     # Activate session

@@ -168,6 +168,20 @@ class NURESTSession(object):
         """
         self._login_controller.stop_impersonate()
 
+    def equals(self, session):
+        """ Verify if the current session equals the given parameter
+
+            Notes:
+                Verification is based on username, enterprise, api_url and its version.
+
+            Args:
+                session(bambou.NURESTSession): the session to compare with
+
+            Returns:
+                (bool): True if session are equal
+        """
+        return self.login_controller == session.login_controller
+
 
 class _NURESTSessionContext (object):
 
