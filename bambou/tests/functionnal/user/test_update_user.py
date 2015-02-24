@@ -4,14 +4,14 @@ from unittest import TestCase
 from mock import patch
 
 from bambou.tests.utils import MockUtils
-from bambou.tests.functionnal import get_login_as_user
+from bambou.tests.functionnal import start_session
 
 
 class Update(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.user = get_login_as_user()
+        cls.user = start_session()
 
     @classmethod
     def tearDownClass(cls):
@@ -32,7 +32,7 @@ class Update(TestCase):
         headers = MockUtils.get_mock_parameter(mock, 'headers')
 
         self.assertEqual(connection.response.status_code, 204)
-        self.assertEqual(url, u'https://<host>:<port>/nuage/api/v3_0/me')
+        self.assertEqual(url, u'https://vsd:8443/nuage/api/v3_2/me')
         self.assertEqual(method, u'PUT')
         self.assertEqual(headers['Authorization'], u'XREST dXNlcjp0ZXN0')
         self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')

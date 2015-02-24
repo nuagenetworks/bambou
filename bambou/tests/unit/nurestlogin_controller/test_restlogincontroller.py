@@ -6,15 +6,16 @@ from bambou import NURESTLoginController
 
 class LoginControllerSingleton(TestCase):
 
-    def test_login_controller_is_singleton(self):
+    def test_login_controller_is_not_singleton(self):
         """ login controller is singleton """
         ctrl_a = NURESTLoginController()
         ctrl_a.user = u'Christophe'
         ctrl_b = NURESTLoginController()
         ctrl_b.user = u'Toto'
 
+        self.assertEquals(ctrl_a.user, u'Christophe')
         self.assertEquals(ctrl_b.user, u'Toto')
-        self.assertEquals(ctrl_a, ctrl_b)
+        self.assertNotEqual(ctrl_a, ctrl_b)
 
 
 class GetAuthenticationHeader(TestCase):
@@ -87,7 +88,6 @@ class ImpersonateLoginController(TestCase):
 
         self.assertEquals(controller.is_impersonating, True)
         self.assertEquals(controller.impersonation, 'Alex@Google')
-        # TODO : Test notification
 
     def test_stop_impersonate(self):
         """ Stop impersonate """
@@ -98,4 +98,3 @@ class ImpersonateLoginController(TestCase):
         controller.stop_impersonate()
         self.assertEquals(controller.is_impersonating, False)
         self.assertEquals(controller.impersonation, None)
-        # TODO : Test notification

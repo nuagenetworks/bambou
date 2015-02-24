@@ -3,8 +3,8 @@
 from unittest import TestCase
 from mock import patch
 
-from bambou import NURESTLoginController
-from bambou.tests import User
+from bambou.tests import start_session
+from bambou.tests.models import User
 from bambou.tests.utils import MockUtils
 
 
@@ -19,16 +19,12 @@ class Impersonate(TestCase):
         pass
 
     def test_impersonate(self):
-        """ GET /enterprises with impersonation """
+        """ GET /enterprises with impersonation
 
-        ctrl = NURESTLoginController()
-        ctrl.user = u'christophe'
-        ctrl.password = u'password'
-        ctrl.url = u'http://www.google.fr'
-        ctrl.api_key = u'12345'
-        ctrl.enterprise = u'Alcatel'
+        """
+        session = start_session()
 
-        ctrl.impersonate(user=u'johndoe', enterprise=u'enterprise')
+        session.impersonate(username=u'johndoe', enterprise=u'enterprise')
 
         mock = MockUtils.create_mock_response(status_code=200, data=[])
 
@@ -41,8 +37,10 @@ class Impersonate(TestCase):
 
         self.assertIn('X-Nuage-ProxyUser', headers)
         self.assertEquals(headers['X-Nuage-ProxyUser'], u'johndoe@enterprise')
+        self.assertEquals(session.is_impersonating, True)
 
-        ctrl.stop_impersonate()
+        session.stop_impersonate()
+        self.assertEquals(session.is_impersonating, False)
 
         with patch('requests.request', mock):
             user.enterprises.fetch()

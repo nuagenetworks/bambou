@@ -20,7 +20,7 @@ from bambou.utils.singleton import Singleton
 from bambou import bambou_logger
 
 
-class NURESTPushCenter(Singleton):
+class NURESTPushCenter(object):
     """ Push center wait for push notifications.
 
         It has to listen a specific URL.
@@ -32,19 +32,17 @@ class NURESTPushCenter(Singleton):
     def __init__(self):
         """ Initialize push center """
 
-        if not hasattr(self, '_initiliazed') or not self._initiliazed:
-            self._initiliazed = True
-            self._url = None
-            self._is_running = False
-            self._current_connection = None
-            self._last_events = list()
-            self.nb_events_received = 0
-            self.nb_push_received = 0
-            self._thread = None
-            self._user = None
-            self._start_time = None
-            self._timeout = None
-            self._delegate_methods = list()
+        self._url = None
+        self._is_running = False
+        self._current_connection = None
+        self._last_events = list()
+        self.nb_events_received = 0
+        self.nb_push_received = 0
+        self._thread = None
+        self._user = None
+        self._start_time = None
+        self._timeout = None
+        self._delegate_methods = list()
 
     # Properties
 

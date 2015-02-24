@@ -4,13 +4,13 @@ from unittest import TestCase
 from mock import patch
 
 from bambou.tests.utils import MockUtils
-from bambou.tests.functionnal import get_login_as_user, get_valid_enterprise
+from bambou.tests.functionnal import start_session, get_valid_enterprise
 
 
 class Fetch(TestCase):
 
     def setUp(self):
-        self.user = get_login_as_user()
+        self.user = start_session()
         self.enterprises = list()
         self.enterprises.append(get_valid_enterprise(id=1, name=u"Enterprise 1"))
         self.enterprises.append(get_valid_enterprise(id=2, name=u"Enterprise 2"))
@@ -33,7 +33,7 @@ class Fetch(TestCase):
         url = MockUtils.get_mock_parameter(mock, 'url')
         headers = MockUtils.get_mock_parameter(mock, 'headers')
 
-        self.assertEqual(url, u'https://<host>:<port>/nuage/api/v3_0/enterprises')
+        self.assertEqual(url, u'https://vsd:8443/nuage/api/v3_2/enterprises')
         self.assertEqual(method, u'GET')
         self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
         self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
@@ -127,7 +127,7 @@ class Fetch(TestCase):
         method = MockUtils.get_mock_parameter(mock, 'method')
         url = MockUtils.get_mock_parameter(mock, 'url')
 
-        self.assertEqual(url, u'https://<host>:<port>/nuage/api/v3_0/enterprises')
+        self.assertEqual(url, u'https://vsd:8443/nuage/api/v3_2/enterprises')
         self.assertEqual(method, u'GET')
         self.assertEqual(enterprises, None)
         self.assertEqual(connection.response.status_code, 500)
