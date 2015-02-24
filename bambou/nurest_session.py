@@ -4,8 +4,10 @@
 # Copyright 2014 Alcatel-Lucent USA Inc.
 
 from .nurest_login_controller import NURESTLoginController
-from peak.context import Service, manager
+from peak import context
 from bambou import bambou_logger
+from contextlib import contextmanager
+import inspect
 
 class NURESTSession(object):
 
@@ -41,18 +43,7 @@ class NURESTSession(object):
         self._login_controller.user_name = username
         self._login_controller.enterprise = enterprise
         self._login_controller.url = api_url
-        self._started = False
 
-
-    # Contexts
-
-    def __enter__(self):
-        _NURESTSessionCurrentContext.new()
-        self.start()
-        return self
-
-    def __exit__(self, type, value, traceback):
-        pass
 
     # Class Methods
 
@@ -91,47 +82,55 @@ class NURESTSession(object):
         return self._user
 
 
+    def _authenticate(self):
+
+        if self._user is None:
+            self._user = self.create_rest_user()
+            self._user.fetch()
+
+        self.login_controller.api_key = self._user.api_key
+        bambou_logger.debug("[NURESTSession] Started session with username %s in enterprise %s" % (self.login_controller._user, self.login_controller.enterprise))
+
     def start(self):
         """
             Starts the session.
 
             Starting the session will actually get the API key of the current user
         """
+        callee = inspect.getouterframes(inspect.currentframe())[1][4][0]
 
-        if self._started:
-            return;
+        if callee.lstrip().startswith("with "): # bon...
+            return _NURESTSessionContext.new(self)
+        else:
+            _NURESTSessionCurrentContext.session = self
+            self._authenticate()
+            return self
 
-        self._started = True;
-
-        _NURESTSessionCurrentContext.session = self
-
-        if self._login_controller.api_key is not None:
-            bambou_logger.warn("[NURESTSession] Previous session has not been terminated.\
-                            Please call stop() on your previous VSD Session to stop it properly")
-            return
-
-        if self._user is None:
-            self._user = self.create_rest_user()
-            self._user.fetch()
-
-        self._login_controller.api_key = self._user.api_key
-        bambou_logger.debug("[NURESTSession] Started session with username %s in enterprise %s (key=%s)" % (self._login_controller._user,\
-                    self._login_controller.password, self.user.api_key))
-
-    def stop(self):
+    def reset(self):
         """
             Stops the session.
 
             Stopping the session will reset the API stored API key. Subsequent calls will need to start it again
         """
-        if not self._started:
-            return;
 
-        self._started = False;
-        self._login_controller.api_key = None
+        self._user = None
+        self.login_controller.reset()
 
 
-
-class _NURESTSessionCurrentContext (Service):
+class _NURESTSessionContext (object):
 
     session = None
+
+    @classmethod
+    @contextmanager
+    def new(self, session):
+        with _NURESTSessionCurrentContext.new() as context:
+            context.session = session
+            session._authenticate()
+            yield session
+
+
+class _NURESTSessionCurrentContext (context.Service):
+
+    session = None
+
