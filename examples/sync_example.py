@@ -8,8 +8,7 @@ sys.path.append("../")
 
 from time import sleep
 
-from bambou import NURESTLoginController
-from models import Enterprise, NURESTUser
+from models import Enterprise, NUSession
 
 # Exemple of how you can activate logs
 
@@ -21,31 +20,21 @@ bambou_logger.addHandler(logging.StreamHandler())
 def main():
     """ Main method """
 
-    user = NURESTUser()
+    session = NUSession(username="csproot", password="csproot", enterprise="csp", api_url="https://135.227.220.152:8443", version="3.1")
 
-    # Initializes login controller
-    ctrl = NURESTLoginController()
-    ctrl.user = u"csproot"
-    ctrl.password = u"csproot"
-    ctrl.enterprise = u"csp"
-    ctrl.url = u"https://135.227.220.152:8443/nuage/api/v3_0"
+    with session.start():
+        user = session.user
 
-    # Get User and set API Key for authentication
-    (user, connection) = user.fetch(async=False)
-    ctrl.api_key = user.api_key
+        enterprise = Enterprise()
+        enterprise.name = 'Christophe Test'
+        enterprise.description = 'Hey hey hey'
 
-    print(ctrl.api_key)
+        (enterprise, connection) = user.create_child_object(nurest_object=enterprise, async=False)
 
-    enterprise = Enterprise()
-    enterprise.name = 'Christophe Test'
-    enterprise.description = 'Hey hey hey'
+        print('Sleeping for... 6 sec')
+        sleep(6)
 
-    (enterprise, connection) = user.create_child_object(nurest_object=enterprise, async=False)
-
-    print('Sleeping for... 6 sec')
-    sleep(6)
-
-    enterprise.delete(response_choice=1)
+        enterprise.delete()
 
 if __name__ == '__main__':
     main()

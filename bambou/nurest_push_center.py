@@ -15,7 +15,6 @@ from time import time
 
 from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
-from bambou.utils.singleton import Singleton
 
 from bambou import bambou_logger
 
@@ -84,7 +83,12 @@ class NURESTPushCenter(object):
         bambou_logger.debug("[NURESTPushCenter] Starting push center on url %s ..." % self.url)
         self._is_running = True
         self._user = user
-        self._thread = threading.Thread(target=self._listen, name='push-center')
+
+        from .nurest_session import NURESTSession
+        current_session = NURESTSession.get_current_session()
+        args_session = {'session': current_session}
+
+        self._thread = threading.Thread(target=self._listen, name='push-center', kwargs=args_session)
         self._thread.daemon = True
         self._thread.start()
 
@@ -164,8 +168,11 @@ class NURESTPushCenter(object):
 
             self._listen(uuid)
 
-    def _listen(self, uuid=None):
+    def _listen(self, uuid=None, session=None):
         """ Listen a connection uuid """
+        if session:
+            from .nurest_session import _NURESTSessionCurrentContext
+            _NURESTSessionCurrentContext.session = session
 
         if self.url is None:
             raise Exception("NURESTPushCenter needs to have a valid URL. please use setURL: before starting it.")

@@ -9,12 +9,10 @@
 
 
 from base64 import urlsafe_b64encode
-from .utils.singleton import Singleton
-
 
 
 class NURESTLoginController(object):
-    """ Singleton that holds information about the current user session """
+    """ Holds information about the current user session """
 
     def __init__(self):
         """ Initiliazes the login controller """

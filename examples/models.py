@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from bambou import NURESTBasicUser
-from bambou import NURESTObject
+from bambou import NURESTBasicUser, NURESTObject, NURESTSession
 
-
-__all__ = ['Enterprise', 'User']
+__all__ = ['Enterprise', 'NURESTUser', 'NUSession']
 
 
 class NURESTUser(NURESTBasicUser):
     """ Defines a User """
+
+    __rest_name__ = "me"
 
     def __init__(self):
         """ Creates a new user """
@@ -40,12 +40,6 @@ class NURESTUser(NURESTBasicUser):
         self.expose_attribute(local_name='external_id', remote_name='externalId', attribute_type=str)  # TODO : Declare bug here
 
     @classmethod
-    def get_remote_name(cls):
-        """ Provides user classname  """
-
-        return "me"
-
-    @classmethod
     def is_resource_name_fixed(cls):
         """ Boolean to say if the resource name should be fixed. Default is False """
 
@@ -67,6 +61,8 @@ class NURESTUser(NURESTBasicUser):
 class Enterprise(NURESTObject):
     """ Creates a enterprise object for tests """
 
+    __rest_name__ = "enterprise"
+
     def __init__(self):
         """ Creates a new Enterprise """
 
@@ -78,8 +74,9 @@ class Enterprise(NURESTObject):
         self.expose_attribute(local_name='name', remote_name='name', attribute_type=str)
         self.expose_attribute(local_name='description', remote_name='description', attribute_type=str)
 
-    @classmethod
-    def get_remote_name(cls):
-        """ Provides enterprise classname  """
 
-        return u"enterprise"
+# Override NURESTSession
+class NUSession(NURESTSession):
+
+    def create_rest_user(self):
+        return NURESTUser()

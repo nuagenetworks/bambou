@@ -3,20 +3,13 @@ import sys
 sys.path.append("../")
 
 from time import sleep
-from bambou import NURESTLoginController, NURESTPushCenter, NURESTBasicUser
+from models import NURESTUser, NUSession
+# Uncomment these lines to enable logging messages
+# import logging
+# from bambou import bambou_logger
+# bambou_logger.setLevel(logging.INFO)
+# bambou_logger.addHandler(logging.StreamHandler())
 
-
-# this class is needed because you are not using our model
-# so you need to define that the rest user resource is /me
-class NURESTUser(NURESTBasicUser):
-
-    @classmethod
-    def get_remote_name(cls):
-        return "me"
-
-    @classmethod
-    def is_resource_name_fixed(cls):
-        return True
 
 
 # this is your call back. it will print all events that are received
@@ -30,37 +23,21 @@ def did_receive_push(data):
 
 if __name__ == '__main__':
 
-    # create a login controller singleton
-    # this class holds information on the crendentials
-    # that need to be use for all REST communication
-    ctrl            = NURESTLoginController()
-    ctrl.user       = "csproot"
-    ctrl.password   = "csproot"
-    ctrl.enterprise = "csp"
-    ctrl.url        = "https://135.227.220.152:8443/nuage/api/v3_0"
+    # create a user session for user csproot
+    session = NUSession(username="csproot", password="csproot", enterprise="csp", api_url="https://135.227.220.152:8443", version="3.1")
 
-    # Then we need to fetch the API key
-    # so we get our NURESTUser and fetch it.
-    # it will use the NURESTLoginController password
-    user = NURESTUser().get_default_user()
+    # start the session
+    # now session contains a push center and the connected user
+    session.start()
 
-    # we get the answer in sync mode (but we have async mode too because we rock)
-    (user, connection) = user.fetch(async=False)
-
-    # and then we set the API key in the NURESTLoginController.
-    # this means that all subsequent REST calls will use the API key
-    ctrl.api_key = user.api_key
-
-    # Then here we get the default push center
-    push_center = NURESTPushCenter()
-    push_center.url = ctrl.url
+    # we get the push center from the session
+    push_center = session.push_center
 
     # we register our delegate that will be called on each event
     push_center.add_delegate(did_receive_push);
 
     # and we start it
     push_center.start()
-
 
     # then we do nothing, welcome to the marvelous world of async programing ;)
     while True:

@@ -299,14 +299,15 @@ class NURESTConnection(object):
         else:
             return self
 
-    def _make_request(self):
+    def _make_request(self, session=None):
         """ Make a synchronous request """
+
+        from .nurest_session import _NURESTSessionCurrentContext
+        _NURESTSessionCurrentContext.session = session
 
         self._has_timeouted = False
 
         # Add specific headers
-        from .nurest_session import NURESTSession
-        session = NURESTSession.get_current_session()
         controller = session.login_controller
 
         enterprise = controller.enterprise
@@ -356,14 +357,16 @@ class NURESTConnection(object):
         """ Make an HTTP request with a specific method """
 
         # TODO : Use Timeout here and _ignore_request_idle
+        from .nurest_session import NURESTSession
+        session = NURESTSession.get_current_session()
+
         if self.async:
-            thread = threading.Thread(target=self._make_request)
+            thread = threading.Thread(target=self._make_request, kwargs={'session': session})
             thread.is_daemon = False
             thread.start()
-
             return
 
-        return self._make_request()
+        return self._make_request(session=session)
 
     def reset(self):
         """ Reset the connection
