@@ -180,7 +180,7 @@ class NURESTSession(object):
             Returns:
                 (bool): True if session are equal
         """
-        return self.login_controller == session.login_controller
+        return self.login_controller.equals(session.login_controller)
 
 
 class _NURESTSessionContext (object):
