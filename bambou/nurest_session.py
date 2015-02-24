@@ -4,6 +4,7 @@
 # Copyright 2014 Alcatel-Lucent USA Inc.
 
 from .nurest_login_controller import NURESTLoginController
+from .nurest_push_center import NURESTPushCenter
 from peak import context
 from bambou import bambou_logger
 from contextlib import contextmanager
@@ -18,7 +19,7 @@ class NURESTSession(object):
         user. It is used by :class:`bambou.NURESTConnection` to get
         the authentication information needed to send the request.
 
-        NURESTSession supports the `with` statetement.
+        NURESTSession supports the `with` statement.
 
         Note:
             NURESTSession *must* be subclassed, and the subclass *must* implement :class:`bambou.NURESTSession.create_rest_user`
@@ -57,6 +58,9 @@ class NURESTSession(object):
         self._login_controller.enterprise = enterprise
         self._login_controller.url = '%s/nuage/api/v%s' % (api_url, str(version).replace('.', '_'))
 
+        self._push_center = NURESTPushCenter()
+        self._push_center.url = self._login_controller.url
+
     # Class Methods
 
     @classmethod
@@ -71,6 +75,16 @@ class NURESTSession(object):
         return _NURESTSessionCurrentContext.session
 
     # Properties
+
+    @property
+    def push_center(self):
+        """
+            Returns the :class:`bambou.NURESTPushCenter` of the current session
+
+            Note:
+                Use this method to start and stop receiving push notifications
+        """
+        return self._push_center
 
     @property
     def login_controller(self):
@@ -181,6 +195,14 @@ class NURESTSession(object):
                 (bool): True if session are equal
         """
         return self.login_controller.equals(session.login_controller)
+
+    def is_current_session(self):
+        """ Verify if the session is the current.
+
+            Returns:
+                (bool): True if the session is the current
+        """
+        return self.equals(NURESTSession.get_current_session())
 
 
 class _NURESTSessionContext (object):

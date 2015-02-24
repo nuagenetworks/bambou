@@ -12,15 +12,15 @@ class PushCenterSingletonTests(TestCase):
         """ Initialize context """
         start_session()
 
-    def test_push_center_is_singleton(self):
-        """ PushCenter is singleton """
+    def test_push_center_is_not_singleton(self):
+        """ PushCenter is not a singleton """
 
         push_center_1 = NURESTPushCenter()
         push_center_1.url = u'http://www.google.fr'
         push_center_2 = NURESTPushCenter()
 
         self.assertEquals(push_center_1.url, u'http://www.google.fr')
-        self.assertEquals(push_center_1, push_center_2)
+        self.assertNotEquals(push_center_1, push_center_2)
 
 
 class PushCenterRunningTests(TestCase):

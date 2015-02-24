@@ -12,9 +12,8 @@ import json
 import requests
 import threading
 
-from .nurest_login_controller import NURESTLoginController
 from .nurest_response import NURESTResponse
-from .nurest_session import _NURESTSessionCurrentContext
+
 
 from bambou import bambou_logger
 
@@ -197,7 +196,6 @@ class NURESTConnection(object):
 
         return self._async
 
-
     # Methods
 
     def has_succeed(self):
@@ -307,7 +305,9 @@ class NURESTConnection(object):
         self._has_timeouted = False
 
         # Add specific headers
-        controller = _NURESTSessionCurrentContext.session.login_controller
+        from .nurest_session import NURESTSession
+        session = NURESTSession.get_current_session()
+        controller = session.login_controller
 
         enterprise = controller.enterprise
         user_name = controller.user
