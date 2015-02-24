@@ -17,19 +17,21 @@ class NURESTSession(object):
         user. It is used by :class:`bambou.NURESTConnection` to get
         the authentication information needed to send the request.
 
-        NURESTSession supports the `with` statetement.
+        NURESTSession supports the `with` statement.
 
         Note:
             NURESTSession *must* be subclassed, and the subclass *must* implement :class:`bambou.NURESTSession.create_rest_user`
 
         Example:
             >>> mainsession =  NUMySession(username="csproot", password="csproot", enterprise="csp", api_url="https://vsd:8443", version="3.2")
+            >>> othersession = NUMySession(username="user", password="password", enterprise="ent", api_url="https://vsd:8443", version="3.2")
+            >>>
             >>> mainsession.start()
             >>> mainsession.user.entities.get()
             [<NUEntity at 1>, <NUEntity at 2>, <NUEntity at 3>]
-
-            >>> with NUMySession(username="user", password="password", enterprise="ent", api_url="https://vsd:8443", version="3.2") as session:
-            >>>     mainsession.user.entities.get()
+            >>>
+            >>> with othersession.start() as session:
+            >>>     session.user.entities.get()
             [<NUEntity at 2>]
     """
 
@@ -108,9 +110,10 @@ class NURESTSession(object):
 
     def reset(self):
         """
-            Stops the session.
+            Resets the session.
 
-            Stopping the session will reset the API stored API key. Subsequent calls will need to start it again
+            Resetting the session will flush the API stored API key. Any additional calls will require to call start, and a
+            /me request will be reissued.
         """
 
         self._user = None
