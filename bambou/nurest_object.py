@@ -607,7 +607,7 @@ class NURESTObject(object):
         """ Discard current object children """
 
         for rest_name in self._fetchers_registry.keys():
-            self._discard_children_for_rest_name(rest_name)
+            self.discard_fetcher_for_rest_name(rest_name)
 
     # Children management
 
@@ -615,7 +615,7 @@ class NURESTObject(object):
         """ Add a child """
 
         rest_name = child.rest_name
-        children = self.children_for_rest_name(rest_name)
+        children = self.fetcher_for_rest_name(rest_name)
 
         if child not in children:
             children.append(child)
@@ -624,14 +624,14 @@ class NURESTObject(object):
         """ Remove a child """
 
         rest_name = child.rest_name
-        children = self.children_for_rest_name(rest_name)
+        children = self.fetcher_for_rest_name(rest_name)
         children.remove(child)
 
     def update_child(self, child):
         """ Update child """
 
         rest_name = child.rest_name
-        children = self.children_for_rest_name(rest_name)
+        children = self.fetcher_for_rest_name(rest_name)
         index = children.index(child)
         children[index] = child
 
