@@ -55,6 +55,8 @@ class NUMetaRESTObject(type):
             if rest_name[-2].lower() not in vowels:
                 rest_name = rest_name[:len(rest_name) - 1]
                 rest_name += "ies"
+            else:
+                rest_name += "s"
 
         elif last_letter != "s":
             rest_name += "s"
