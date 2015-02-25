@@ -627,15 +627,32 @@ class NURESTObject(object):
 
         rest_name = child.rest_name
         children = self.fetcher_for_rest_name(rest_name)
-        children.remove(child)
+
+        target_child = None
+
+        for local_child in children:
+            if local_child.id == child.id:
+                target_child = local_child
+                break
+
+        if target_child:
+            children.remove(target_child)
 
     def update_child(self, child):
         """ Update child """
 
         rest_name = child.rest_name
         children = self.fetcher_for_rest_name(rest_name)
-        index = children.index(child)
-        children[index] = child
+
+        index = None
+
+        for local_child in children:
+            if local_child.id == child.id:
+                index = children.index(local_child)
+                break
+
+        if index:
+            children[index] = child
 
     # Compression / Decompression
 
