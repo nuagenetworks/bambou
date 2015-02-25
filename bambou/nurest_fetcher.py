@@ -257,7 +257,7 @@ class NURESTFetcher(list):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def get(self, filter=None, order_by=None, group_by=[], page=None, page_size=None):
+    def get(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
         """ Fetch object and directly return them
 
             Note:
@@ -272,6 +272,8 @@ class NURESTFetcher(list):
                 group_by (string): list of names for grouping
                 page (int): number of the page to load
                 page_size (int): number of results per page
+                commit (bool): boolean to update current object
+                callback (function): Callback that should be called in case of a async request
 
             Returns:
                 list: list of vsdk.NURESTObject if any
@@ -282,7 +284,7 @@ class NURESTFetcher(list):
         """
         return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, commit=False)[2]
 
-    def get_first(self, filter=None, order_by=None, group_by=[], page=None, page_size=None):
+    def get_first(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
         """ Fetch object and directly return the first one
 
             Note:
@@ -297,6 +299,8 @@ class NURESTFetcher(list):
                 group_by (string): list of names for grouping
                 page (int): number of the page to load
                 page_size (int): number of results per page
+                commit (bool): boolean to update current object
+                callback (function): Callback that should be called in case of a async request
 
             Returns:
                 vsdk.NURESTObject: the first object if any, or None
