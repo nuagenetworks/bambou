@@ -1,5 +1,2 @@
 requests
 logging
---allow-external Contextual
---allow-unverified Contextual
-Contextual==0.7a1.dev-r2695
