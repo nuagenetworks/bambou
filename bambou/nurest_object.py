@@ -122,12 +122,17 @@ class NURESTObject(object):
                 data: a dict()
                 kwargs: a list of arguments
         """
+
+        for name, remote_attribute in self._attributes.items():
+            default_value = BambouConfig.get_default_attribute_value(self.__class__, name, remote_attribute.attribute_type)
+            setattr(self, name, default_value)
+
         if len(data) > 0:
             self.from_dict(data)
-        else:
-            for key, value in kwargs.iteritems():
-                if hasattr(self, key):
-                    setattr(self, key, value)
+
+        for key, value in kwargs.iteritems():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
     # Properties
 
