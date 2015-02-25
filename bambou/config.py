@@ -34,7 +34,7 @@ class BambouConfig(object):
         cls._should_raise_bambou_http_error = should_raise
 
     @classmethod
-    def set_default_value_config_file(cls, file_path):
+    def set_default_values_config_file(cls, file_path):
         """ Set the name for an alternative default value configuration file
 
             Args:
