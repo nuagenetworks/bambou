@@ -178,7 +178,9 @@ class AttributeTests(TestCase):
         """ Get validate attributes """
 
         enterprise = Enterprise()
+        enterprise.name = "Test Enterprise"
         enterprise.allowed_forwarding_classes = u'A'
+
         is_valid = enterprise.validate()
 
         self.assertEqual(is_valid, True)
@@ -199,6 +201,7 @@ class AttributeTests(TestCase):
         """ Get validate with too long attribute """
 
         enterprise = Enterprise()
+        enterprise.name = "Enterprise"
         enterprise.description = 'a long description'.zfill(256)
         is_valid = enterprise.validate()
 
@@ -210,6 +213,7 @@ class AttributeTests(TestCase):
         """ Get validate with too long attribute """
 
         enterprise = Enterprise()
+        enterprise.name = "Enterprise"
         enterprise.allowed_forwarding_classes = 'NOT_AN_OPTION_FROM_CHOICES'
         is_valid = enterprise.validate()
 
