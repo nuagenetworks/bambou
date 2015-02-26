@@ -26,7 +26,7 @@ class Create(TestCase):
         mock = MockUtils.create_mock_response(status_code=201, data=enterprise)
 
         with patch('requests.request', mock):
-            (obj, connection) = user.create_child_object(enterprise)
+            (obj, connection) = user.create_child(enterprise)
 
         method = MockUtils.get_mock_parameter(mock, 'method')
         url = MockUtils.get_mock_parameter(mock, 'url')
@@ -51,4 +51,4 @@ class Create(TestCase):
 
         with patch('requests.request', mock):
             with self.assertRaises(BambouHTTPError):
-                (obj, connection) = user.create_child_object(enterprise)
+                (obj, connection) = user.create_child(enterprise)

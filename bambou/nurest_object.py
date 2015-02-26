@@ -15,7 +15,7 @@ from copy import deepcopy
 
 from time import time
 
-from .exceptions import BambouHTTPError
+from .exceptions import BambouHTTPError, InternalConsitencyError
 from .nurest_login_controller import NURESTLoginController
 from .nurest_connection import NURESTConnection, HTTP_METHOD_DELETE, HTTP_METHOD_PUT, HTTP_METHOD_POST, HTTP_METHOD_GET
 from .nurest_fetcher import NURESTFetcher
@@ -837,44 +837,6 @@ class NURESTObject(object):
             connection = self.send_request(request=request, user_info=nurest_object)
             return handler(connection)
 
-    def assign_objects(self, objects, nurest_object_type, async=False, callback=None):
-        """ Reference a list of objects into the current resource
-
-            Args:
-                objects (list): list of NURESTObject to link
-                nurest_object_type (type): Type of the object to link
-                callback (function): Callback method that should be fired at the end
-
-            Returns:
-                Returns the current object and the connection (object, connection)
-
-            Example:
-                >>> entity.assign_objects([entity1, entity2, entity3], NUEntity) # entity1, entity2 and entity3 are now part of the entity
-        """
-
-        if len(objects) == 0:
-            return
-
-        ids = list()
-
-        for nurest_object in objects:
-            ids.append(nurest_object.id)
-
-        url = self.get_resource_url_for_child_type(nurest_object_type)
-
-        request = NURESTRequest(method=HTTP_METHOD_PUT, url=url, data=ids)
-
-        if async:
-            self.send_request(request=request,
-                              async=async,
-                              local_callback=self._did_perform_standard_operation,
-                              remote_callback=callback,
-                              user_info=objects)
-        else:
-            connection = self.send_request(request=request,
-                                           user_info=objects)
-
-            return self._did_perform_standard_operation(connection)
 
     # REST Operation handlers
 
@@ -927,11 +889,11 @@ class NURESTObject(object):
 
     # Advanced REST Operations
 
-    def create_child_object(self, nurest_object, async=False, callback=None):
+    def create_child(self, nurest_object, async=False, callback=None):
         """ Add given nurest_object to the current object
 
             For example, to add a child into a parent, you can call
-            parent.create_child_object(nurest_object=child)
+            parent.create_child(nurest_object=child)
 
             Args:
                 nurest_object (bambou.NURESTObject): the NURESTObject object to add
@@ -943,16 +905,19 @@ class NURESTObject(object):
 
             Example:
                 >>> entity = NUEntity(name="Super Entity")
-                >>> parent_entity.create_child_object(entity) # the new entity as been created in the parent_entity
+                >>> parent_entity.create_child(entity) # the new entity as been created in the parent_entity
         """
+
+        # if nurest_object.id:
+        #     raise InternalConsitencyError("Cannot create a child that already has an ID: %s." % nurest_object)
 
         return self._manage_child_object(nurest_object=nurest_object,
                                          async=async,
                                          method=HTTP_METHOD_POST,
                                          callback=callback,
-                                         handler=self._did_create_child_object)
+                                         handler=self._did_create_child)
 
-    def instantiate_child_object(self, nurest_object, from_template, async=False, callback=None):
+    def instantiate_child(self, nurest_object, from_template, async=False, callback=None):
         """ Instantiate an nurest_object from a template object
 
             Args:
@@ -968,17 +933,23 @@ class NURESTObject(object):
                 >>> other_entity_template = NUOtherEntityTemplate(id="yyyy-yyyy-yyyy-yyyy") # create a NUOtherEntityTemplate with an existing ID (or retrieve one)
                 >>> other_entity_instance = NUOtherEntityInstance(name="my new instance") # create a new NUOtherEntityInstance to be intantiated from other_entity_template
                 >>>
-                >>> parent_entity.instantiate_child_object(other_entity_instance, other_entity_template) # instatiate the new domain in the server
+                >>> parent_entity.instantiate_child(other_entity_instance, other_entity_template) # instatiate the new domain in the server
         """
+
+        # if nurest_object.id:
+        #     raise InternalConsitencyError("Cannot instantiate a child that already has an ID: %s." % nurest_object)
+
+        if not from_template.id:
+            raise InternalConsitencyError("Cannot instantiate a child from a template with no ID: %s." % from_template)
 
         nurest_object.template_id = from_template.id
         return self._manage_child_object(nurest_object=nurest_object,
                                          async=async,
                                          method=HTTP_METHOD_POST,
                                          callback=callback,
-                                         handler=self._did_create_child_object)
+                                         handler=self._did_create_child)
 
-    def _did_create_child_object(self, connection):
+    def _did_create_child(self, connection):
         """ Callback called after adding a new child nurest_object """
 
         response = connection.response
@@ -988,6 +959,45 @@ class NURESTObject(object):
             pass
 
         return self._did_perform_standard_operation(connection)
+
+    def assign(self, objects, nurest_object_type, async=False, callback=None):
+        """ Reference a list of objects into the current resource
+
+            Args:
+                objects (list): list of NURESTObject to link
+                nurest_object_type (type): Type of the object to link
+                callback (function): Callback method that should be fired at the end
+
+            Returns:
+                Returns the current object and the connection (object, connection)
+
+            Example:
+                >>> entity.assign([entity1, entity2, entity3], NUEntity) # entity1, entity2 and entity3 are now part of the entity
+        """
+
+        if len(objects) == 0:
+            return
+
+        ids = list()
+
+        for nurest_object in objects:
+            ids.append(nurest_object.id)
+
+        url = self.get_resource_url_for_child_type(nurest_object_type)
+
+        request = NURESTRequest(method=HTTP_METHOD_PUT, url=url, data=ids)
+
+        if async:
+            self.send_request(request=request,
+                              async=async,
+                              local_callback=self._did_perform_standard_operation,
+                              remote_callback=callback,
+                              user_info=objects)
+        else:
+            connection = self.send_request(request=request,
+                                           user_info=objects)
+
+            return self._did_perform_standard_operation(connection)
 
     # Comparison
 

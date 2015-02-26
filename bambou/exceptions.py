@@ -24,3 +24,10 @@ class BambouHTTPError(Exception):
         self.response = connection.response
 
         super(BambouHTTPError, self).__init__("[HTTP %s(%s)] %s" % (self.response.status_code, self.response.reason, self.response.errors))
+
+
+class InternalConsitencyError(Exception):
+    """ Bambou InternalConsitency
+
+    """
+    pass

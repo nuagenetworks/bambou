@@ -12,7 +12,7 @@ from models import Enterprise, NUSession
 
 
 def _did_add_enterprise(enterprise, connection):
-    """ Callback after user.create_child_object(nurest_object=enterprise...) """
+    """ Callback after user.create_child(nurest_object=enterprise...) """
 
     # Retrieve push center from the current session
     session = NUSession.get_current_session()
@@ -62,7 +62,7 @@ def main():
     enterprise = Enterprise()
     enterprise.name = 'Async Enterprise test'
     enterprise.description = 'Description of test enterprise'
-    user.create_child_object(nurest_object=enterprise, callback=_did_add_enterprise, async=True)
+    user.create_child(nurest_object=enterprise, callback=_did_add_enterprise, async=True)
 
     print("\nEnd Main\nUser %s (%s)" % (user, threading.current_thread()))
 
