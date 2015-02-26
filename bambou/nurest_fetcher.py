@@ -40,6 +40,9 @@ class NURESTFetcher(list):
         self._current_connection = None
         self._transaction_id = None
 
+    def __repr__(self):
+        return "<%s: %s>" % (self.__class__.__name__, super(NURESTFetcher, self).__repr__())
+
     # Properties
 
     @property
@@ -279,7 +282,7 @@ class NURESTFetcher(list):
                 list: list of vsdk.NURESTObject if any
 
             Example:
-                >>> print entity.children_fetcher.fetch_many()
+                >>> print entity.children.get()
                 [<NUChildren at xxx>, <NUChildren at yyyy>, <NUChildren at zzz>]
         """
         return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, commit=False)[2]
@@ -306,7 +309,7 @@ class NURESTFetcher(list):
                 vsdk.NURESTObject: the first object if any, or None
 
             Example:
-                >>> print entity.children_fetcher.fetch_one(filter="name == 'My Entity'")
+                >>> print entity.children.get_first(filter="name == 'My Entity'")
                 <NUChildren at xxx>
         """
         objects = self.get(filter=filter, order_by=order_by, group_by=group_by, page=0, page_size=1, commit=False)

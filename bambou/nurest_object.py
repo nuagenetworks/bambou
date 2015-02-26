@@ -256,7 +256,6 @@ class NURESTObject(object):
 
         self._last_updated_date = update_date
 
-
     @property
     def rest_name(self):
         """ Returns the current ReST name of the object.
@@ -276,6 +275,42 @@ class NURESTObject(object):
                 Returns a string that represents the resouce name of the object
         """
         return self.__class__.rest_resource_name
+
+    @property
+    def fetchers(self):
+        """ Return a copy of all fetchers
+
+            Returns:
+                list: list of all fetchers
+
+            Example:
+                >>> print entity.children()
+                [<NUSubEntitiesFetcher at xxxx>, <NUOtherEntitiesFetcher at yyyy>]
+        """
+        return deepcopy(self._fetchers_registry.values())
+
+    # Children
+
+    @property
+    def children_rest_names(self):
+        """ Gets the list of all possible children ReST names.
+
+            Returns:
+                list: list containing all possible rest names as string
+
+            Example:
+                >>> entity = NUEntity()
+                >>> entity.children_rest_names()
+                ["foo", "bar"]
+        """
+
+        names = []
+        fetchers = self.fetchers
+
+        for fetcher in self.fetchers:
+            names.append(fetcher.__class__.managed_object_rest_name())
+
+        return names
 
     # Class methods
 
@@ -538,40 +573,6 @@ class NURESTObject(object):
             return None
 
         return self._fetchers_registry[rest_name]
-
-    def fetchers(self):
-        """ Return a copy of all fetchers
-
-            Returns:
-                list: list of all fetchers
-
-            Example:
-                >>> print entity.children_fetchers()
-                [<NUSubEntitiesFetcher at xxxx>, <NUOtherEntitiesFetcher at yyyy>]
-        """
-        return deepcopy(self._fetchers_registry.values())
-
-    # Children
-
-    def children_rest_names(self):
-        """ Gets the list of all possible children ReST names.
-
-            Returns:
-                list: list containing all possible rest names as string
-
-            Example:
-                >>> entity = NUEntity()
-                >>> entity.children_rest_names()
-                ["foo", "bar"]
-        """
-
-        names = []
-        fetchers = self.fetchers()
-
-        for fetcher in self.fetchers():
-            names.append(fetcher.__class__.managed_object_rest_name())
-
-        return names
 
     # Memory management
 
@@ -848,7 +849,7 @@ class NURESTObject(object):
                 Returns the current object and the connection (object, connection)
 
             Example:
-                >>> entity.assign_objects([entity1, entity2, entity3], NUEntity.rest_name) # entity1, entity2 and entity3 are now part of the entity
+                >>> entity.assign_objects([entity1, entity2, entity3], NUEntity) # entity1, entity2 and entity3 are now part of the entity
         """
 
         if len(objects) == 0:
