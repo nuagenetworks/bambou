@@ -20,7 +20,7 @@ bambou_logger.addHandler(logging.StreamHandler())
 def main():
     """ Main method """
 
-    session = NUSession(username="csproot", password="csproot", enterprise="csp", api_url="https://135.227.220.152:8443", version="3.1")
+    session = NUSession(username="csproot", password="csproot", enterprise="csp", api_url="https://vsd:8443", version="3.1")
 
     with session.start():
         user = session.user
