@@ -198,7 +198,7 @@ class NURESTFetcher(list):
                 tuple: Returns a tuple of information (fetcher, served object, fetched objects, connection)
 
             Example:
-                >>> entity.children_fetcher.fetch()
+                >>> entity.children.fetch()
                 (<NUChildrenFetcher at aaaa>, <NUEntity at bbbb>, [<NUChildren at ccc>, <NUChildren at ddd>], <NURESTConnection at zzz>)
         """
 
