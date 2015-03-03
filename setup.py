@@ -2,7 +2,7 @@ from setuptools  import setup
 
 setup(
     name='bambou',
-    version='0.0.2',
+    version='1.0-a1',
     url='http://www.nuagenetworks.net/',
     author='Christophe Serafin',
     author_email='christophe.serafin@alcatel-lucent.com',
