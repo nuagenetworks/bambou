@@ -26,8 +26,8 @@ def main():
         user = session.user
 
         enterprise = Enterprise()
-        enterprise.name = 'Christophe Test'
-        enterprise.description = 'Hey hey hey'
+        enterprise.name = u'My company'
+        enterprise.description = 'A nice description here'
 
         (enterprise, connection) = user.create_child(nurest_object=enterprise, async=False)
 
