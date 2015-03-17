@@ -166,7 +166,7 @@ class NURESTSession(object):
         """
 
         self._user = None
-        self.login_controller.reset()
+        self.login_controller.api_key = None
 
     def impersonate(self, username, enterprise):
         """
