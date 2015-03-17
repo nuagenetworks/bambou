@@ -82,17 +82,17 @@ class NURESTBasicUser(NURESTObject):
 
         self._api_key = api_key
 
-    @property
-    def api_url(self):
-        """ Get API URL """
-
-        return self._api_url
-
-    @api_url.setter
-    def api_url(self, api_url):
-        """ Set API Key """
-
-        self._api_url = api_url
+    # @property
+    # def api_url(self):
+    #     """ Get API URL """
+    #
+    #     return self._api_url
+    #
+    # @api_url.setter
+    # def api_url(self, api_url):
+    #     """ Set API Key """
+    #
+    #     self._api_url = api_url
 
     @property
     def enterprise(self):
@@ -101,7 +101,7 @@ class NURESTBasicUser(NURESTObject):
         return self._enterprise
 
     @enterprise.setter
-    def api_url(self, enterprise):
+    def enterprise(self, enterprise):
         """ Set API Key """
 
         self._enterprise = enterprise
