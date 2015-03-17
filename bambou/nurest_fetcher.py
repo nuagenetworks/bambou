@@ -124,7 +124,7 @@ class NURESTFetcher(list):
             It will clear attribute of the served object
         """
         self._current_connection = None
-        self = list()
+        del self[:]
 
     def new(self):
         """ Create an instance of the managed class
