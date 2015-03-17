@@ -171,7 +171,7 @@ class NURESTFetcher(list):
         url = self.parent_object.get_resource_url_for_child_type(self.__class__.managed_class())
 
         if self.query_string:
-            url += "?%s", self.query_string
+            url += "?%s" % self.query_string
 
         return url
 
