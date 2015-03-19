@@ -254,6 +254,9 @@ class NURESTFetcher(list):
         response = connection.response
         should_commit = 'commit' not in connection.user_info or connection.user_info['commit']
 
+        if connection.response.status_code == 401 and BambouConfig._should_raise_bambou_http_error:
+            raise BambouHTTPError(connection=connection)
+
         if response.status_code != 200:
 
             if should_commit:
