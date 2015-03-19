@@ -162,3 +162,27 @@ class NURESTBasicUser(NURESTObject):
                 callback(self, connection)
         else:
             return (self, connection)
+
+    def fetch(self, async=False, callback=None):
+        """ Fetch all information about the current object
+
+            Args:
+                async (bool): Boolean to make an asynchronous call. Default is False
+                callback (function): Callback method that will be triggered in case of asynchronous call
+
+            Returns:
+                tuple: (current_fetcher, callee_parent, fetched_bjects, connection)
+
+            Example:
+                >>> entity = NUEntity(id="xxx-xxx-xxx-xxx")
+                >>> entity.fetch() # will get the entity with id "xxx-xxx-xxx-xxx"
+                >>> print entity.name
+                "My Entity"
+        """
+        request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
+
+        if async:
+            self.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback)
+        else:
+            connection = self.send_request(request=request)
+            return self._did_retrieve(connection)
