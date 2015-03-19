@@ -10,9 +10,8 @@
 
 import json
 
-from .nurest_connection import HTTP_METHOD_PUT
+from .nurest_connection import HTTP_METHOD_PUT, HTTP_METHOD_GET
 from .nurest_request import NURESTRequest
-from .nurest_login_controller import NURESTLoginController
 from .nurest_object import NURESTObject
 from .nurest_session import _NURESTSessionCurrentContext
 
