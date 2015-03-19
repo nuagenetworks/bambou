@@ -766,6 +766,10 @@ class NURESTObject(object):
                 >>> print entity.name
                 "My Entity"
         """
+
+        if self.id is None:
+            raise InternalConsitencyError("Cannot fetch an object that does not have an ID")
+
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
         if async:

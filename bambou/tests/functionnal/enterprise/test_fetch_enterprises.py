@@ -149,4 +149,3 @@ class Fetch(TestCase):
         self.assertEqual(user, self.user)
         self.assertEqual(len(enterprises), 4)
         self.assertEqual(self.user.enterprises[2].name, "Enterprise 3")
-
