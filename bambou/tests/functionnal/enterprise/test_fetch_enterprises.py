@@ -93,7 +93,6 @@ class Fetch(TestCase):
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-OrderBy'], 'name ASC')
 
-
     def test_fetch_with_page(self):
         """ GET /enterprises retrieve enterprises with page """
 
@@ -131,3 +130,23 @@ class Fetch(TestCase):
         self.assertEqual(method, u'GET')
         self.assertEqual(enterprises, None)
         self.assertEqual(connection.response.status_code, 500)
+
+    def test_refetch_all(self):
+        """ GET /enterprises refetch all enterprises """
+
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
+
+        with patch('requests.request', mock):
+            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch()
+
+            enterprise = self.user.enterprises[2]
+            enterprise.name = u'This name should not appear because we will refetch everything!'
+
+            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch()
+
+        self.assertEqual(connection.response.status_code, 200)
+        self.assertEqual(fetcher, self.user.enterprises)
+        self.assertEqual(user, self.user)
+        self.assertEqual(len(enterprises), 4)
+        self.assertEqual(self.user.enterprises[2].name, "Enterprise 3")
+

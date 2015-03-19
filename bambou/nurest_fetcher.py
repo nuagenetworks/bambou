@@ -43,6 +43,39 @@ class NURESTFetcher(list):
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, super(NURESTFetcher, self).__repr__())
 
+    def __contains__(self, nurest_object):
+        """ Verify if the fetcher contains the given NURESTObject
+
+            Args:
+                nurest_object (bambou.NURESTObject): the NURESTObject object to verify
+
+            Returns:
+                Returns True if the object has been found. False otherwise
+
+        """
+        for obj in self:
+            if obj.equals(nurest_object):
+                return True
+
+        return False
+
+    def index(self, nurest_object):
+        """ Get index of the given item
+            Args:
+                nurest_object (bambou.NURESTObject): the NURESTObject object to verify
+
+            Returns:
+                Returns the position of the object.
+
+            Raises:
+                Raise a ValueError exception if object is not present
+        """
+        for index, obj in enumerate(self):
+            if obj.equals(nurest_object):
+                return index
+
+        raise ValueError("%s is  not in %s" % (nurest_object, self))
+
     # Properties
 
     @property
@@ -255,7 +288,11 @@ class NURESTFetcher(list):
                 if not should_commit:
                     continue
 
-                if nurest_object not in self:
+                if nurest_object in self:
+                    idx = self.index(nurest_object)
+                    current_object = self[idx]
+                    current_object.from_dict(nurest_object.to_dict())
+                else:
                     self.append(nurest_object)
 
         return self._send_content(content=fetched_objects, connection=connection)
