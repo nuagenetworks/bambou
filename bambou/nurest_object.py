@@ -808,7 +808,7 @@ class NURESTObject(object):
 
         return connection.start()
 
-    def _manage_child_object(self, nurest_object, method=HTTP_METHOD_GET, async=False, callback=None, handler=None, response_choice=None):
+    def _manage_child_object(self, nurest_object, method=HTTP_METHOD_GET, async=False, callback=None, handler=None, response_choice=None, commit=False):
         """ Low level child management. Send given HTTP method with given nurest_object to given ressource of current object
 
             Args:
@@ -816,6 +816,7 @@ class NURESTObject(object):
                 method: the HTTP method to use (GET, POST, PUT, DELETE)
                 callback: the callback to call at the end
                 handler: a custom handler to call when complete, before calling the callback
+                commit: True to auto commit changes in the current object
 
             Returns:
                 Returns the object and connection (object, connection)
@@ -831,14 +832,16 @@ class NURESTObject(object):
                 url += '?responseChoice=%s' % response_choice
 
         request = NURESTRequest(method=method, url=url, data=nurest_object.to_dict())
+        user_info = {'nurest_object': nurest_object, 'commit': commit}
 
         if not handler:
             handler = self._did_perform_standard_operation
 
         if async:
-            self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=nurest_object)
+
+            self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=commit)
         else:
-            connection = self.send_request(request=request, user_info=nurest_object)
+            connection = self.send_request(request=request, user_info=user_info)
             return handler(connection)
 
 
@@ -884,16 +887,21 @@ class NURESTObject(object):
                 callback(self, connection)
         else:
             if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
+                print connection.response.errors
                 raise BambouHTTPError(connection=connection)
 
-            if connection.user_info:
-                return (connection.user_info, connection)
+            if connection.user_info and connection.user_info['nurest_object']:
+
+                if connection.user_info['commit']:
+                    self.add_child(connection.user_info['nurest_object'])
+
+                return (connection.user_info['nurest_object'], connection)
 
             return (self, connection)
 
     # Advanced REST Operations
 
-    def create_child(self, nurest_object, async=False, callback=None):
+    def create_child(self, nurest_object, async=False, callback=None, commit=True):
         """ Add given nurest_object to the current object
 
             For example, to add a child into a parent, you can call
@@ -919,9 +927,10 @@ class NURESTObject(object):
                                          async=async,
                                          method=HTTP_METHOD_POST,
                                          callback=callback,
-                                         handler=self._did_create_child)
+                                         handler=self._did_create_child,
+                                         commit=commit)
 
-    def instantiate_child(self, nurest_object, from_template, async=False, callback=None):
+    def instantiate_child(self, nurest_object, from_template, async=False, callback=None, commit=True):
         """ Instantiate an nurest_object from a template object
 
             Args:
@@ -951,16 +960,18 @@ class NURESTObject(object):
                                          async=async,
                                          method=HTTP_METHOD_POST,
                                          callback=callback,
-                                         handler=self._did_create_child)
+                                         handler=self._did_create_child,
+                                         commit=commit)
 
     def _did_create_child(self, connection):
         """ Callback called after adding a new child nurest_object """
 
         response = connection.response
         try:
-            connection.user_info.from_dict(response.data[0])
+            connection.user_info['nurest_object'].from_dict(response.data[0])
         except Exception:
-            pass
+            print 'user info not loaded'
+            print response.data
 
         return self._did_perform_standard_operation(connection)
 

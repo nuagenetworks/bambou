@@ -38,9 +38,26 @@ class Create(TestCase):
         self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
         self.assertEqual(headers['Content-Type'], u'application/json')
 
+        self.assertEqual(connection.response.status_code, 201)
         self.assertEqual(obj.id, 1)
         self.assertEqual(obj.name, enterprise.name)
-        self.assertEqual(connection.response.status_code, 201)
+        self.assertIn(obj, user.enterprises)
+        self.assertIn(enterprise, user.enterprises)
+
+        user.enterprises.flush()
+
+    def test_create_without_commit(self):
+        """ POST /enterprises create enterprise without commit """
+
+        user = self.user
+        enterprise = get_valid_enterprise(id=1, name=u"Enterprise")
+        mock = MockUtils.create_mock_response(status_code=201, data=enterprise)
+
+        with patch('requests.request', mock):
+            (obj, connection) = user.create_child(enterprise, commit=False)
+
+        self.assertNotIn(obj, user.enterprises)
+        self.assertNotIn(enterprise, user.enterprises)
 
     def test_create_raise_error(self):
         """ POST /enterprises create enterprise raises an error """
