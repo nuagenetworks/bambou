@@ -4,7 +4,7 @@ import logging
 
 from bambou import bambou_logger
 from bambou.nurest_session import _NURESTSessionCurrentContext
-from bambou.tests.models import User, Enterprise, NURESTTestSession
+from bambou.tests.models import User, Enterprise, Group, NURESTTestSession
 
 bambou_logger.setLevel(logging.ERROR)
 
@@ -41,3 +41,12 @@ def get_valid_enterprise(id, name):
     enterprise.name = name
 
     return enterprise
+
+def get_valid_group(id, name):
+    """ Returns a valid group object """
+
+    group = Group()
+    group.id = id
+    group.name = name
+
+    return group

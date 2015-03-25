@@ -62,6 +62,8 @@ class Group(NURESTObject):
         self.name = None
         self.expose_attribute(local_name='name', remote_name='name', attribute_type=str)
 
+        self.employees = EmployeesFetcher.fetcher_with_object(parent_object=self)
+
         self._compute_args(**kwargs)
 
 
@@ -78,6 +80,37 @@ class GroupsFetcher(NURESTFetcher):
         """
 
         return Group
+
+class Employee(NURESTObject):
+
+    __rest_name__ = "user"
+
+    def __init__(self, **kwargs):
+        """ Creates an employee """
+
+        super(Employee, self).__init__()
+
+        self.firstname = None
+        self.lastname = None
+
+        self.expose_attribute(local_name='firstname', remote_name='firstname', attribute_type=str)
+        self.expose_attribute(local_name='lastname', remote_name='lastname', attribute_type=str)
+
+        self._compute_args(**kwargs)
+
+class EmployeesFetcher(NURESTFetcher):
+    """ Represents a Employees fetcher
+
+    """
+    @classmethod
+    def managed_class(cls):
+        """ This fetcher manages Employee objects
+
+            Returns:
+                Returns the Employee class
+        """
+
+        return Employee
 
 
 class User(NURESTBasicUser):

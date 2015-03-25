@@ -889,7 +889,15 @@ class NURESTObject(object):
             if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
                 raise BambouHTTPError(connection=connection)
 
-            if connection.user_info and connection.user_info['nurest_object']:
+            # Case with multiple objects like assignment
+            if connection.user_info and 'nurest_objects' in connection.user_info:
+
+                if connection.user_info['commit']:
+                    for nurest_object in connection.user_info['nurest_objects']:
+                        self.add_child(nurest_object)
+                return (connection.user_info['nurest_objects'], connection)
+
+            if connection.user_info and 'nurest_object' in connection.user_info:
 
                 if connection.user_info['commit']:
                     self.add_child(connection.user_info['nurest_object'])
@@ -968,13 +976,12 @@ class NURESTObject(object):
         response = connection.response
         try:
             connection.user_info['nurest_object'].from_dict(response.data[0])
-        except Exception:
-            print 'user info not loaded'
-            print response.data
+        except Exception as exc:
+            pass
 
         return self._did_perform_standard_operation(connection)
 
-    def assign(self, objects, nurest_object_type, async=False, callback=None):
+    def assign(self, objects, nurest_object_type, async=False, callback=None, commit=True):
         """ Reference a list of objects into the current resource
 
             Args:
@@ -998,18 +1005,18 @@ class NURESTObject(object):
             ids.append(nurest_object.id)
 
         url = self.get_resource_url_for_child_type(nurest_object_type)
-
         request = NURESTRequest(method=HTTP_METHOD_PUT, url=url, data=ids)
+        user_info = {'nurest_objects': objects, 'commit': commit}
 
         if async:
             self.send_request(request=request,
                               async=async,
                               local_callback=self._did_perform_standard_operation,
                               remote_callback=callback,
-                              user_info=objects)
+                              user_info=user_info)
         else:
             connection = self.send_request(request=request,
-                                           user_info=objects)
+                                           user_info=user_info)
 
             return self._did_perform_standard_operation(connection)
 
