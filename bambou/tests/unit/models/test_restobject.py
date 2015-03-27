@@ -80,6 +80,7 @@ class CompressionTests(TestCase):
 
         to_dict = enterprise.to_dict()
 
+        self.assertEquals(to_dict.keys(), ['groups', u'allowedForwardingClasses', 'name', 'ceo', u'parentType', u'lastUpdatedBy', u'lastUpdatedDate', u'parentID', u'owner', u'creationDate', u'ID', 'description'])
         self.assertEquals(to_dict['name'], u'NewEnterprise')
         self.assertEquals(to_dict['ID'], 3)
         #self.assertEquals(to_dict['externalID'], None)
