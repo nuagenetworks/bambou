@@ -731,16 +731,16 @@ class NURESTObject(object):
         """ Delete object and call given callback in case of call.
 
             Args:
+                response_choice (int): Automatically send a response choice when confirmation is needed
                 async (bool): Boolean to make an asynchronous call. Default is False
                 callback (function): Callback method that will be triggered in case of asynchronous call
-                response_choice (int): Automatically send a response choice when confirmation is needed
 
             Example:
                 >>> entity.delete() # will delete the enterprise from the server
         """
         return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_DELETE, async=async, callback=callback, response_choice=response_choice)
 
-    def save(self, async=False, callback=None):
+    def save(self, response_choice=None, async=False, callback=None):
         """ Update object and call given callback in case of async call
 
             Args:
@@ -751,7 +751,7 @@ class NURESTObject(object):
                 >>> entity.name = "My Super Object"
                 >>> entity.save() # will save the new name in the server
         """
-        return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_PUT, async=async, callback=callback)
+        return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_PUT, async=async, callback=callback, response_choice=response_choice)
 
     def fetch(self, async=False, callback=None):
         """ Fetch all information about the current object
@@ -831,8 +831,8 @@ class NURESTObject(object):
         else:
             url = self.get_resource_url()
 
-            if method == HTTP_METHOD_DELETE and response_choice is not None:
-                url += '?responseChoice=%s' % response_choice
+        if response_choice is not None:
+            url += '?responseChoice=%s' % response_choice
 
         request = NURESTRequest(method=method, url=url, data=nurest_object.to_dict())
         user_info = {'nurest_object': nurest_object, 'commit': commit}
@@ -911,7 +911,7 @@ class NURESTObject(object):
 
     # Advanced REST Operations
 
-    def create_child(self, nurest_object, async=False, callback=None, commit=True):
+    def create_child(self, nurest_object, response_choice=None, async=False, callback=None, commit=True):
         """ Add given nurest_object to the current object
 
             For example, to add a child into a parent, you can call
@@ -919,6 +919,7 @@ class NURESTObject(object):
 
             Args:
                 nurest_object (bambou.NURESTObject): the NURESTObject object to add
+                response_choice (int): Automatically send a response choice when confirmation is needed
                 async (bool): should the request be done asynchronously or not
                 callback (function): callback containing the object and the connection
 
@@ -938,9 +939,10 @@ class NURESTObject(object):
                                          method=HTTP_METHOD_POST,
                                          callback=callback,
                                          handler=self._did_create_child,
+                                         response_choice=response_choice,
                                          commit=commit)
 
-    def instantiate_child(self, nurest_object, from_template, async=False, callback=None, commit=True):
+    def instantiate_child(self, nurest_object, from_template, response_choice=None, async=False, callback=None, commit=True):
         """ Instantiate an nurest_object from a template object
 
             Args:
@@ -971,6 +973,7 @@ class NURESTObject(object):
                                          method=HTTP_METHOD_POST,
                                          callback=callback,
                                          handler=self._did_create_child,
+                                         response_choice=response_choice,
                                          commit=commit)
 
     def _did_create_child(self, connection):

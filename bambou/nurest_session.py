@@ -5,7 +5,7 @@
 
 from .nurest_login_controller import NURESTLoginController
 from .nurest_push_center import NURESTPushCenter
-from peak import context
+from bambou.contextual import context
 from bambou import bambou_logger
 from contextlib import contextmanager
 import inspect
