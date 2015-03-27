@@ -3,7 +3,6 @@ from setuptools  import setup
 setup(
     name='bambou',
     version='0.0.1',
-    url='http://www.nuagenetworks.net/',
     author='Christophe Serafin',
     author_email='christophe.serafin@nuagenetworks.net',
     packages=['bambou', 'bambou.utils', 'bambou.contextual'],
