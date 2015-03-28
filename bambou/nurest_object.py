@@ -284,7 +284,7 @@ class NURESTObject(object):
                 list: list of all fetchers
 
             Example:
-                >>> print entity.children()
+                >>> print entity.fetchers
                 [<NUSubEntitiesFetcher at xxxx>, <NUOtherEntitiesFetcher at yyyy>]
         """
         return deepcopy(self._fetchers_registry.values())
@@ -300,7 +300,7 @@ class NURESTObject(object):
 
             Example:
                 >>> entity = NUEntity()
-                >>> entity.children_rest_names()
+                >>> entity.children_rest_names
                 ["foo", "bar"]
         """
 
