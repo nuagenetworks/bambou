@@ -8,6 +8,7 @@ from .nurest_push_center import NURESTPushCenter
 from bambou.contextual import context
 from bambou import bambou_logger
 from contextlib import contextmanager
+from opcode import opname
 import inspect
 
 
@@ -142,15 +143,23 @@ class NURESTSession(object):
         self.login_controller.api_key = self._user.api_key
         bambou_logger.debug("[NURESTSession] Started session with username %s in enterprise %s" % (self.login_controller._user, self.login_controller.enterprise))
 
+    def _in_with_statement(self, frame):
+        """
+        Well, you'll have to trust me on this one.
+        """
+        return opname[ord(frame.f_code.co_code[frame.f_lasti + 3])] is "SETUP_WITH"
+
+
     def start(self):
         """
             Starts the session.
 
             Starting the session will actually get the API key of the current user
         """
-        callee = inspect.getouterframes(inspect.currentframe())[1][4][0]
 
-        if callee.lstrip().startswith("with "):  # Cases 'with','\twith'. Check with other Python versions
+        frame = inspect.stack()[1][0]
+
+        if self._in_with_statement(frame):
             return _NURESTSessionContext.new(self)
         else:
             _NURESTSessionCurrentContext.session = self
