@@ -388,6 +388,22 @@ class NURESTFetcher(list):
             connection = self.parent_object.send_request(request=request)
             return self._did_count(connection)
 
+    def get_count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None):
+        """ Get the total count of objects that can be fetched according to filter
+
+            Args:
+                filter (string): string that represents a predicate fitler (eg. name == 'x')
+                order_by (string): string that represents an order by clause
+                group_by (string): list of names for grouping
+                page (int): number of the page to load
+                page_size (int): number of results per page
+
+            Returns:
+                Returns the number of objects found
+
+        """
+        return self.count(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, async=False)[2]
+
     def _did_count(self, connection):
         """ Called when count if finished """
 

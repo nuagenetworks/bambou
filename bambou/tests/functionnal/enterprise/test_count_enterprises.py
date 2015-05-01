@@ -124,3 +124,16 @@ class Count(TestCase):
         with patch('requests.request', mock):
             with self.assertRaises(BambouHTTPError):
                 (fetcher, user, count) = self.user.enterprises.count()
+
+    def test_direct_count_all(self):
+        """ HEAD /enterprises direct count all enterprises """
+
+        user = self.user
+        headers = {'X-Nuage-Count': 4}
+
+        mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
+
+        with patch('requests.request', mock):
+            count = self.user.enterprises.get_count()
+
+        self.assertEqual(count, 4)
