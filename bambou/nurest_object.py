@@ -8,7 +8,6 @@
 # Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
 
-import inspect
 import json
 
 from copy import deepcopy
@@ -16,9 +15,7 @@ from copy import deepcopy
 from time import time
 
 from .exceptions import BambouHTTPError, InternalConsitencyError
-from .nurest_login_controller import NURESTLoginController
 from .nurest_connection import NURESTConnection, HTTP_METHOD_DELETE, HTTP_METHOD_PUT, HTTP_METHOD_POST, HTTP_METHOD_GET
-from .nurest_fetcher import NURESTFetcher
 from .nurest_request import NURESTRequest
 from .nurest_modelcontroller import NURESTModelController
 from .nurest_session import _NURESTSessionCurrentContext
@@ -305,7 +302,6 @@ class NURESTObject(object):
         """
 
         names = []
-        fetchers = self.fetchers
 
         for fetcher in self.fetchers:
             names.append(fetcher.__class__.managed_object_rest_name())
@@ -467,7 +463,6 @@ class NURESTObject(object):
         from bambou.nurest_user import NURESTBasicUser
         current_user = NURESTBasicUser.get_default_user()
         return self._owner == current_user.id
-
 
     def parent_for_matching_rest_name(self, rest_names):
         """ Return parent that matches a rest name """
@@ -776,7 +771,7 @@ class NURESTObject(object):
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
         if async:
-            self.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback)
+            return self.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback)
         else:
             connection = self.send_request(request=request)
             return self._did_retrieve(connection)
@@ -842,7 +837,7 @@ class NURESTObject(object):
 
         if async:
 
-            self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=commit)
+            return self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=commit)
         else:
             connection = self.send_request(request=request, user_info=user_info)
             return handler(connection)
@@ -982,7 +977,7 @@ class NURESTObject(object):
         response = connection.response
         try:
             connection.user_info['nurest_object'].from_dict(response.data[0])
-        except Exception as exc:
+        except Exception:
             pass
 
         return self._did_perform_standard_operation(connection)
@@ -1015,7 +1010,7 @@ class NURESTObject(object):
         user_info = {'nurest_objects': objects, 'commit': commit}
 
         if async:
-            self.send_request(request=request,
+            return self.send_request(request=request,
                               async=async,
                               local_callback=self._did_perform_standard_operation,
                               remote_callback=callback,

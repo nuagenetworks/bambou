@@ -38,7 +38,6 @@ class NURESTFetcher(list):
         self.query_string = None
         self.total_count = 0
         self._current_connection = None
-        self._transaction_id = None
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, super(NURESTFetcher, self).__repr__())
@@ -238,11 +237,9 @@ class NURESTFetcher(list):
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self._prepare_url())
 
         self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
-        self._transaction_id = uuid.uuid4().hex
 
         if async:
-            self.parent_object.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit': commit})
-            return self._transaction_id
+            return self.parent_object.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit': commit})
 
         connection = self.parent_object.send_request(request=request, user_info={'commit': commit})
         return self._did_fetch(connection=connection)
@@ -380,9 +377,7 @@ class NURESTFetcher(list):
         self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
 
         if async:
-            self._transaction_id = uuid.uuid4().hex
-            self.parent_object.send_request(request=request, async=async, local_callback=self._did_count, remote_callback=callback)
-            return self._transaction_id
+            return self.parent_object.send_request(request=request, async=async, local_callback=self._did_count, remote_callback=callback)
 
         else:
             connection = self.parent_object.send_request(request=request)

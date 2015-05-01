@@ -7,13 +7,12 @@
 #
 # Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
-
 import json
 import requests
 import threading
+import uuid
 
 from .nurest_response import NURESTResponse
-
 
 from bambou import bambou_logger
 
@@ -43,7 +42,6 @@ HTTP_METHOD_DELETE = 'DELETE'
 
 
 ## TODO: remove this at some point. this is the SSL ugly patch
-from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
 import ssl
 
@@ -81,6 +79,7 @@ class NURESTConnection(object):
         self._xhr_timeout = 3000
         self._response = None
         self._error_message = None
+        self._transaction_id = uuid.uuid4().hex
 
         self._request = request
         self._async = async
@@ -112,6 +111,16 @@ class NURESTConnection(object):
         """
 
         return self._request
+
+    @property
+    def transaction_id(self):
+        """ Get transaction ID. Read-only property
+
+            Returns:
+                Returns the transaction ID
+        """
+
+        return self._transaction_id
 
     @property
     def response(self):
@@ -382,7 +391,7 @@ class NURESTConnection(object):
             thread = threading.Thread(target=self._make_request, kwargs={'session': session})
             thread.is_daemon = False
             thread.start()
-            return
+            return self.transaction_id
 
         return self._make_request(session=session)
 
@@ -392,3 +401,4 @@ class NURESTConnection(object):
         """
         self._request = None
         self._response = None
+        self._transaction_id = uuid.uuid4().hex
