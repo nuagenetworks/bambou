@@ -27,7 +27,8 @@ class Fetch(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
-            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch()
+            (fetcher, user, enterprises) = self.user.enterprises.fetch()
+            connection = fetcher.current_connection
 
         method = MockUtils.get_mock_parameter(mock, 'method')
         url = MockUtils.get_mock_parameter(mock, 'url')
@@ -50,7 +51,8 @@ class Fetch(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
-            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch(commit=False)
+            (fetcher, user, enterprises) = self.user.enterprises.fetch(commit=False)
+            connection = fetcher.current_connection
 
         self.assertEqual(connection.response.status_code, 200)
         self.assertEqual(len(enterprises), 4)
@@ -63,7 +65,7 @@ class Fetch(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=[self.enterprises[1]])
 
         with patch('requests.request', mock):
-            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch(filter=u"name == 'Enterprise 2'")
+            (fetcher, user, enterprises) = self.user.enterprises.fetch(filter=u"name == 'Enterprise 2'")
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-Filter'], u"name == 'Enterprise 2'")
@@ -76,7 +78,7 @@ class Fetch(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
-            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch(group_by=['field1', 'field2'])
+            (fetcher, user, enterprises) = self.user.enterprises.fetch(group_by=['field1', 'field2'])
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-GroupBy'], 'true')
@@ -88,7 +90,7 @@ class Fetch(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
-            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch(order_by='name ASC')
+            (fetcher, user, enterprises) = self.user.enterprises.fetch(order_by='name ASC')
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-OrderBy'], 'name ASC')
@@ -99,7 +101,7 @@ class Fetch(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
-            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch(page=2)
+            (fetcher, user, enterprises) = self.user.enterprises.fetch(page=2)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-Page'], 2)
@@ -110,7 +112,7 @@ class Fetch(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
-            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch(page_size=10)
+            (fetcher, user, enterprises) = self.user.enterprises.fetch(page_size=10)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-PageSize'], 10)
@@ -121,7 +123,8 @@ class Fetch(TestCase):
         mock = MockUtils.create_mock_response(status_code=500, data=[], error=u"Internal error")
 
         with patch('requests.request', mock):
-            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch()
+            (fetcher, user, enterprises) = self.user.enterprises.fetch()
+            connection = fetcher.current_connection
 
         method = MockUtils.get_mock_parameter(mock, 'method')
         url = MockUtils.get_mock_parameter(mock, 'url')
@@ -137,12 +140,13 @@ class Fetch(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
-            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch()
+            (fetcher, user, enterprises) = self.user.enterprises.fetch()
 
             enterprise = self.user.enterprises[2]
             enterprise.name = u'This name should not appear because we will refetch everything!'
 
-            (fetcher, user, enterprises, connection) = self.user.enterprises.fetch()
+            (fetcher, user, enterprises) = self.user.enterprises.fetch()
+            connection = fetcher.current_connection
 
         self.assertEqual(connection.response.status_code, 200)
         self.assertEqual(fetcher, self.user.enterprises)

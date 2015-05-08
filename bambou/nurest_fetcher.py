@@ -37,7 +37,7 @@ class NURESTFetcher(list):
         self.ordered_by = ''
         self.query_string = None
         self.total_count = 0
-        self._current_connection = None
+        self.current_connection = None
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, super(NURESTFetcher, self).__repr__())
@@ -155,7 +155,7 @@ class NURESTFetcher(list):
 
             It will clear attribute of the served object
         """
-        self._current_connection = None
+        self.current_connection = None
         del self[:]
 
     def new(self):
@@ -247,7 +247,7 @@ class NURESTFetcher(list):
     def _did_fetch(self, connection):
         """ Fetching objects has been done """
 
-        self._current_connection = connection
+        self.current_connection = connection
         response = connection.response
         should_commit = 'commit' not in connection.user_info or connection.user_info['commit']
 
@@ -420,7 +420,7 @@ class NURESTFetcher(list):
             if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
                 raise BambouHTTPError(connection=connection)
 
-            return (self, self.parent_object, count, connection)
+            return (self, self.parent_object, count)
 
     def _send_content(self, content, connection):
         """ Send a content array from the connection """
@@ -431,9 +431,9 @@ class NURESTFetcher(list):
                 callback = connection.callbacks['remote']
 
                 if callback:
-                    callback(self, self.parent_object, content, connection)
+                    callback(self, self.parent_object, content)
             else:
-                return (self, self.parent_object, content, connection)
+                return (self, self.parent_object, content)
 
-            self._current_connection.reset()
-            self._current_connection = None
+            self.current_connection.reset()
+            self.current_connection = None
