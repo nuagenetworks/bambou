@@ -9,8 +9,6 @@
 # Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
 
-import uuid
-
 from .exceptions import BambouHTTPError
 from .nurest_request import NURESTRequest
 from .nurest_connection import HTTP_METHOD_GET, HTTP_METHOD_HEAD
@@ -402,6 +400,7 @@ class NURESTFetcher(list):
     def _did_count(self, connection):
         """ Called when count if finished """
 
+        self.current_connection = connection
         response = connection.response
         count = 0
         callback = None
@@ -415,6 +414,9 @@ class NURESTFetcher(list):
         if connection.async:
             if callback:
                 callback(self, self.parent_object, count)
+
+                self.current_connection.reset()
+                self.current_connection = None
         else:
 
             if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
@@ -432,8 +434,8 @@ class NURESTFetcher(list):
 
                 if callback:
                     callback(self, self.parent_object, content)
+
+                    self.current_connection.reset()
+                    self.current_connection = None
             else:
                 return (self, self.parent_object, content)
-
-            self.current_connection.reset()
-            self.current_connection = None
