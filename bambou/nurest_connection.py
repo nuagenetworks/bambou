@@ -83,7 +83,6 @@ class NURESTConnection(object):
 
         self._request = request
         self._async = async
-        self._response = None
         self._callback = callback
         self._callbacks = callbacks
         self._user_info = None
