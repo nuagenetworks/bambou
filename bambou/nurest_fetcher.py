@@ -420,7 +420,7 @@ class NURESTFetcher(list):
             if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
                 raise BambouHTTPError(connection=connection)
 
-            return (self, self.parent_object, count)
+            return (self, self.parent_object, count, connection)
 
     def _send_content(self, content, connection):
         """ Send a content array from the connection """
