@@ -33,7 +33,6 @@ class NURESTBasicUser(NURESTObject):
 
         self._api_url = None
         self._new_password = None
-        self._enterprise = None
 
         self._user_name = None
         self._password = None
@@ -80,31 +79,6 @@ class NURESTBasicUser(NURESTObject):
         """ Set API Key """
 
         self._api_key = api_key
-
-    # @property
-    # def api_url(self):
-    #     """ Get API URL """
-    #
-    #     return self._api_url
-    #
-    # @api_url.setter
-    # def api_url(self, api_url):
-    #     """ Set API Key """
-    #
-    #     self._api_url = api_url
-
-    @property
-    def enterprise(self):
-        """ Get API URL """
-
-        return self._enterprise
-
-    @enterprise.setter
-    def enterprise(self, enterprise):
-        """ Set API Key """
-
-        self._enterprise = enterprise
-
 
     # Class Methods
 
