@@ -157,7 +157,12 @@ class NURESTSession(object):
             Starting the session will actually get the API key of the current user
         """
 
-        frame = inspect.stack()[1][0]
+        try:
+            frame = inspect.stack()[1][0]
+        except IndexError:
+            _NURESTSessionCurrentContext.session = self
+            self._authenticate()
+            return self
 
         if self._in_with_statement(frame):
             return _NURESTSessionContext.new(self)
