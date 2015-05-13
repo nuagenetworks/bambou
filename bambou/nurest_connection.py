@@ -345,8 +345,6 @@ class NURESTConnection(object):
             user_name = self._user.user_name
             api_key = self._user.api_key
 
-        bambou_logger.info('Bambou has been sent with user:%s within enterprise:%s (Key=%s)' % (user_name, enterprise, api_key))
-
         if self._uses_authentication:
             self._request.set_header('X-Nuage-Organization', enterprise)
             self._request.set_header('Authorization', controller.get_authentication_header(user_name, api_key))
@@ -356,7 +354,7 @@ class NURESTConnection(object):
 
         headers = self._request.headers
 
-        bambou_logger.debug(headers)
+        bambou_logger.debug('Bambou has been sent with user:%s within enterprise:%s (Key=%s)\nHeaders: %s' % (user_name, enterprise, api_key, headers))
 
         try:  # TODO : Remove this ugly try/except after fixing Java issue: http://mvjira.mv.usa.alcatel.com/browse/VSD-546
             response = requests.request(method=self._request.method,
