@@ -30,7 +30,8 @@ class NURemoteAttribute(object):
         self._is_identifier = False
         self.min_length = None
         self.max_length = None
-        self.choices = None
+        self._choices = None
+        self.has_choices = False
         self._is_password = False
         self.is_forgetable = False
 
@@ -68,6 +69,21 @@ class NURemoteAttribute(object):
             self.is_forgetable = True
 
         self._is_password = is_password
+
+    @property
+    def choices(self):
+        """ Getter for is_identifier """
+
+        return self._choices
+
+    @choices.setter
+    def choices(self, choices):
+        """ Setter for is_identifier """
+
+        if choices is not None and len(choices) > 0:
+            self.has_choices = True
+
+        self._choices = choices
 
     # Methods
 
