@@ -20,10 +20,11 @@ class BambouHTTPError(Exception):
                 connection: the Connection object
 
         """
-        self.request = connection.request
-        self.response = connection.response
+        self.connection = connection
+        request = connection.request
+        response = connection.response
 
-        super(BambouHTTPError, self).__init__("[HTTP %s(%s)] %s" % (self.response.status_code, self.response.reason, self.response.errors))
+        super(BambouHTTPError, self).__init__("[HTTP %s(%s)] %s" % (response.status_code, response.reason, response.errors))
 
 
 class InternalConsitencyError(Exception):
