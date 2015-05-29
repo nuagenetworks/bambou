@@ -11,9 +11,7 @@
 from __future__ import print_function
 
 import logging
-import requests
 
-# requests.packages.urllib3.disable_warnings()
 bambou_logger = logging.getLogger('bambou')
 
 try:  # Python 2.7+
