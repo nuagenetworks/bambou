@@ -9,7 +9,7 @@
 # Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
 
-from .exceptions import BambouHTTPError
+from .exceptions import BambouHTTPError, InternalConsitencyError
 from .nurest_request import NURESTRequest
 from .nurest_connection import HTTP_METHOD_GET, HTTP_METHOD_HEAD
 
@@ -30,12 +30,12 @@ class NURESTFetcher(list):
 
         super(NURESTFetcher, self).__init__()
 
-        self.latest_loaded_page = 0
-        self._parent_object = None
-        self.ordered_by = ''
-        self.query_string = None
-        self.total_count = 0
         self.current_connection = None
+        self.current_ordered_by = ''
+        self.current_page = 0
+        self.current_total_count = 0
+        self.query_string = None
+        self._parent_object = None
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, super(NURESTFetcher, self).__repr__())
@@ -96,6 +96,18 @@ class NURESTFetcher(list):
         """
 
         self._parent_object = parent_object
+
+    @property
+    def transaction_id(self):
+        """ Get the transaction ID of the current connection
+
+            Returns:
+                the transaction id
+        """
+        if self.current_connection is None:
+            raise InternalConsitencyError("%s could not find a current transaction." % self)
+
+        return self.current_connection.transaction_id
 
     # Methods
 
@@ -255,9 +267,9 @@ class NURESTFetcher(list):
         if response.status_code != 200:
 
             if should_commit:
-                self.total_count = 0
-                self.latest_loaded_page = 0
-                self.ordered_by = ''
+                self.current_total_count = 0
+                self.current_page = 0
+                self.current_ordered_by = ''
 
             return self._send_content(content=None, connection=connection)
 
@@ -266,13 +278,13 @@ class NURESTFetcher(list):
 
         if should_commit:
             if 'X-Nuage-Count' in response.headers and response.headers['X-Nuage-Count']:
-                self.total_count = int(response.headers['X-Nuage-Count'])
+                self.current_total_count = int(response.headers['X-Nuage-Count'])
 
             if 'X-Nuage-Page' in response.headers and response.headers['X-Nuage-Page']:
-                self.latest_loaded_page = int(response.headers['X-Nuage-Page'])
+                self.current_page = int(response.headers['X-Nuage-Page'])
 
             if 'X-Nuage-OrderBy' in response.headers and response.headers['X-Nuage-OrderBy']:
-                self.ordered_by = response.headers['X-Nuage-OrderBy']
+                self.current_ordered_by = response.headers['X-Nuage-OrderBy']
 
         if results:
             for result in results:
