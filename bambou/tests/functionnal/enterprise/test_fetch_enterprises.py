@@ -3,6 +3,7 @@
 from unittest import TestCase
 from mock import patch
 
+from bambou.exceptions import BambouHTTPError
 from bambou.tests.utils import MockUtils
 from bambou.tests.functionnal import start_session, get_valid_enterprise
 
@@ -123,16 +124,9 @@ class Fetch(TestCase):
         mock = MockUtils.create_mock_response(status_code=500, data=[], error=u"Internal error")
 
         with patch('requests.request', mock):
-            (fetcher, user, enterprises) = self.user.enterprises.fetch()
-            connection = fetcher.current_connection
-
-        method = MockUtils.get_mock_parameter(mock, 'method')
-        url = MockUtils.get_mock_parameter(mock, 'url')
-
-        self.assertEqual(url, u'https://vsd:8443/nuage/api/v3_2/enterprises')
-        self.assertEqual(method, u'GET')
-        self.assertEqual(enterprises, None)
-        self.assertEqual(connection.response.status_code, 500)
+            with self.assertRaises(BambouHTTPError):
+                (fetcher, user, enterprises) = self.user.enterprises.fetch()
+                connection = fetcher.current_connection
 
     def test_refetch_all(self):
         """ GET /enterprises refetch all enterprises """
