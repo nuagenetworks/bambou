@@ -879,8 +879,8 @@ class NURESTObject(object):
         if connection.async:
             callback = connection.callbacks['remote']
 
-            if connection.user_info:
-                callback(connection.user_info, connection)
+            if connection.user_info and 'nurest_object' in connection.user_info:
+                callback(connection.user_info['nurest_object'], connection)
             else:
                 callback(self, connection)
         else:
