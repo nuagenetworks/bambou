@@ -837,7 +837,7 @@ class NURESTObject(object):
 
         if async:
 
-            return self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=commit)
+            return self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=user_info)
         else:
             connection = self.send_request(request=request, user_info=user_info)
             return handler(connection)
