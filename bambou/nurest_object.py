@@ -771,7 +771,7 @@ class NURESTObject(object):
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
         if async:
-            return self.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback)
+            return self.send_request(request=request, async=async, local_callback=self._did_retrieve, remote_callback=callback)
         else:
             connection = self.send_request(request=request)
             return self._did_retrieve(connection)
