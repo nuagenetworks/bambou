@@ -16,7 +16,7 @@ from time import time
 from .nurest_connection import NURESTConnection
 from .nurest_request import NURESTRequest
 
-from bambou import bambou_logger
+from bambou import pushcenter_logger
 
 
 class NURESTPushCenter(object):
@@ -80,7 +80,7 @@ class NURESTPushCenter(object):
             self._timeout = timeout
             self._start_time = int(time())
 
-        bambou_logger.debug("[NURESTPushCenter] Starting push center on url %s ..." % self.url)
+        pushcenter_logger.debug("[NURESTPushCenter] Starting push center on url %s ..." % self.url)
         self._is_running = True
         self._user = user
 
@@ -98,7 +98,7 @@ class NURESTPushCenter(object):
         if not self._is_running:
             return
 
-        bambou_logger.debug("[NURESTPushCenter] Stopping...")
+        pushcenter_logger.debug("[NURESTPushCenter] Stopping...")
 
         self._is_running = False
         self._thread = None
@@ -145,7 +145,7 @@ class NURESTPushCenter(object):
         response = connection.response
 
         if response.status_code != 200:
-            bambou_logger.error("[NURESTPushCenter]: Connection failure on %s.\nError: [%s] %s\nConnection with user %s" % (response.errors, response.status_code, response.reason, connection.user.user_name))
+            pushcenter_logger.error("[NURESTPushCenter]: Connection failure on %s.\nError: [%s] %s\nConnection with user %s" % (response.errors, response.status_code, response.reason, connection.user.user_name))
             return
 
         data = response.data
@@ -158,7 +158,7 @@ class NURESTPushCenter(object):
             self.nb_events_received += len(events)
             self.nb_push_received += 1
 
-            bambou_logger.info("[NURESTPushCenter] Received Push #%s (total=%s, latest=%s)\n%s" % (self.nb_push_received, self.nb_events_received, len(events), json.dumps(events, indent=4)))
+            pushcenter_logger.info("[NURESTPushCenter] Received Push #%s (total=%s, latest=%s)\n%s" % (self.nb_push_received, self.nb_events_received, len(events), json.dumps(events, indent=4)))
             self._last_events.extend(events)
 
         if self._is_running:
@@ -188,13 +188,13 @@ class NURESTPushCenter(object):
 
         if self._timeout:
             if int(time()) - self._start_time >= self._timeout:
-                bambou_logger.debug("[NURESTPushCenter] Timeout (timeout=%ss)." % self._timeout)
+                pushcenter_logger.debug("[NURESTPushCenter] Timeout (timeout=%ss)." % self._timeout)
                 return
 
             else:
                 connection.timeout = self._timeout
 
-        bambou_logger.info('Bambou Sending >>>>>>\n%s %s' % (request.method, request.url))
+        pushcenter_logger.info('Bambou Sending >>>>>>\n%s %s' % (request.method, request.url))
 
         #connection.ignore_request_idle = True
         connection.start()

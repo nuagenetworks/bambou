@@ -13,6 +13,7 @@ from __future__ import print_function
 import logging
 
 bambou_logger = logging.getLogger('bambou')
+pushcenter_logger = logging.getLogger('pushcenter')
 
 try:  # Python 2.7+
     from logging import NullHandler
