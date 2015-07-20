@@ -9,6 +9,7 @@
 
 
 import json
+import logging
 
 from copy import deepcopy
 
@@ -855,7 +856,14 @@ class NURESTObject(object):
         has_callbacks = connection.has_callbacks()
         should_post = not has_callbacks
 
-        bambou_logger.info('Bambou <<<<< Response for\n%s %s\n%s' % (connection._request.method, connection._request.url, json.dumps(connection._response.data, indent=4)))
+        response_code = connection._response.status_code
+        log_message = 'Bambou <<<<< Response [%s] for\n%s %s\n%s' % (response_code, connection._request.method, connection._request.url, json.dumps(connection._response.data, indent=4))
+        level = logging.INFO
+
+        if response_code >= 300:
+            level = logging.WARNING
+
+        bambou_logger.log(level, log_message)
 
         if  connection.handle_response_for_connection(should_post=should_post) and has_callbacks:
             callback = connection.callbacks['local']
