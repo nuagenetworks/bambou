@@ -772,7 +772,7 @@ class NURESTObject(object):
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
         if async:
-            return self.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback)
+            return self.send_request(request=request, async=async, local_callback=self._did_retrieve, remote_callback=callback)
         else:
             connection = self.send_request(request=request)
             return self._did_retrieve(connection)
@@ -838,7 +838,7 @@ class NURESTObject(object):
 
         if async:
 
-            return self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=commit)
+            return self.send_request(request=request, async=async, local_callback=handler, remote_callback=callback, user_info=user_info)
         else:
             connection = self.send_request(request=request, user_info=user_info)
             return handler(connection)
@@ -887,8 +887,8 @@ class NURESTObject(object):
         if connection.async:
             callback = connection.callbacks['remote']
 
-            if connection.user_info:
-                callback(connection.user_info, connection)
+            if connection.user_info and 'nurest_object' in connection.user_info:
+                callback(connection.user_info['nurest_object'], connection)
             else:
                 callback(self, connection)
         else:
