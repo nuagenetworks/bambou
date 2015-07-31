@@ -339,6 +339,7 @@ class NURESTConnection(object):
         enterprise = controller.enterprise
         user_name = controller.user
         api_key = controller.api_key
+        certificate = controller.certificate
 
         if self._user:
             enterprise = self._user.enterprise_name
@@ -357,20 +358,22 @@ class NURESTConnection(object):
         bambou_logger.debug('Bambou has been sent with user:%s within enterprise:%s (Key=%s)\nHeaders: %s' % (user_name, enterprise, api_key, headers))
 
         try:  # TODO : Remove this ugly try/except after fixing Java issue: http://mvjira.mv.usa.alcatel.com/browse/VSD-546
-            response = requests.request(method=self._request.method,
-                                      url=self._request.url,
-                                      data=json.dumps(self._request.data),
-                                      headers=headers,
-                                      verify=False,
-                                      timeout=self.timeout)
-        except requests.exceptions.SSLError:
-            try:
-                response = requests.request(method=self._request.method,
+            response = requests.request(  method=self._request.method,
                                           url=self._request.url,
                                           data=json.dumps(self._request.data),
                                           headers=headers,
                                           verify=False,
-                                          timeout=self.timeout)
+                                          timeout=self.timeout,
+                                          cert=certificate)
+        except requests.exceptions.SSLError:
+            try:
+                response = requests.request(  method=self._request.method,
+                                              url=self._request.url,
+                                              data=json.dumps(self._request.data),
+                                              headers=headers,
+                                              verify=False,
+                                              timeout=self.timeout,
+                                              cert=certificate)
             except requests.exceptions.Timeout:
                 return self._did_timeout()
 

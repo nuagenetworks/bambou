@@ -22,6 +22,7 @@ class NURESTLoginController(object):
             self._is_impersonating = False
             self._impersonation = None
 
+            self._certificate = None
             self._user = None
             self._password = None
             self._api_key = None
@@ -95,6 +96,24 @@ class NURESTLoginController(object):
         """
 
         self._password = password
+
+    @property
+    def certificate(self):
+        """ Get the certificate used for authentication
+
+            Returns:
+                Returns the certificate
+        """
+        return self._certificate
+
+    @certificate.setter
+    def certificate(self, certificate):
+        """ Set certificate to connect with
+
+            Args:
+                certificate: the certificate
+        """
+        self._certificate = certificate
 
     @property
     def api_key(self):
@@ -183,7 +202,7 @@ class NURESTLoginController(object):
 
     # Methods
 
-    def get_authentication_header(self, user=None, api_key=None, password=None):
+    def get_authentication_header(self, user=None, api_key=None, password=None, certificate=None):
         """ Return authenication string to place in Authorization Header
 
             If API Token is set, it'll be used. Otherwise, the clear
@@ -194,14 +213,23 @@ class NURESTLoginController(object):
                 Returns the XREST Authentication string with API Key or user password encoded.
         """
 
-        if user is None:
+        if not user:
             user = self.user
 
-        if api_key is None:
+        if not api_key:
             api_key = self.api_key
 
-        if password is None:
+        if not password:
             password = self.password
+
+        if not password:
+            password = self.password
+
+        if not certificate:
+            certificate = self._certificate
+
+        if certificate:
+            return "XREST %s" % urlsafe_b64encode("%s:%s" % (user, ""))
 
         if api_key:
             return "XREST %s" % urlsafe_b64encode("%s:%s" % (user, api_key))
