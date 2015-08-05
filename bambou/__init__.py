@@ -10,6 +10,12 @@
 
 from __future__ import print_function
 
+try:
+    import requests
+    requests.packages.urllib3.disable_warnings()
+except:
+    pass
+
 import logging
 
 bambou_logger = logging.getLogger('bambou')
