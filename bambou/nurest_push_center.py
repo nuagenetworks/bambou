@@ -145,25 +145,28 @@ class NURESTPushCenter(object):
         response = connection.response
 
         if response.status_code != 200:
-            pushcenter_logger.error("[NURESTPushCenter]: Connection failure on %s.\nError: [%s] %s\nConnection with user %s" % (response.errors, response.status_code, response.reason, connection.user.user_name))
-            return
+            pushcenter_logger.error("[NURESTPushCenter]: Connection failure [%s] %s" % (response.status_code, response.errors))
 
-        data = response.data
+        else:
+            data = response.data
 
-        if len(self._delegate_methods) > 0:
-            for m in self._delegate_methods:
-                m(data)
-        elif data:
-            events = data['events']
-            self.nb_events_received += len(events)
-            self.nb_push_received += 1
+            if len(self._delegate_methods) > 0:
+                for m in self._delegate_methods:
+                    try:
+                        m(data)
+                    except Exception as exc:
+                        pushcenter_logger.error("[NURESTPushCenter] Delegate method %s failed:\n%s" % (m, exc)
+            elif data:
+                events = data['events']
+                self.nb_events_received += len(events)
+                self.nb_push_received += 1
 
-            pushcenter_logger.info("[NURESTPushCenter] Received Push #%s (total=%s, latest=%s)\n%s" % (self.nb_push_received, self.nb_events_received, len(events), json.dumps(events, indent=4)))
-            self._last_events.extend(events)
+                pushcenter_logger.info("[NURESTPushCenter] Received Push #%s (total=%s, latest=%s)\n%s" % (self.nb_push_received, self.nb_events_received, len(events), json.dumps(events, indent=4)))
+                self._last_events.extend(events)
 
         if self._is_running:
             uuid = None
-            if 'uuid' in data:
+            if data and 'uuid' in data:
                 uuid = data['uuid']
 
             self._listen(uuid)
