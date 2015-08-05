@@ -155,7 +155,7 @@ class NURESTPushCenter(object):
                     try:
                         m(data)
                     except Exception as exc:
-                        pushcenter_logger.error("[NURESTPushCenter] Delegate method %s failed:\n%s" % (m, exc)
+                        pushcenter_logger.error("[NURESTPushCenter] Delegate method %s failed:\n%s" % (m, exc))
             elif data:
                 events = data['events']
                 self.nb_events_received += len(events)
