@@ -30,6 +30,7 @@ HTTP_CODE_METHOD_NOT_ALLOWED = 405
 HTTP_CODE_CONNECTION_TIMEOUT = 408
 HTTP_CODE_CONFLICT = 409
 HTTP_CODE_PRECONDITION_FAILED = 412
+HTTP_CODE_AUTHENTICATION_EXPIRED = 415
 HTTP_CODE_INTERNAL_SERVER_ERROR = 500
 HTTP_CODE_SERVICE_UNAVAILABLE = 503
 
@@ -354,25 +355,52 @@ class NURESTConnection(object):
             self._request.set_header('X-Nuage-ProxyUser', controller.impersonation)
 
         headers = self._request.headers
+        data = json.dumps(self._request.data)
 
         bambou_logger.debug('Bambou has been sent with user:%s within enterprise:%s (Key=%s)\nHeaders: %s' % (user_name, enterprise, api_key, headers))
 
+        response = self.__make_request(method=self._request.method, url=self._request.url, data=data, headers=headers, certificate=certificate)
+
+        retry_request = False
+
+        if response.status_code == HTTP_CODE_MULTIPLE_CHOICES:
+            self._request.url += '?responseChoice=1'
+            bambou_logger.info('Bambou got [%s] response. Trying to force response choice' % HTTP_CODE_MULTIPLE_CHOICES)
+            retry_request = True
+
+        elif response.status_code == HTTP_CODE_AUTHENTICATION_EXPIRED and _NURESTSessionCurrentContext.session:
+            bambou_logger.info('Bambou got [%s] response . Trying to reconnect your session that has expired' % HTTP_CODE_AUTHENTICATION_EXPIRED)
+            _NURESTSessionCurrentContext.session.reset()
+            _NURESTSessionCurrentContext.session.start()
+            retry_request = True
+
+        if retry_request:
+            response = self.__make_request(method=self._request.method, url=self._request.url, data=data, headers=headers, certificate=certificate)
+
+        return self._did_receive_response(response)
+
+    def __make_request(self, method, url, data, headers, certificate):
+        """ Encapsulate requests call
+        """
+        verify = False
+        timeout = self.timeout
+
         try:  # TODO : Remove this ugly try/except after fixing Java issue: http://mvjira.mv.usa.alcatel.com/browse/VSD-546
-            response = requests.request(  method=self._request.method,
-                                          url=self._request.url,
-                                          data=json.dumps(self._request.data),
+            response = requests.request(  method=method,
+                                          url=url,
+                                          data=data,
                                           headers=headers,
-                                          verify=False,
-                                          timeout=self.timeout,
+                                          verify=verify,
+                                          timeout=timeout,
                                           cert=certificate)
         except requests.exceptions.SSLError:
             try:
-                response = requests.request(  method=self._request.method,
-                                              url=self._request.url,
-                                              data=json.dumps(self._request.data),
+                response = requests.request(  method=method,
+                                              url=url,
+                                              data=data,
                                               headers=headers,
-                                              verify=False,
-                                              timeout=self.timeout,
+                                              verify=verify,
+                                              timeout=timeout,
                                               cert=certificate)
             except requests.exceptions.Timeout:
                 return self._did_timeout()
@@ -380,7 +408,7 @@ class NURESTConnection(object):
         except requests.exceptions.Timeout:
             return self._did_timeout()
 
-        return self._did_receive_response(response)
+        return response
 
     def start(self):
         """ Make an HTTP request with a specific method """
