@@ -1005,9 +1005,6 @@ class NURESTObject(object):
                 >>> entity.assign([entity1, entity2, entity3], NUEntity) # entity1, entity2 and entity3 are now part of the entity
         """
 
-        if len(objects) == 0:
-            return
-
         ids = list()
 
         for nurest_object in objects:
