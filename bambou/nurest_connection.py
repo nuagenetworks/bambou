@@ -365,11 +365,11 @@ class NURESTConnection(object):
 
         if response.status_code == HTTP_CODE_MULTIPLE_CHOICES:
             self._request.url += '?responseChoice=1'
-            bambou_logger.info('Bambou got [%s] response. Trying to force response choice' % HTTP_CODE_MULTIPLE_CHOICES)
+            bambou_logger.debug('Bambou got [%s] response. Trying to force response choice' % HTTP_CODE_MULTIPLE_CHOICES)
             retry_request = True
 
         elif response.status_code == HTTP_CODE_AUTHENTICATION_EXPIRED and _NURESTSessionCurrentContext.session:
-            bambou_logger.info('Bambou got [%s] response . Trying to reconnect your session that has expired' % HTTP_CODE_AUTHENTICATION_EXPIRED)
+            bambou_logger.debug('Bambou got [%s] response . Trying to reconnect your session that has expired' % HTTP_CODE_AUTHENTICATION_EXPIRED)
             _NURESTSessionCurrentContext.session.reset()
             _NURESTSessionCurrentContext.session.start()
             retry_request = True
