@@ -219,7 +219,8 @@ class NURESTSession(object):
             Returns:
                 (bool): True if the session is the current
         """
-        return self.equals(NURESTSession.get_current_session())
+        current_session = NURESTSession.get_current_session()
+        return current_session and self.equals(current_session)
 
 
 class _NURESTSessionContext (object):
