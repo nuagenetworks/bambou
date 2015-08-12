@@ -18,7 +18,6 @@ from time import time
 from .exceptions import BambouHTTPError, InternalConsitencyError
 from .nurest_connection import NURESTConnection, HTTP_METHOD_DELETE, HTTP_METHOD_PUT, HTTP_METHOD_POST, HTTP_METHOD_GET
 from .nurest_request import NURESTRequest
-from .nurest_modelcontroller import NURESTModelController
 from .nurest_session import _NURESTSessionCurrentContext
 from .utils import NURemoteAttribute
 
@@ -106,9 +105,6 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
         self._fetchers_registry = dict()
-
-        model_controller = NURESTModelController.get_default()
-        model_controller.register_model(self.__class__)
 
     def _compute_args(self, data=dict(), **kwargs):
         """ Compute the arguments

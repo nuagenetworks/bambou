@@ -8,29 +8,14 @@
 # Alcatel-Lucent is a trademark of Alcatel-Lucent, Inc.
 
 
-from .utils.singleton import Singleton
 
-
-class NURESTModelController(Singleton):
+class NURESTModelController(object):
     """ Access any object via its remote name """
 
-    __default_controller = None
-
-    def __init__(self):
-        """ Initializes the Model controller """
-
-        self._model_registry = dict()
+    _model_registry = dict()
 
     @classmethod
-    def get_default(cls):
-        """ Get default controller """
-
-        if not cls.__default_controller:
-            cls.__default_controller = cls()
-
-        return cls.__default_controller
-
-    def register_model(self, model):
+    def register_model(cls, model):
         """
             Register a model class according to its remote name
 
@@ -40,13 +25,14 @@ class NURESTModelController(Singleton):
 
         rest_name = model.rest_name
 
-        if rest_name not in self._model_registry:
-            self._model_registry[rest_name] = [model]
+        if rest_name not in cls._model_registry:
+            cls._model_registry[rest_name] = [model]
 
-        elif model not in self._model_registry[rest_name]:
-            self._model_registry[rest_name].append(model)
+        elif model not in cls._model_registry[rest_name]:
+            cls._model_registry[rest_name].append(model)
 
-    def get_models(self, rest_name):
+    @classmethod
+    def get_models(cls, rest_name):
         """ Retrieve all models from a given remote name
 
             Args:
@@ -57,19 +43,20 @@ class NURESTModelController(Singleton):
                 An empty list if no entries found for the remote name
         """
 
-        if rest_name in self._model_registry:
-            return self._model_registry[rest_name]
+        if rest_name in cls._model_registry:
+            return cls._model_registry[rest_name]
 
         return []
 
-    def get_first_model(self, rest_name):
+    @classmethod
+    def get_first_model(cls, rest_name):
         """ Get the first model corresponding to a rest_name
 
             Args:
                 rest_name: the remote name
         """
 
-        models = self.get_models(rest_name)
+        models = cls.get_models(rest_name)
 
         if len(models) > 0:
             return models[0]
