@@ -665,6 +665,37 @@ class NURESTObject(object):
 
     # Compression / Decompression
 
+    def copy(self):
+        """ Returns a copy of the current object
+
+            Returns:
+                A copy of the given object
+
+            Example::
+                >>> print entity.to_dict()
+                <Entity object at 0x10b9d4910>
+
+        """
+
+        copy = self.__class__()
+
+        for local_name, attribute in self._attributes.iteritems():
+            value = getattr(self, local_name)
+
+            if isinstance(value, NURESTObject):
+                value = value.to_dict()
+
+            if isinstance(value, list) and len(value) > 0 and isinstance(value[0], NURESTObject):
+                tmp = list()
+                for obj in value:
+                    tmp.append(obj.to_dict())
+
+                value = tmp
+
+            setattr(copy, local_name, value)
+
+        return copy
+
     def to_dict(self):
         """ Converts the current object into a Dictionary using all exposed ReST attributes.
 

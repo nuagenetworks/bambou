@@ -222,6 +222,18 @@ class AttributeTests(TestCase):
         self.assertEqual(len(enterprise.errors), 1)
         self.assertIn("allowed_forwarding_classes", enterprise.errors)
 
+class CopyTests(TestCase):
+
+    def test_copy(self):
+        """ Copy instance """
+
+        enterprise = Enterprise(id=u'4', name=u'enterprise')
+
+        enterprise_copy = enterprise.copy()
+
+        self.assertNotEqual(enterprise, enterprise_copy)
+        self.assertEqual(enterprise.to_dict(), enterprise_copy.to_dict())
+
 class ComparisonTests(TestCase):
 
     def test_compare_instance(self):
