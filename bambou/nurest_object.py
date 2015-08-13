@@ -94,6 +94,7 @@ class NURESTObject(object):
         self._last_updated_date = None
         self._is_dirty = False
 
+        self._attribute_errors = dict()
         self._attributes = dict()
 
         self.expose_attribute(local_name=u'id', remote_name=u'ID', attribute_type=str, is_identifier=True)
@@ -367,14 +368,14 @@ class NURESTObject(object):
                 store error in errors dict.
 
         """
-        self.errors = dict()
+        self._attribute_errors = dict()  # Reset validation errors
 
         for local_name, attribute in self._attributes.iteritems():
 
             value = getattr(self, local_name, None)
 
             if value is None and attribute.is_required:
-                self.errors[local_name] = 'Attribute %s is required' % (local_name)
+                self._attribute_errors[local_name] = 'Attribute %s is required' % (local_name)
                 continue
 
             if value is None:
@@ -382,22 +383,34 @@ class NURESTObject(object):
 
             if type(value) != attribute.attribute_type:
                 if attribute.attribute_type != str or type(value) != unicode:
-                    self.errors[local_name] = 'Attribute %s is not of type %s' % (local_name, attribute.attribute_type)
+                    self._attribute_errors[local_name] = 'Attribute %s is not of type %s' % (local_name, attribute.attribute_type)
                     continue
 
             if attribute.min_length and len(value) < attribute.min_length:
-                self.errors[local_name] = 'Attribute %s length is too short (minimum=%s)' % (local_name, attribute.min_length)
+                self._attribute_errors[local_name] = 'Attribute %s length is too short (minimum=%s)' % (local_name, attribute.min_length)
                 continue
 
             if attribute.max_length and len(value) > attribute.max_length:
-                self.errors[local_name] = 'Attribute %s length is too long (maximum=%s)' % (local_name, attribute.max_length)
+                self._attribute_errors[local_name] = 'Attribute %s length is too long (maximum=%s)' % (local_name, attribute.max_length)
                 continue
 
             if attribute.choices and value not in attribute.choices:
-                self.errors[local_name] = 'Attribute %s is not a valid option (choices=%s)' % (local_name, attribute.choices)
+                self._attribute_errors[local_name] = 'Attribute %s is not a valid option (choices=%s)' % (local_name, attribute.choices)
                 continue
 
+        return self.is_valid()
+
+    def is_valid(self):
+        """
+        """
         return len(self.errors) == 0
+
+    @property
+    def errors(self):
+        """
+        """
+        return self._attribute_errors
+
 
     def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False):
         """ Expose local_name as remote_name
