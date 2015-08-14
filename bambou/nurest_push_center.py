@@ -18,6 +18,20 @@ from .nurest_request import NURESTRequest
 
 from bambou import pushcenter_logger
 
+class StoppableThread(threading.Thread):
+    """Thread class with a stop() method. The thread itself has to check
+    regularly for the stopped() condition."""
+
+    def __init__(self, *args, **kwargs):
+        super(StoppableThread, self).__init__(*args, **kwargs)
+        self._stop = threading.Event()
+
+    def stop(self):
+        self._stop.set()
+
+    def stopped(self):
+        return self._stop.isSet()
+
 
 class NURESTPushCenter(object):
     """ Push center wait for push notifications.
@@ -88,7 +102,7 @@ class NURESTPushCenter(object):
         current_session = NURESTSession.get_current_session()
         args_session = {'session': current_session}
 
-        self._thread = threading.Thread(target=self._listen, name='push-center', kwargs=args_session)
+        self._thread = StoppableThread(target=self._listen, name='push-center', kwargs=args_session)
         self._thread.daemon = True
         self._thread.start()
 
@@ -100,8 +114,10 @@ class NURESTPushCenter(object):
 
         pushcenter_logger.debug("[NURESTPushCenter] Stopping...")
 
+        self._thread.stop()
+        self._thread.join()
+
         self._is_running = False
-        self._thread = None
         self._current_connection = None
         self._start_time = None
         self._timeout = None
@@ -187,7 +203,7 @@ class NURESTPushCenter(object):
         request = NURESTRequest(method='GET', url=events_url)
 
         # Force async to False so the push center will have only 1 thread running
-        connection = NURESTConnection(request=request, async=False, callback=self._did_receive_event, user=self._user)
+        connection = NURESTConnection(request=request, async=True, callback=self._did_receive_event, user=self._user)
 
         if self._timeout:
             if int(time()) - self._start_time >= self._timeout:
