@@ -44,7 +44,7 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Topic :: Utilities",
-        "License :: License :: OSI Approved :: BSD License",
+        "License :: OSI Approved :: BSD License",
         "Environment :: Console",
         "Intended Audience :: Developers"
     ]
