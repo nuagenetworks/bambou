@@ -10,7 +10,7 @@ Bends but does not break!
 `Bambou` can not be used as is, and it's mainly used by the Nuage Networks' `vsdk` and `vspk`.
 
 
-# Licence
+# License
 
 Copyright (c) 2015, Alcatel-Lucent Inc.
 All rights reserved.
