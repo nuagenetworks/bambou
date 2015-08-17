@@ -42,9 +42,9 @@ setup(
     license='BSD-3',
     url='https://github.com/nuagenetworks',
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Utilities",
-        "License :: Other/Proprietary License",
+        "License :: License :: OSI Approved :: BSD License",
         "Environment :: Console",
         "Intended Audience :: Developers"
     ]
