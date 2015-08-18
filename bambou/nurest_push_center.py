@@ -177,6 +177,7 @@ class NURESTPushCenter(object):
             return
 
         response = connection.response
+        data = None
 
         if response.status_code != 200:
             pushcenter_logger.error("[NURESTPushCenter]: Connection failure [%s] %s" % (response.status_code, response.errors))
