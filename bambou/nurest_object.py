@@ -73,7 +73,7 @@ class NUMetaRESTObject(type):
             else:
                 rest_name += "s"
 
-        elif last_letter != "s":
+        elif last_letter != "s" or rest_name == 'vrs':
             rest_name += "s"
 
         return rest_name
