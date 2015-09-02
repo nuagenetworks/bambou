@@ -12,6 +12,7 @@ class Enterprise(NURESTObject):
     """ Creates a enterprise object for tests """
 
     __rest_name__ = "enterprise"
+    __resource_name__ = "enterprises"
 
     def __init__(self, name=u'NuageNetworks', **kwargs):
         """ Creates a new Enterprise
@@ -54,6 +55,7 @@ class EnterprisesFetcher(NURESTFetcher):
 class Group(NURESTObject):
 
     __rest_name__ = "group"
+    __resource_name__ = "groups"
 
     def __init__(self, **kwargs):
         """ Creates a group """
@@ -84,6 +86,7 @@ class GroupsFetcher(NURESTFetcher):
 class Employee(NURESTObject):
 
     __rest_name__ = "user"
+    __resource_name__ = "users"
 
     def __init__(self, **kwargs):
         """ Creates an employee """

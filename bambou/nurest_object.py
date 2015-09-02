@@ -44,39 +44,31 @@ from bambou.config import BambouConfig
 
 
 class NUMetaRESTObject(type):
-
+    """
+    """
     @property
     def rest_name(cls):
+        """ Represents a singular REST name
+        """
         if cls.__name__ == "NURESTBasicUser" or cls.__name__ == "NURESTObject":
             return "Not Implemented"
 
         if cls.__rest_name__ is None:
-            raise NotImplementedError('%s has no defined name. Implements rest_name property first.' % cls)
+            raise NotImplementedError('%s has no defined name. Implement rest_name property first.' % cls)
+
         return cls.__rest_name__
 
     @property
     def rest_resource_name(cls):
-        rest_name = cls.rest_name
-
+        """ Represents the resource name
+        """
         if cls.is_resource_name_fixed():
-            return rest_name
+            return cls.rest_name
 
-        last_letter = rest_name[-1]
+        if cls.__resource_name__ is None:
+            raise NotImplementedError('%s has no defined resource name. Implement resource_name property first.' % cls)
 
-        if last_letter == "y":
-
-            vowels = ['a', 'e', 'i', 'o', 'u', 'y']
-
-            if rest_name[-2].lower() not in vowels:
-                rest_name = rest_name[:len(rest_name) - 1]
-                rest_name += "ies"
-            else:
-                rest_name += "s"
-
-        elif last_letter != "s":
-            rest_name += "s"
-
-        return rest_name
+        return cls.__resource_name__
 
 
 class NURESTObject(object):
@@ -86,6 +78,7 @@ class NURESTObject(object):
 
     __metaclass__ = NUMetaRESTObject
     __rest_name__ = None
+    __resource_name__ = None
 
     def __init__(self):
         """ Initializes the object with general information
@@ -428,7 +421,6 @@ class NURESTObject(object):
         """
         """
         return self._attribute_errors
-
 
     def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False):
         """ Expose local_name as remote_name
@@ -900,7 +892,6 @@ class NURESTObject(object):
         else:
             connection = self.send_request(request=request, user_info=user_info)
             return handler(connection)
-
 
     # REST Operation handlers
 
