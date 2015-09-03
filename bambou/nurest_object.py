@@ -62,6 +62,9 @@ class NUMetaRESTObject(type):
     def rest_resource_name(cls):
         """ Represents the resource name
         """
+        if cls.__name__ == "NURESTBasicUser" or cls.__name__ == "NURESTObject":
+            return "Not Implemented"
+
         if cls.is_resource_name_fixed():
             return cls.rest_name
 
