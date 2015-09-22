@@ -70,7 +70,7 @@ class NURESTPushCenter(object):
         self.nb_events_received = 0
         self.nb_push_received = 0
         self._thread = None
-        self._user = None
+        self._root_object = None
         self._start_time = None
         self._timeout = None
         self._delegate_methods = list()
@@ -97,12 +97,12 @@ class NURESTPushCenter(object):
 
     # Control Methods
 
-    def start(self, timeout=None, user=None):
+    def start(self, timeout=None, root_object=None):
         """ Starts listening to events.
 
             Args:
                 timeout (int): number of seconds before timeout. Used for testing purpose only.
-                user (bambou.NURESTBasicUser): NURESTBasicUser object that is listening. Used for testing purpose only.
+                root_object (bambou.NURESTRootObject): NURESTRootObject object that is listening. Used for testing purpose only.
         """
 
         if self._is_running:
@@ -114,7 +114,7 @@ class NURESTPushCenter(object):
 
         pushcenter_logger.debug("[NURESTPushCenter] Starting push center on url %s ..." % self.url)
         self._is_running = True
-        self._user = user
+        self.__root_object = root_object
 
         from .nurest_session import NURESTSession
         current_session = NURESTSession.get_current_session()
@@ -222,7 +222,7 @@ class NURESTPushCenter(object):
         request = NURESTRequest(method='GET', url=events_url)
 
         # Force async to False so the push center will have only 1 thread running
-        connection = NURESTConnection(request=request, async=True, callback=self._did_receive_event, user=self._user)
+        connection = NURESTConnection(request=request, async=True, callback=self._did_receive_event, root_object=self._root_object)
 
         if self._timeout:
             if int(time()) - self._start_time >= self._timeout:

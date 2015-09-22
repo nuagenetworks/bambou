@@ -137,7 +137,7 @@ class NURESTLoginController(object):
     def api_key(self):
         """ Get API Key
 
-            API Key is available when NURESTUser has been fetched.
+            API Key is available when root api has been fetched.
 
             Returns:
                 Returns the string containing the API Key

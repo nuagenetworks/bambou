@@ -80,7 +80,7 @@ PoolManager.__init__ = sslwrap(PoolManager.__init__)
 class NURESTConnection(object):
     """ Connection that enable HTTP requests """
 
-    def __init__(self, request, async, callback=None, callbacks=dict(), user=None):
+    def __init__(self, request, async, callback=None, callbacks=dict(), root_object=None):
         """ Intializes a new connection for a given request
 
             NURESTConnection object is in charge of the HTTP call. It relies on request library
@@ -106,7 +106,7 @@ class NURESTConnection(object):
         self._callbacks = callbacks
         self._user_info = None
         self._object_last_action_timer = None
-        self._user = user
+        self._root_object = root_object
 
     # Properties
 
@@ -360,10 +360,10 @@ class NURESTConnection(object):
         api_key = controller.api_key
         certificate = controller.certificate
 
-        if self._user:
-            enterprise = self._user.enterprise_name
-            user_name = self._user.user_name
-            api_key = self._user.api_key
+        if self._root_object:
+            enterprise = self._root_object.enterprise_name
+            user_name = self._root_object.user_name
+            api_key = self._root_object.api_key
 
         if self._uses_authentication:
             self._request.set_header('X-Nuage-Organization', enterprise)

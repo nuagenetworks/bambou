@@ -105,7 +105,7 @@ class NURESTSession(object):
             Returns the user of the session
 
             Returns:
-                (bambou.NURESTBasicUser): the REST user
+                (bambou.NURESTRootObject): the REST user
         """
         return self._user
 
@@ -124,13 +124,13 @@ class NURESTSession(object):
 
     def create_rest_user(self):
         """
-            Create a :class:`bambou.NURESTBasicUser`.
+            Create a :class:`bambou.NURESTRootObject`.
 
             This method *MUST* be overriden by subclasses in order to provide
-            a valid :class:`bambou.NURESTBasicUser`.
+            a valid :class:`bambou.NURESTRootObject`.
 
             Returns:
-                A instance of a subclass of :class:`bambou.NURESTBasicUser`
+                A instance of a subclass of :class:`bambou.NURESTRootObject`
         """
         raise NotImplementedError('%s must define method def create_rest_user(self).' % self)
 

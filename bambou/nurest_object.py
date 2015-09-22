@@ -50,7 +50,7 @@ class NUMetaRESTObject(type):
     def rest_name(cls):
         """ Represents a singular REST name
         """
-        if cls.__name__ == "NURESTBasicUser" or cls.__name__ == "NURESTObject":
+        if cls.__name__ == "NURESTRootObject" or cls.__name__ == "NURESTObject":
             return "Not Implemented"
 
         if cls.__rest_name__ is None:
@@ -62,7 +62,7 @@ class NUMetaRESTObject(type):
     def rest_resource_name(cls):
         """ Represents the resource name
         """
-        if cls.__name__ == "NURESTBasicUser" or cls.__name__ == "NURESTObject":
+        if cls.__name__ == "NURESTRootObject" or cls.__name__ == "NURESTObject":
             return "Not Implemented"
 
         if cls.is_resource_name_fixed():
@@ -483,9 +483,9 @@ class NURESTObject(object):
     def is_owned_by_current_user(self):
         """ Check if the current user owns the object """
 
-        from bambou.nurest_user import NURESTBasicUser
-        current_user = NURESTBasicUser.get_default_user()
-        return self._owner == current_user.id
+        from bambou.nurest_root_object import NURESTRootObject
+        root_object = NURESTRootObject.get_default_root_object()
+        return self._owner == root_object.id
 
     def parent_for_matching_rest_name(self, rest_names):
         """ Return parent that matches a rest name """

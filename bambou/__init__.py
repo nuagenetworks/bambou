@@ -48,10 +48,10 @@ except ImportError:
 
 bambou_logger.addHandler(NullHandler())
 
-__all__ = ['NURESTBasicUser', 'NURESTConnection', 'NURESTModelController', 'NURESTFetcher', 'NURESTLoginController', 'NURESTObject', 'NURESTPushCenter', 'NURESTRequest', 'NURESTResponse', 'NURESTSession']
+__all__ = ['NURESTRootObject', 'NURESTConnection', 'NURESTModelController', 'NURESTFetcher', 'NURESTLoginController', 'NURESTObject', 'NURESTPushCenter', 'NURESTRequest', 'NURESTResponse', 'NURESTSession']
 
 from bambou.nurest_session import NURESTSession
-from bambou.nurest_user import NURESTBasicUser
+from bambou.nurest_root_object import NURESTRootObject
 from bambou.nurest_connection import NURESTConnection
 from bambou.nurest_fetcher import NURESTFetcher
 from bambou.nurest_login_controller import NURESTLoginController

@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from bambou import NURESTObject, NURESTBasicUser, NURESTFetcher, NURESTSession
+from bambou import NURESTObject, NURESTRootObject, NURESTFetcher, NURESTSession
 from bambou.config import BambouConfig
 
 BambouConfig.set_should_raise_bambou_http_error(True)
@@ -116,7 +116,7 @@ class EmployeesFetcher(NURESTFetcher):
         return Employee
 
 
-class User(NURESTBasicUser):
+class User(NURESTRootObject):
 
     __rest_name__ = "me"
 
