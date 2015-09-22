@@ -174,7 +174,7 @@ class User(NURESTRootObject):
 
 class NURESTTestSession(NURESTSession):
 
-    def create_rest_user(self):
+    def create_root_objec(self):
         """ Creates a new user
 
         """

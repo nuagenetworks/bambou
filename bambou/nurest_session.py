@@ -23,7 +23,7 @@ class NURESTSession(object):
         NURESTSession supports the `with` statement.
 
         Note:
-            NURESTSession *must* be subclassed, and the subclass *must* implement :class:`bambou.NURESTSession.create_rest_user`
+            NURESTSession *must* be subclassed, and the subclass *must* implement :class:`bambou.NURESTSession.create_root_object`
 
         Example:
             >>> mainsession =  NUMySession(username="csproot", password="csproot", enterprise="csp", api_url="https://vsd:8443", version="3.2")
@@ -52,7 +52,7 @@ class NURESTSession(object):
                 >>> mainsession =  NUMySession(username="csproot", password="csproot", enterprise="csp", api_url="https://vsd:8443", version="3.2")
 
         """
-        self._user = None
+        self._root_object = None
         self._login_controller = NURESTLoginController()
         self._login_controller.user = username
         self._login_controller.password = password
@@ -100,29 +100,29 @@ class NURESTSession(object):
         return self._login_controller
 
     @property
-    def user(self):
+    def root_object(self):
         """
-            Returns the user of the session
+            Returns the root object of the session
 
             Returns:
-                (bambou.NURESTRootObject): the REST user
+                (bambou.NURESTRootObject): the root object
         """
-        return self._user
+        return self._root_object
 
     @property
     def is_impersonating(self):
         """ Returns True if the session is currently impersonating
-            a user
+            a root object
 
             Returns:
-                (bool): a boolean that indicate if the session is impersonating a user
+                (bool): a boolean that indicate if the session is impersonating a root object
 
         """
         return self._login_controller.is_impersonating
 
     # Methods
 
-    def create_rest_user(self):
+    def create_root_object(self):
         """
             Create a :class:`bambou.NURESTRootObject`.
 
@@ -132,16 +132,16 @@ class NURESTSession(object):
             Returns:
                 A instance of a subclass of :class:`bambou.NURESTRootObject`
         """
-        raise NotImplementedError('%s must define method def create_rest_user(self).' % self)
+        raise NotImplementedError('%s must define method def create_root_object(self).' % self)
 
     def _authenticate(self):
 
-        if self._user is None:
-            self._user = self.create_rest_user()
-            self._user.fetch()
+        if self._root_object is None:
+            self._root_object = self.create_root_object()
+            self._root_object.fetch()
 
-        self.login_controller.api_key = self._user.api_key
-        bambou_logger.debug("[NURESTSession] Started session with username %s in enterprise %s" % (self.login_controller._user, self.login_controller.enterprise))
+        self.login_controller.api_key = self._root_object.api_key
+        bambou_logger.debug("[NURESTSession] Started session with username %s in enterprise %s" % (self.login_controller.user, self.login_controller.enterprise))
 
     def _in_with_statement(self, frame):
         """
@@ -179,7 +179,7 @@ class NURESTSession(object):
             /me request will be reissued.
         """
 
-        self._user = None
+        self._root_object = None
         self.login_controller.api_key = None
 
     def impersonate(self, username, enterprise):
