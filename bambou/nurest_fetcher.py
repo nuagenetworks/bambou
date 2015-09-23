@@ -350,7 +350,7 @@ class NURESTFetcher(list):
                 >>> print entity.children.get()
                 [<NUChildren at xxx>, <NUChildren at yyyy>, <NUChildren at zzz>]
         """
-        return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, commit=False)[2]
+        return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, commit=commit)[2]
 
     def get_first(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
         """ Fetch object and directly return the first one
