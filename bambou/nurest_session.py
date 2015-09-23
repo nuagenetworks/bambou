@@ -38,7 +38,7 @@ class NURESTSession(object):
             [<NUEntity at 2>]
     """
 
-    def __init__(self, username, password, enterprise, api_url, version, certificate=None):
+    def __init__(self, username, password, enterprise, api_url, api_prefix, version, certificate=None):
         """ Initializes a new sesssion
 
             Args:
@@ -59,7 +59,7 @@ class NURESTSession(object):
         self._login_controller.certificate = certificate
         self._login_controller.user_name = username
         self._login_controller.enterprise = enterprise
-        self._login_controller.url = '%s/nuage/api/v%s' % (api_url, str(version).replace('.', '_'))
+        self._login_controller.url = '%s/%s/v%s' % (api_url, api_prefix, str(version).replace('.', '_'))
 
         self._push_center = NURESTPushCenter()
         self._push_center.url = self._login_controller.url
