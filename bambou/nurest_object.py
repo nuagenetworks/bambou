@@ -690,24 +690,7 @@ class NURESTObject(object):
 
         """
 
-        copy = self.__class__()
-
-        for local_name, attribute in self._attributes.iteritems():
-            value = getattr(self, local_name)
-
-            if isinstance(value, NURESTObject):
-                value = value.to_dict()
-
-            if isinstance(value, list) and len(value) > 0 and isinstance(value[0], NURESTObject):
-                tmp = list()
-                for obj in value:
-                    tmp.append(obj.to_dict())
-
-                value = tmp
-
-            setattr(copy, local_name, value)
-
-        return copy
+        return self.__class__(data=self.to_dict())
 
     def to_dict(self):
         """ Converts the current object into a Dictionary using all exposed ReST attributes.
