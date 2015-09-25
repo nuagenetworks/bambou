@@ -28,11 +28,9 @@
 import os
 from setuptools  import setup
 
-version = os.environ.get("BAMBOU_VERSION", "1.0.0")
-
 setup(
     name='bambou',
-    version=version,
+    version='1.0.1',
     author='Christophe Serafin, Antoine Mercadal',
     author_email='christophe.serafin@nuagenetworks.net, antoine@nuagenetworks.net',
     packages=['bambou', 'bambou.utils', 'bambou.contextual'],
@@ -40,7 +38,7 @@ setup(
     long_description=open('README.md').read(),
     install_requires=[line for line in open('requirements.txt')],
     license='BSD-3',
-    url='https://github.com/nuagenetworks',
+    url='https://github.com/nuagenetworks/bambou',
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Topic :: Utilities",
