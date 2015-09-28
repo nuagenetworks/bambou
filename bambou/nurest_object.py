@@ -88,7 +88,6 @@ class NURESTObject(object):
 
             Args:
                 creation_date: datetime when the object as been created
-                external_id: external identifier of the object
                 id: identifier of the object
                 local_id: internal identifier of the object
                 owner: string representing the owner
@@ -97,15 +96,12 @@ class NURESTObject(object):
         """
 
         self._creation_date = None
-        self._external_id = None
         self._id = None
         self._local_id = None
         self._owner = None
         self._parent_id = None
         self._parent_type = None
         self._parent = None
-        self._last_updated_by = None
-        self._last_updated_date = None
         self._is_dirty = False
 
         self._attribute_errors = dict()
@@ -116,8 +112,6 @@ class NURESTObject(object):
         self.expose_attribute(local_name=u'parent_type', remote_name=u'parentType', attribute_type=str)
         self.expose_attribute(local_name=u'creation_date', remote_name=u'creationDate', attribute_type=time, is_editable=False)
         self.expose_attribute(local_name=u'owner', attribute_type=str, is_readonly=True)
-        self.expose_attribute(local_name=u'last_updated_date', remote_name=u'lastUpdatedDate', attribute_type=time, is_readonly=True)
-        self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
         self._fetchers_registry = dict()
 
@@ -156,18 +150,6 @@ class NURESTObject(object):
         """ Set creation date """
 
         self._creation_date = creation_date
-
-    @property
-    def external_id(self):
-        """ Get external id """
-
-        return self._external_id
-
-    @external_id.setter
-    def external_id(self, external_id):
-        """ Set external id """
-
-        self._external_id = external_id
 
     @property
     def id(self):
@@ -240,30 +222,6 @@ class NURESTObject(object):
         """ Set parent id """
 
         self._parent = parent
-
-    @property
-    def last_updated_by(self):
-        """ Get last updated by user id info """
-
-        return self._last_updated_by
-
-    @last_updated_by.setter
-    def last_updated_by(self, user_id):
-        """ Set last updated by user id info """
-
-        self._last_updated_by = user_id
-
-    @property
-    def last_updated_date(self):
-        """ Get last updated date """
-
-        return self._last_updated_date
-
-    @last_updated_date.setter
-    def last_updated_date(self, update_date):
-        """ Set last updated by user id info """
-
-        self._last_updated_date = update_date
 
     @property
     def rest_name(self):
