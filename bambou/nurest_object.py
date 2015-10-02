@@ -305,8 +305,7 @@ class NURESTObject(object):
         name = self.__class__.rest_resource_name
         url = self.__class__.rest_base_url()
 
-        from nurest_root_object import NURESTRootObject
-        if not isinstance(self, NURESTRootObject) and self.id is not None:
+        if self.id is not None:
             return "%s/%s/%s" % (url, name, self.id)
 
         return "%s/%s" % (url, name)
@@ -315,6 +314,7 @@ class NURESTObject(object):
         """ Get the resource url for the nurest_object type """
 
         return "%s/%s" % (self.get_resource_url(), nurest_object_type.rest_resource_name)
+
 
     def __str__(self):
         """ Prints a NURESTObject """
