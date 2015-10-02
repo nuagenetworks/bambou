@@ -32,7 +32,7 @@ class Update(TestCase):
         headers = MockUtils.get_mock_parameter(mock, 'headers')
 
         self.assertEqual(connection.response.status_code, 204)
-        self.assertEqual(url, u'https://vsd:8443/nuage/api/v3_2/me')
+        self.assertEqual(url, u'https://vsd:8443/api/v3_2/me')
         self.assertEqual(method, u'PUT')
         self.assertEqual(headers['Authorization'], u'XREST dXNlcjp0ZXN0')
         self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')

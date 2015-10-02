@@ -35,7 +35,7 @@ class Fetch(TestCase):
         url = MockUtils.get_mock_parameter(mock, 'url')
         headers = MockUtils.get_mock_parameter(mock, 'headers')
 
-        self.assertEqual(url, u'https://vsd:8443/nuage/api/v3_2/enterprises')
+        self.assertEqual(url, u'https://vsd:8443/api/v3_2/enterprises')
         self.assertEqual(method, u'GET')
         self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
         self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')

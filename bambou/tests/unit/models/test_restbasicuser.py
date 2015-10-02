@@ -15,11 +15,11 @@ class GetUserTests(TestCase):
 
     def test_get_rest_name(self):
         """ Get user REST name """
-        session = start_session(username="user", password="password", enterprise="Alcatel", api_url="https://example.com", version="3.0")
+        session = start_session(username="user", password="password", enterprise="Alcatel", api_url="https://example.com", version="3.0", api_prefix="api")
 
         user = User()
         self.assertEquals(user.rest_name, 'me')
-        self.assertEquals(user.get_resource_url(), 'https://example.com/nuage/api/v3_0/me')
+        self.assertEquals(user.get_resource_url(), 'https://example.com/api/v3_0/me')
 
     def test_rest_resource_name(self):
         """ Get user resource name """
@@ -30,13 +30,13 @@ class GetUserTests(TestCase):
         """ Get user resource url """
 
         user = User()
-        self.assertEquals(user.get_resource_url(), u'https://vsd:8443/nuage/api/v3_2/me')
+        self.assertEquals(user.get_resource_url(), u'https://vsd:8443/api/v3_2/me')
 
     def test_get_resource_url_for_child_type(self):
         """ Get user for child type """
 
         user = User()
-        self.assertEquals(user.get_resource_url_for_child_type(Enterprise), u'https://vsd:8443/nuage/api/v3_2/enterprises')
+        self.assertEquals(user.get_resource_url_for_child_type(Enterprise), u'https://vsd:8443/api/v3_2/enterprises')
 
 
 class CompressionTests(TestCase):

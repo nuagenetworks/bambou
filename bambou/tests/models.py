@@ -119,6 +119,7 @@ class EmployeesFetcher(NURESTFetcher):
 class User(NURESTRootObject):
 
     __rest_name__ = "me"
+    __resource_name__ = "me"
 
     def __init__(self, **kwargs):
         """ Creates a new user
@@ -153,12 +154,6 @@ class User(NURESTRootObject):
 
         self._compute_args(**kwargs)
 
-    @classmethod
-    def is_resource_name_fixed(cls):
-        """ Boolean to say if the resource name should be fixed. Default is False """
-
-        return True
-
     def get_resource_url(self):
         """ Get resource complete url """
 
@@ -174,7 +169,7 @@ class User(NURESTRootObject):
 
 class NURESTTestSession(NURESTSession):
 
-    def create_root_objec(self):
+    def create_root_object(self):
         """ Creates a new user
 
         """

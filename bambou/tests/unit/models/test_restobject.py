@@ -35,7 +35,7 @@ class GetResourceTests(TestCase):
 
         enterprise = Enterprise()
         enterprise.id = 4
-        self.assertEquals(enterprise.get_resource_url(), u'https://vsd:8443/nuage/api/v3_2/enterprises/4')
+        self.assertEquals(enterprise.get_resource_url(), u'https://vsd:8443/api/v3_2/enterprises/4')
 
     def test_get_resource_base_url(self):
         """ Get object resource base url """
@@ -47,7 +47,7 @@ class GetResourceTests(TestCase):
 
         enterprise = Enterprise()
         enterprise.id = 4
-        self.assertEquals(enterprise.get_resource_url_for_child_type(Enterprise), u'https://vsd:8443/nuage/api/v3_2/enterprises/4/enterprises')
+        self.assertEquals(enterprise.get_resource_url_for_child_type(Enterprise), u'https://vsd:8443/api/v3_2/enterprises/4/enterprises')
 
     def test_object_with_id(self):
         """ Get object resource base url """
@@ -80,7 +80,8 @@ class CompressionTests(TestCase):
 
         to_dict = enterprise.to_dict()
 
-        self.assertEquals(to_dict.keys(), ['groups', u'allowedForwardingClasses', 'name', 'ceo', u'parentType', u'lastUpdatedBy', u'lastUpdatedDate', u'parentID', u'owner', u'creationDate', u'ID', 'description'])
+
+        self.assertEquals(sorted(to_dict.keys()), sorted(['groups', 'allowedForwardingClasses', 'name', 'ceo', u'parentType', u'parentID', u'owner', u'creationDate', u'ID', 'description']))
         self.assertEquals(to_dict['name'], u'NewEnterprise')
         self.assertEquals(to_dict['ID'], 3)
         #self.assertEquals(to_dict['externalID'], None)
@@ -92,43 +93,37 @@ class CompressionTests(TestCase):
         self.assertEquals(to_dict['ceo'], {
                                             'APIKey': None,
                                             'APIKeyExpiry': None,
-                                            u'ID': None,
+                                            'ID': None,
                                             'avatarData': None,
                                             'avatarType': None,
-                                            u'creationDate': None,
+                                            'creationDate': None,
                                             'email': None,
                                             'enterpriseID': None,
                                             'enterpriseName': None,
                                             'firstName': 'John',
                                             'lastName': 'Doe',
-                                            u'lastUpdatedBy': None,
-                                            u'lastUpdatedDate': None,
-                                            u'owner': None,
-                                            u'parentID': None,
-                                            u'parentType': None,
+                                            'owner': None,
+                                            'parentID': None,
+                                            'parentType': None,
                                             'password': None,
                                             'role': None,
                                             'userName': None
                                         })
         self.assertEquals(to_dict['groups'], [{
-                                                u'ID': None,
-                                                 u'creationDate': None,
-                                                 u'lastUpdatedBy': None,
-                                                 u'lastUpdatedDate': None,
+                                                'ID': None,
+                                                 'creationDate': None,
                                                  'name': 'Admins',
-                                                 u'owner': None,
-                                                 u'parentID': None,
-                                                 u'parentType': None
+                                                 'owner': None,
+                                                 'parentID': None,
+                                                 'parentType': None
                                              },
                                              {
-                                                u'ID': None,
-                                                u'creationDate': None,
-                                                u'lastUpdatedBy': None,
-                                                u'lastUpdatedDate': None,
+                                                'ID': None,
+                                                'creationDate': None,
                                                 'name': 'Others',
-                                                u'owner': None,
-                                                u'parentID': None,
-                                                u'parentType': None
+                                                'owner': None,
+                                                'parentID': None,
+                                                'parentType': None
                                             }])
 
     def test_from_dict(self):
@@ -173,7 +168,7 @@ class AttributeTests(TestCase):
 
         attributes = enterprise.get_attributes()
 
-        self.assertEqual(len(attributes), 12)
+        self.assertEqual(len(attributes), 10)
 
     def test_validate_attributes(self):
         """ Get validate attributes """

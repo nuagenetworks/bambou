@@ -9,10 +9,10 @@ from bambou.tests.models import User, Enterprise, NURESTTestSession
 bambou_logger.setLevel(logging.ERROR)
 
 
-def start_session(username="user", password="password", enterprise="enterprise", api_url="https://vsd:8443", version="3.2"):
+def start_session(username="user", password="password", enterprise="enterprise", api_url="https://vsd:8443", version="3.2", api_prefix="api"):
     """ Log in and fetch api key """
 
-    session = NURESTTestSession(username=username, password=password, enterprise=enterprise, api_url=api_url, version=version)
+    session = NURESTTestSession(username=username, password=password, enterprise=enterprise, api_url=api_url, version=version, api_prefix=api_prefix)
 
     user = User()
     user.api_key = u"51f31042-b047-48ca-a88b-68368608e3da"
