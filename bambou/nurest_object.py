@@ -65,9 +65,6 @@ class NUMetaRESTObject(type):
         if cls.__name__ == "NURESTRootObject" or cls.__name__ == "NURESTObject":
             return "Not Implemented"
 
-        if cls.is_resource_name_fixed():
-            return cls.rest_name
-
         if cls.__resource_name__ is None:
             raise NotImplementedError('%s has no defined resource name. Implement resource_name property first.' % cls)
 
@@ -288,12 +285,6 @@ class NURESTObject(object):
         return controller.url
 
     @classmethod
-    def is_resource_name_fixed(cls):
-        """ Boolean to say if the resource name should be fixed. Default is False """
-
-        return False
-
-    @classmethod
     def object_with_id(cls, id):
         """ Get a new object with the given id
 
@@ -314,7 +305,8 @@ class NURESTObject(object):
         name = self.__class__.rest_resource_name
         url = self.__class__.rest_base_url()
 
-        if self.id is not None:
+        from nurest_root_object import NURESTRootObject
+        if not isinstance(self, NURESTRootObject) and self.id is not None:
             return "%s/%s/%s" % (url, name, self.id)
 
         return "%s/%s" % (url, name)

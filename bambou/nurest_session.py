@@ -26,8 +26,8 @@ class NURESTSession(object):
             NURESTSession *must* be subclassed, and the subclass *must* implement :class:`bambou.NURESTSession.create_root_object`
 
         Example:
-            >>> mainsession =  NUMySession(username="csproot", password="csproot", enterprise="csp", api_url="https://vsd:8443", version="3.2")
-            >>> othersession = NUMySession(username="user", password="password", enterprise="ent", api_url="https://vsd:8443", version="3.2")
+            >>> mainsession =  NUMySession(username="csproot", password="csproot", enterprise="csp", api_url="https://vsd:8443")
+            >>> othersession = NUMySession(username="user", password="password", enterprise="ent", api_url="https://vsd:8443")
             >>>
             >>> mainsession.start()
             >>> mainsession.user.entities.get()
@@ -49,7 +49,7 @@ class NURESTSession(object):
                 version (string): the version of the api to target
 
             Example:
-                >>> mainsession =  NUMySession(username="csproot", password="csproot", enterprise="csp", api_url="https://vsd:8443", version="3.2")
+                >>> mainsession =  NUMySession(username="csproot", password="csproot", enterprise="csp", api_url="https://vsd:8443")
 
         """
         self._root_object = None
