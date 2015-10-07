@@ -789,7 +789,7 @@ class NURESTObject(object):
         connection = NURESTConnection(request=request, async=async, callback=self._did_receive_response, callbacks=callbacks)
         connection.user_info = user_info
 
-        bambou_logger.info('Bambou Sending >>>>>>\n%s %s' % (request.method, request.url))
+        bambou_logger.info('Bambou Sending >>>>>>\n%s %s %s' % (request.method, request.url, request.params if request.params else ""))
         bambou_logger.debug('Bambou Sending Data >>>>>>\n%s' % json.dumps(request.data, indent=4))
 
         return connection.start()
