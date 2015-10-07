@@ -287,6 +287,7 @@ class NURESTFetcher(list):
 
         results = response.data
         fetched_objects = list()
+        current_ids = list()
 
         if should_commit:
             if 'X-Nuage-Count' in response.headers and response.headers['X-Nuage-Count']:
@@ -300,7 +301,6 @@ class NURESTFetcher(list):
 
         if results:
             for result in results:
-
                 nurest_object = self.new()
                 nurest_object.from_dict(result)
                 nurest_object.parent = self.parent_object
@@ -310,12 +310,19 @@ class NURESTFetcher(list):
                 if not should_commit:
                     continue
 
+                current_ids.append(nurest_object.id)
+
                 if nurest_object in self:
                     idx = self.index(nurest_object)
                     current_object = self[idx]
                     current_object.from_dict(nurest_object.to_dict())
                 else:
                     self.append(nurest_object)
+
+            if should_commit:
+                for obj in self:
+                    if obj.id not in current_ids:
+                        self.remove(obj)
 
         return self._send_content(content=fetched_objects, connection=connection)
 

@@ -129,16 +129,19 @@ class Fetch(TestCase):
                 connection = fetcher.current_connection
 
     def test_refetch_all(self):
-        """ GET /enterprises refetch all enterprises """
+        """ GET /enterprises refetch all enterprises should override local changes"""
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
+            print '......'
             (fetcher, user, enterprises) = self.user.enterprises.fetch()
+            print 'xxxxx'
 
             enterprise = self.user.enterprises[2]
             enterprise.name = u'This name should not appear because we will refetch everything!'
 
+            print '*****'
             (fetcher, user, enterprises) = self.user.enterprises.fetch()
             connection = fetcher.current_connection
 
@@ -147,6 +150,23 @@ class Fetch(TestCase):
         self.assertEqual(user, self.user)
         self.assertEqual(len(enterprises), 4)
         self.assertEqual(self.user.enterprises[2].name, "Enterprise 3")
+
+    def test_refetch_all_with_delete_object(self):
+        """ GET /enterprises refetch all enterprises should remove local info when object is deleted """
+
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
+
+        with patch('requests.request', mock):
+            (fetcher, user, enterprises) = self.user.enterprises.fetch()
+
+
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises[1:])
+        with patch('requests.request', mock):
+            (fetcher, user, enterprises) = self.user.enterprises.fetch()
+            connection = fetcher.current_connection
+
+        self.assertEqual(connection.response.status_code, 200)
+        self.assertEqual(len(enterprises), 3)
 
     def test_fetch_with_query_parameter(self):
         """ GET /enterprises with a query parameter using fetch() """
