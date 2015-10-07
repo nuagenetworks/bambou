@@ -147,3 +147,58 @@ class Fetch(TestCase):
         self.assertEqual(user, self.user)
         self.assertEqual(len(enterprises), 4)
         self.assertEqual(self.user.enterprises[2].name, "Enterprise 3")
+
+    def test_fetch_with_query_parameter(self):
+        """ GET /enterprises with a query parameter using fetch() """
+
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
+
+        with patch('requests.request', mock):
+            (fetcher, user, enterprises) = self.user.enterprises.fetch(query_parameters={"query_param": "query_value"})
+            connection = fetcher.current_connection
+
+        self.assertEqual(connection.request.params, {"query_param": "query_value"})
+
+    def test_get_with_query_parameter(self):
+        """ GET /enterprises with a query parameter using get() """
+
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
+
+        with patch('requests.request', mock):
+            enterprises = self.user.enterprises.get(query_parameters={"query_param": "query_value"})
+            connection = self.user.enterprises.current_connection
+
+        self.assertEqual(connection.request.params, {"query_param": "query_value"})
+
+    def test_get_first_with_query_parameter(self):
+        """ GET /enterprises with a query parameter using get_first()"""
+
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
+
+        with patch('requests.request', mock):
+            enterprises = self.user.enterprises.get_first(query_parameters={"query_param": "query_value"})
+            connection = self.user.enterprises.current_connection
+
+        self.assertEqual(connection.request.params, {"query_param": "query_value"})
+
+    def test_count_with_query_parameter(self):
+        """ HEAD /enterprises with a query parameter using count() """
+
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
+
+        with patch('requests.request', mock):
+            (fetcher, user, enterprises) = self.user.enterprises.count(query_parameters={"query_param": "query_value"})
+            connection = fetcher.current_connection
+
+        self.assertEqual(connection.request.params, {"query_param": "query_value"})
+
+    def test_get_count_with_query_parameter(self):
+        """ GET /enterprises with a query parameter using get_count() """
+
+        mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
+
+        with patch('requests.request', mock):
+            enterprises = self.user.enterprises.get_count(query_parameters={"query_param": "query_value"})
+            connection = self.user.enterprises.current_connection
+
+        self.assertEqual(connection.request.params, {"query_param": "query_value"})

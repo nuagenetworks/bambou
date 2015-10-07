@@ -377,7 +377,7 @@ class NURESTConnection(object):
 
         bambou_logger.debug('Bambou has been sent with user:%s within enterprise:%s (Key=%s)\nHeaders: %s' % (user_name, enterprise, api_key, headers))
 
-        response = self.__make_request(method=self._request.method, url=self._request.url, data=data, headers=headers, certificate=certificate)
+        response = self.__make_request(method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
 
         retry_request = False
 
@@ -393,11 +393,11 @@ class NURESTConnection(object):
             retry_request = True
 
         if retry_request:
-            response = self.__make_request(method=self._request.method, url=self._request.url, data=data, headers=headers, certificate=certificate)
+            response = self.__make_request(method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
 
         return self._did_receive_response(response)
 
-    def __make_request(self, method, url, data, headers, certificate):
+    def __make_request(self, method, url, params, data, headers, certificate):
         """ Encapsulate requests call
         """
         verify = False
@@ -410,6 +410,7 @@ class NURESTConnection(object):
                                           headers=headers,
                                           verify=verify,
                                           timeout=timeout,
+                                          params=params,
                                           cert=certificate)
         except requests.exceptions.SSLError:
             try:
@@ -419,6 +420,7 @@ class NURESTConnection(object):
                                               headers=headers,
                                               verify=verify,
                                               timeout=timeout,
+                                              params=params,
                                               cert=certificate)
             except requests.exceptions.Timeout:
                 return self._did_timeout()

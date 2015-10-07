@@ -52,7 +52,6 @@ class NURESTFetcher(list):
         self.current_ordered_by = ''
         self.current_page = 0
         self.current_total_count = 0
-        self.query_string = None
         self._parent_object = None
 
     def __repr__(self):
@@ -228,14 +227,9 @@ class NURESTFetcher(list):
     def _prepare_url(self):
         """ Prepare url for request """
 
-        url = self.parent_object.get_resource_url_for_child_type(self.__class__.managed_class())
+        return self.parent_object.get_resource_url_for_child_type(self.__class__.managed_class())
 
-        if self.query_string:
-            url += "?%s" % self.query_string
-
-        return url
-
-    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
+    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, async=False, callback=None):
         """ Fetch objects according to given filter and page.
 
             Note:
@@ -262,7 +256,7 @@ class NURESTFetcher(list):
                 (<NUChildrenFetcher at aaaa>, <NUEntity at bbbb>, [<NUChildren at ccc>, <NUChildren at ddd>], <NURESTConnection at zzz>)
         """
 
-        request = NURESTRequest(method=HTTP_METHOD_GET, url=self._prepare_url())
+        request = NURESTRequest(method=HTTP_METHOD_GET, url=self._prepare_url(), params=query_parameters)
 
         self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
 
@@ -325,7 +319,7 @@ class NURESTFetcher(list):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def get(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
+    def get(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, async=False, callback=None):
         """ Fetch object and directly return them
 
             Note:
@@ -350,9 +344,9 @@ class NURESTFetcher(list):
                 >>> print entity.children.get()
                 [<NUChildren at xxx>, <NUChildren at yyyy>, <NUChildren at zzz>]
         """
-        return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, commit=commit)[2]
+        return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, commit=commit)[2]
 
-    def get_first(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, commit=True, async=False, callback=None):
+    def get_first(self, filter=None, order_by=None, group_by=[], query_parameters=None, commit=False, async=False, callback=None):
         """ Fetch object and directly return the first one
 
             Note:
@@ -377,10 +371,10 @@ class NURESTFetcher(list):
                 >>> print entity.children.get_first(filter="name == 'My Entity'")
                 <NUChildren at xxx>
         """
-        objects = self.get(filter=filter, order_by=order_by, group_by=group_by, page=0, page_size=1, commit=False)
+        objects = self.get(filter=filter, order_by=order_by, group_by=group_by, page=0, page_size=1, query_parameters=query_parameters, commit=commit)
         return objects[0] if len(objects) else None
 
-    def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, async=False, callback=None):
+    def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, async=False, callback=None):
         """ Get the total count of objects that can be fetched according to filter
 
             This method can be asynchronous and trigger the callback method
@@ -399,8 +393,7 @@ class NURESTFetcher(list):
                 Otherwise it will return a tuple of information containing
                 (fetcher, served object, count of fetched objects)
         """
-
-        request = NURESTRequest(method=HTTP_METHOD_HEAD, url=self._prepare_url())
+        request = NURESTRequest(method=HTTP_METHOD_HEAD, url=self._prepare_url(), params=query_parameters)
 
         self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
 
@@ -411,7 +404,7 @@ class NURESTFetcher(list):
             connection = self.parent_object.send_request(request=request)
             return self._did_count(connection)
 
-    def get_count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None):
+    def get_count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None):
         """ Get the total count of objects that can be fetched according to filter
 
             Args:
@@ -425,7 +418,7 @@ class NURESTFetcher(list):
                 Returns the number of objects found
 
         """
-        return self.count(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, async=False)[2]
+        return self.count(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, async=False)[2]
 
     def _did_count(self, connection):
         """ Called when count if finished """

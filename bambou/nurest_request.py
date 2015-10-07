@@ -102,7 +102,6 @@ class NURESTRequest(object):
     @params.setter
     def params(self, params):
         """ Set params """
-
         self._params = params
 
     @property
