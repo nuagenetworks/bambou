@@ -50,6 +50,17 @@ class NURESTModelController(object):
             cls._model_registry[rest_name].append(model)
 
     @classmethod
+    def get_all_models(cls):
+        """ Retrieve all models
+
+            Returns:
+                A list of all models.
+                An empty list if no entries found for the remote name
+        """
+
+        return cls._model_registry.values()
+
+    @classmethod
     def get_models(cls, rest_name):
         """ Retrieve all models from a given remote name
 
