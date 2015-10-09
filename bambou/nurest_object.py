@@ -339,7 +339,7 @@ class NURESTObject(object):
             value = getattr(self, local_name, None)
 
             if value is None and attribute.is_required:
-                self._attribute_errors[local_name] = 'Attribute %s is required' % (local_name)
+                self._attribute_errors[local_name] = {'title': 'Invalid input', 'description': 'This value is mandatory.'}
                 continue
 
             if value is None:
@@ -359,7 +359,7 @@ class NURESTObject(object):
                 continue
 
             if attribute.choices and value not in attribute.choices:
-                self._attribute_errors[local_name] = 'Attribute %s is not a valid option (choices=%s)' % (local_name, attribute.choices)
+                self._attribute_errors[local_name] = {'title': 'Invalid input', 'description': 'Invalid input'}
                 continue
 
         return self.is_valid()
