@@ -33,7 +33,6 @@ from .nurest_connection import HTTP_METHOD_GET, HTTP_METHOD_HEAD
 
 from bambou.config import BambouConfig
 
-
 class NURESTFetcher(list):
     """ Object fetcher for childrens
 
@@ -48,6 +47,7 @@ class NURESTFetcher(list):
 
         super(NURESTFetcher, self).__init__()
 
+        self._relationship = "child"
         self.current_connection = None
         self.current_ordered_by = ''
         self.current_page = 0
@@ -126,6 +126,27 @@ class NURESTFetcher(list):
 
         return self.current_connection.transaction_id
 
+    @property
+    def relationship(self):
+        """ Get relationship of the fetcher's owner and the fetched objects
+
+            Returns:
+                Returns the relationship.
+        """
+
+        return self._relationship
+
+    @relationship.setter
+    def relationship(self, relationship):
+        """ Set the relationship
+
+            Args:
+                relationship: the relationship
+
+        """
+
+        self._relationship = relationship
+
     # Methods
 
     @classmethod
@@ -157,7 +178,7 @@ class NURESTFetcher(list):
         return cls.managed_class().rest_name
 
     @classmethod
-    def fetcher_with_object(cls, parent_object):
+    def fetcher_with_object(cls, parent_object, relationship="child"):
         """ Register the fetcher for a served object.
 
             This method will fill the fetcher with `managed_class` instances
@@ -171,6 +192,7 @@ class NURESTFetcher(list):
 
         fetcher = cls()
         fetcher.parent_object = parent_object
+        fetcher.relationship = relationship
 
         rest_name = cls.managed_object_rest_name()
         parent_object.register_fetcher(fetcher, rest_name)
