@@ -28,6 +28,7 @@
 
 import json
 import logging
+import weakref
 
 from copy import deepcopy
 
@@ -602,6 +603,7 @@ class NURESTObject(object):
             raise InternalConsitencyError('Could not find fetcher with name %s while adding %s in parent %s' % (rest_name, child, self))
 
         if child not in children:
+            child.parent_object = self
             children.append(child)
 
     def remove_child(self, child):
@@ -618,6 +620,7 @@ class NURESTObject(object):
                 break
 
         if target_child:
+            target_child.parent_object = None
             children.remove(target_child)
 
     def update_child(self, child):
