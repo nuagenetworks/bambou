@@ -267,6 +267,19 @@ class ComparisonTests(TestCase):
         self.assertFalse(enterprise1.rest_equals(enterprise3))
         self.assertFalse(enterprise1.rest_equals(None))
 
+    def test_parents_relationship(self):
+        """ Test is parent obects are correctly set"""
+        user = User()
+
+        group1 = Group(id='xxxx-xxxx-xxx', name="group1")
+        group2 = Group(id='yyyy-yyyy-yyy', name="group2")
+
+        user.add_child(group1)
+        self.assertEquals(group1.parent_object, user)
+
+        user.remove_child(group1)
+        self.assertEquals(group1.parent_object, None)
+
 class FetchersTests(TestCase):
 
     def test_fetchers(self):

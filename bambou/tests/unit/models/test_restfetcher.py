@@ -50,6 +50,11 @@ class ListOperatorsFetcher(TestCase):
         """ Removes context """
         pass
 
+    def test_fetcher_parent_assignation(self):
+        """ Test is parent obects are correctly set"""
+        user = User()
+        self.assertEquals(user.fetcher_for_rest_name("group").parent_object, user)
+
     def test_contains(self):
         """ Fetcher contains object """
 
@@ -65,6 +70,7 @@ class ListOperatorsFetcher(TestCase):
         self.assertEquals(group1 in user.groups, True)
         self.assertEquals(group2 in user.groups, True)
         self.assertEquals(group3 in user.groups, False)
+
 
     def test_index(self):
         """ Fetcher index object """
