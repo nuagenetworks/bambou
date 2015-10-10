@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+import weakref
 from .exceptions import BambouHTTPError, InternalConsitencyError
 from .nurest_request import NURESTRequest
 from .nurest_connection import HTTP_METHOD_GET, HTTP_METHOD_HEAD
@@ -102,7 +102,7 @@ class NURESTFetcher(list):
                 Returns the object it is serving.
         """
 
-        return self._parent_object
+        return self._parent_object() if self._parent_object else None
 
     @parent_object.setter
     def parent_object(self, parent_object):
@@ -112,7 +112,7 @@ class NURESTFetcher(list):
                 parent_object: the object to serve
         """
 
-        self._parent_object = parent_object
+        self._parent_object = weakref.ref(parent_object) if parent_object else None
 
     @property
     def transaction_id(self):

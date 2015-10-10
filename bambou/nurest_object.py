@@ -212,13 +212,13 @@ class NURESTObject(object):
     def parent_object(self):
         """ Get parent """
 
-        return self._parent
+        return self._parent() if self._parent else None
 
     @parent_object.setter
     def parent_object(self, parent):
         """ Set parent id """
 
-        self._parent = parent
+        self._parent = weakref.ref(parent) if parent else None
 
     @property
     def rest_name(self):
