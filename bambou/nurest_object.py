@@ -339,7 +339,9 @@ class NURESTObject(object):
             value = getattr(self, local_name, None)
 
             if value is None and attribute.is_required:
-                self._attribute_errors[local_name] = {'title': 'Invalid input', 'description': 'This value is mandatory.'}
+                self._attribute_errors[local_name] = {  'title': 'Invalid input',
+                                                        'description': 'This value is mandatory.',
+                                                        'remote_name': attribute.remote_name}
                 continue
 
             if value is None:
@@ -347,19 +349,27 @@ class NURESTObject(object):
 
             if type(value) != attribute.attribute_type:
                 if attribute.attribute_type != str or type(value) != unicode:
-                    self._attribute_errors[local_name] = 'Attribute %s is not of type %s' % (local_name, attribute.attribute_type)
+                    self._attribute_errors[local_name] = {  'title': 'Wrong type',
+                                                            'description': 'Attribute %s type should be %s but is %s' % (attribute.remote_name, attribute.attribute_type, type(value)),
+                                                            'remote_name': attribute.remote_name}
                     continue
 
             if attribute.min_length and len(value) < attribute.min_length:
-                self._attribute_errors[local_name] = 'Attribute %s length is too short (minimum=%s)' % (local_name, attribute.min_length)
+                self._attribute_errors[local_name] = {  'title': 'Invalid lenght',
+                                                        'description': 'Attribute %s minimum size should be %s but is %s' % (attribute.remote_name, attribute.min_length, len(value)),
+                                                        'remote_name': attribute.remote_name}
                 continue
 
             if attribute.max_length and len(value) > attribute.max_length:
-                self._attribute_errors[local_name] = 'Attribute %s length is too long (maximum=%s)' % (local_name, attribute.max_length)
+                self._attribute_errors[local_name] = {  'title': 'Invalid lenght',
+                                                        'description': 'Attribute %s maximum size should be %s but is %s' % (attribute.remote_name, attribute.max_length, len(value)),
+                                                        'remote_name': attribute.remote_name}
                 continue
 
             if attribute.choices and value not in attribute.choices:
-                self._attribute_errors[local_name] = {'title': 'Invalid input', 'description': 'Invalid input'}
+                self._attribute_errors[local_name] = {  'title': 'Invalid input',
+                                                        'description': 'Invalid input',
+                                                        'remote_name': attribute.remote_name}
                 continue
 
         return self.is_valid()
