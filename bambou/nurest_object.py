@@ -26,22 +26,19 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import json
 import logging
 import weakref
-
 from copy import deepcopy
-
 from time import time
+import json
 
+from bambou import bambou_logger
 from .exceptions import BambouHTTPError, InternalConsitencyError
 from .nurest_connection import NURESTConnection, HTTP_METHOD_DELETE, HTTP_METHOD_PUT, HTTP_METHOD_POST, HTTP_METHOD_GET
 from .nurest_request import NURESTRequest
 from .nurest_session import _NURESTSessionCurrentContext
 from .utils import NURemoteAttribute
-
-from bambou import bambou_logger
-from bambou.config import BambouConfig
+from .config import BambouConfig
 
 
 class NUMetaRESTObject(type):
@@ -105,11 +102,11 @@ class NURESTObject(object):
         self._attribute_errors = dict()
         self._attributes = dict()
 
-        self.expose_attribute(local_name=u'id', remote_name=u'ID', attribute_type=str, is_identifier=True)
-        self.expose_attribute(local_name=u'parent_id', remote_name=u'parentID', attribute_type=str)
-        self.expose_attribute(local_name=u'parent_type', remote_name=u'parentType', attribute_type=str)
-        self.expose_attribute(local_name=u'creation_date', remote_name=u'creationDate', attribute_type=time, is_editable=False)
-        self.expose_attribute(local_name=u'owner', attribute_type=str, is_readonly=True)
+        self.expose_attribute(local_name='id', remote_name=BambouConfig.get_id_remote_name(), attribute_type=BambouConfig.get_id_type(), is_identifier=True)
+        self.expose_attribute(local_name='parent_id', remote_name='parentID', attribute_type=str)
+        self.expose_attribute(local_name='parent_type', remote_name='parentType', attribute_type=str)
+        self.expose_attribute(local_name='creation_date', remote_name='creationDate', attribute_type=time, is_editable=False)
+        self.expose_attribute(local_name='owner', attribute_type=str, is_readonly=True)
 
         self._fetchers_registry = dict()
 

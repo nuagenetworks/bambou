@@ -39,6 +39,44 @@ class BambouConfig(object):
     _should_raise_bambou_http_error = True
     _default_attribute_values_configuration_file_path = None
     _config_parser = None
+    _id_remote_name = "ID"
+    _id_type = str
+
+    @classmethod
+    def set_id_remote_name(cls, remote_name):
+        """ Sets the remote name of the ID attribute.
+
+            Args:
+                remote_name (string): the ID remote name
+        """
+        cls._id_remote_name = remote_name
+
+    @classmethod
+    def get_id_remote_name(cls):
+        """ Returns the remote name of the ID attribute.
+
+            Returns:
+                string: the remote name to use of ID
+        """
+        return cls._id_remote_name
+
+    @classmethod
+    def set_id_type(cls, typ):
+        """ Sets the type ID attribute.
+
+            Args:
+                typ (type): the ID type
+        """
+        cls._id_type = typ
+
+    @classmethod
+    def get_id_type(cls):
+        """ Returns the ID type
+
+            Returns:
+                type: the type of the ID
+        """
+        return cls._id_type
 
     @classmethod
     def set_should_raise_bambou_http_error(cls, should_raise):
