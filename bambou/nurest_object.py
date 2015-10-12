@@ -799,9 +799,6 @@ class NURESTObject(object):
         connection = NURESTConnection(request=request, async=async, callback=self._did_receive_response, callbacks=callbacks)
         connection.user_info = user_info
 
-        bambou_logger.info('Bambou Sending >>>>>>\n%s %s %s' % (request.method, request.url, request.params if request.params else ""))
-        bambou_logger.debug('Bambou Sending Data >>>>>>\n%s' % json.dumps(request.data, indent=4))
-
         return connection.start()
 
     def _manage_child_object(self, nurest_object, method=HTTP_METHOD_GET, async=False, callback=None, handler=None, response_choice=None, commit=False):
@@ -851,15 +848,6 @@ class NURESTObject(object):
 
         has_callbacks = connection.has_callbacks()
         should_post = not has_callbacks
-
-        response_code = connection._response.status_code
-        log_message = 'Bambou <<<<< Response [%s] for\n%s %s\n%s' % (response_code, connection._request.method, connection._request.url, json.dumps(connection._response.data, indent=4))
-        level = logging.INFO
-
-        if response_code >= 300:
-            level = logging.WARNING
-
-        bambou_logger.log(level, log_message)
 
         if  connection.handle_response_for_connection(should_post=should_post) and has_callbacks:
             callback = connection.callbacks['local']

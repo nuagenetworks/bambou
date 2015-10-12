@@ -29,6 +29,7 @@ import json
 import requests
 import threading
 import uuid
+import logging
 
 from .nurest_response import NURESTResponse
 
@@ -329,6 +330,13 @@ class NURESTConnection(object):
             data = None
 
         self._response = NURESTResponse(status_code=response.status_code, headers=response.headers, data=data, reason=response.reason)
+
+        level = logging.WARNING if self._response.status_code >= 300 else logging.INFO
+
+        bambou_logger.log(level, '< %s %s %s [%s] ' % (self._request.method, self._request.url, self._request.params if self._request.params else "", self._response.status_code))
+        bambou_logger.log(level, '< headers: %s' % self._response.headers)
+        bambou_logger.log(level, '< data:\n%s' % json.dumps(self._response.data, indent=4))
+
         self._callback(self)
 
         return self
@@ -375,7 +383,9 @@ class NURESTConnection(object):
         headers = self._request.headers
         data = json.dumps(self._request.data)
 
-        bambou_logger.debug('Bambou has been sent with user:%s within enterprise:%s (Key=%s)\nHeaders: %s' % (user_name, enterprise, api_key, headers))
+        bambou_logger.info('> %s %s %s' % (self._request.method, self._request.url, self._request.params if self._request.params else ""))
+        bambou_logger.debug('> headers: %s' % headers)
+        bambou_logger.debug('> data:\n  %s' % json.dumps(self._request.data, indent=4))
 
         response = self.__make_request(method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
 
