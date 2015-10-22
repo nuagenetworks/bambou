@@ -29,7 +29,6 @@
 import logging
 import weakref
 from copy import deepcopy
-from time import time
 import json
 
 from bambou import bambou_logger
@@ -82,7 +81,7 @@ class NURESTObject(object):
         """ Initializes the object with general information
 
             Args:
-                creation_date: datetime when the object as been created
+                creation_date: float representing time since epoch
                 id: identifier of the object
                 local_id: internal identifier of the object
                 owner: string representing the owner
@@ -91,6 +90,7 @@ class NURESTObject(object):
         """
 
         self._creation_date = None
+        self._last_updated_date = None
         self._id = None
         self._local_id = None
         self._owner = None
@@ -105,7 +105,8 @@ class NURESTObject(object):
         self.expose_attribute(local_name='id', remote_name=BambouConfig.get_id_remote_name(), attribute_type=BambouConfig.get_id_type(), is_identifier=True)
         self.expose_attribute(local_name='parent_id', remote_name='parentID', attribute_type=str)
         self.expose_attribute(local_name='parent_type', remote_name='parentType', attribute_type=str)
-        self.expose_attribute(local_name='creation_date', remote_name='creationDate', attribute_type=time, is_editable=False)
+        self.expose_attribute(local_name='creation_date', remote_name='creationDate', attribute_type=float, is_editable=False)
+        self.expose_attribute(local_name='last_updated_date', remote_name='lastUpdatedDate', attribute_type=float, is_editable=False)
         self.expose_attribute(local_name='owner', attribute_type=str, is_readonly=True)
 
         self._fetchers_registry = dict()
@@ -145,6 +146,18 @@ class NURESTObject(object):
         """ Set creation date """
 
         self._creation_date = creation_date
+
+    @property
+    def last_updated_date(self):
+        """ Get last update date """
+
+        return self._last_updated_date
+
+    @creation_date.setter
+    def last_updated_date(self, update_date):
+        """ Set creation date """
+
+        self._last_updated_date = update_date
 
     @property
     def id(self):
