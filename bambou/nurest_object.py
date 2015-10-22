@@ -153,7 +153,7 @@ class NURESTObject(object):
 
         return self._last_updated_date
 
-    @creation_date.setter
+    @last_updated_date.setter
     def last_updated_date(self, update_date):
         """ Set creation date """
 
