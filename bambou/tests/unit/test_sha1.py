@@ -20,10 +20,10 @@ class Sha1Tests(TestCase):
     def test_encrypt_with_message(self):
         """ Sha1 encryption with a message """
 
-        message = u"HelloWorld"
+        message ="HelloWorld"
         encrypted = Sha1.encrypt(message)
 
-        self.assertEquals(encrypted, u'db8ac1c259eb89d4a131b253bacfca5f319d54f2')
+        self.assertEquals(encrypted, 'db8ac1c259eb89d4a131b253bacfca5f319d54f2')
 
     def test_encrypt_without_message(self):
         """ Sha1 encryption without a message """

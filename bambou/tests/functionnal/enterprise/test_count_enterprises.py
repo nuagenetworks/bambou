@@ -33,11 +33,11 @@ class Count(TestCase):
         url = MockUtils.get_mock_parameter(mock, 'url')
         headers = MockUtils.get_mock_parameter(mock, 'headers')
 
-        self.assertEqual(url, u'https://vsd:8443/api/v3_2/enterprises')
-        self.assertEqual(method, u'HEAD')
-        self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
-        self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
-        self.assertEqual(headers['Content-Type'], u'application/json')
+        self.assertEqual(url, 'https://vsd:8443/api/v3_2/enterprises')
+        self.assertEqual(method, 'HEAD')
+        self.assertEqual(headers['Authorization'], 'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
+        self.assertEqual(headers['X-Nuage-Organization'], 'enterprise')
+        self.assertEqual(headers['Content-Type'], 'application/json')
 
         self.assertEqual(fetcher, self.user.enterprises)
         self.assertEqual(user, self.user)
@@ -55,7 +55,7 @@ class Count(TestCase):
             (fetcher, user, count) = self.user.enterprises.count(filter=u"name == 'Enterprise 2'")
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
-        self.assertEqual(headers['X-Nuage-Filter'], u"name == 'Enterprise 2'")
+        self.assertEqual(headers['X-Nuage-Filter'],"name == 'Enterprise 2'")
         self.assertEqual(count, 2)
 
     def test_count_with_order_by(self):
@@ -67,7 +67,7 @@ class Count(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
         with patch('requests.request', mock):
-            (fetcher, user, count) = self.user.enterprises.count(order_by=u'name ASC')
+            (fetcher, user, count) = self.user.enterprises.count(order_by='name ASC')
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
         self.assertEqual(headers['X-Nuage-OrderBy'], 'name ASC')

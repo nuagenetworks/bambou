@@ -35,11 +35,11 @@ class Fetch(TestCase):
         url = MockUtils.get_mock_parameter(mock, 'url')
         headers = MockUtils.get_mock_parameter(mock, 'headers')
 
-        self.assertEqual(url, u'https://vsd:8443/api/v3_2/enterprises')
-        self.assertEqual(method, u'GET')
-        self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
-        self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
-        self.assertEqual(headers['Content-Type'], u'application/json')
+        self.assertEqual(url, 'https://vsd:8443/api/v3_2/enterprises')
+        self.assertEqual(method, 'GET')
+        self.assertEqual(headers['Authorization'], 'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
+        self.assertEqual(headers['X-Nuage-Organization'], 'enterprise')
+        self.assertEqual(headers['Content-Type'], 'application/json')
 
         self.assertEqual(fetcher, self.user.enterprises)
         self.assertEqual(user, self.user)
@@ -69,9 +69,9 @@ class Fetch(TestCase):
             (fetcher, user, enterprises) = self.user.enterprises.fetch(filter=u"name == 'Enterprise 2'")
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
-        self.assertEqual(headers['X-Nuage-Filter'], u"name == 'Enterprise 2'")
+        self.assertEqual(headers['X-Nuage-Filter'],"name == 'Enterprise 2'")
         self.assertEqual(len(enterprises), 1)
-        self.assertEqual(enterprises[0].name, u"Enterprise 2")
+        self.assertEqual(enterprises[0].name,"Enterprise 2")
 
     def test_fetch_with_group_by(self):
         """ GET /enterprises retrieve enterprises with group_by """
@@ -139,7 +139,7 @@ class Fetch(TestCase):
             print 'xxxxx'
 
             enterprise = self.user.enterprises[2]
-            enterprise.name = u'This name should not appear because we will refetch everything!'
+            enterprise.name = 'This name should not appear because we will refetch everything!'
 
             print '*****'
             (fetcher, user, enterprises) = self.user.enterprises.fetch()

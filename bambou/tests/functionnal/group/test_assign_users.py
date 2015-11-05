@@ -13,7 +13,7 @@ class Assign(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.user = start_session()
-        cls.group = get_valid_group(id=u'xxxx-xxx-xxx', name=u"TestGroup")
+        cls.group = get_valid_group(id='xxxx-xxx-xxx', name=u"TestGroup")
 
     @classmethod
     def tearDownClass(cls):
@@ -35,11 +35,11 @@ class Assign(TestCase):
         headers = MockUtils.get_mock_parameter(mock, 'headers')
 
         self.assertEqual(connection.response.status_code, 204)
-        self.assertEqual(url, u'https://vsd:8443/api/v3_2/groups/' + self.group.id + '/users')
-        self.assertEqual(method, u'PUT')
-        self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
-        self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
-        self.assertEqual(headers['Content-Type'], u'application/json')
+        self.assertEqual(url, 'https://vsd:8443/api/v3_2/groups/' + self.group.id + '/users')
+        self.assertEqual(method, 'PUT')
+        self.assertEqual(headers['Authorization'], 'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
+        self.assertEqual(headers['X-Nuage-Organization'], 'enterprise')
+        self.assertEqual(headers['Content-Type'], 'application/json')
 
         self.assertEqual(objects, [employee1, employee2])
         self.assertEqual(self.group.employees, [employee1, employee2])

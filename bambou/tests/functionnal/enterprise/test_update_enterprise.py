@@ -23,7 +23,7 @@ class Update(TestCase):
         """ PUT /enterprises update enterprise """
 
         enterprise = self.enterprise
-        enterprise.name = u"Another name"
+        enterprise.name ="Another name"
         mock = MockUtils.create_mock_response(status_code=200, data=enterprise)
 
         with patch('requests.request', mock):
@@ -33,21 +33,21 @@ class Update(TestCase):
         url = MockUtils.get_mock_parameter(mock, 'url')
         headers = MockUtils.get_mock_parameter(mock, 'headers')
 
-        self.assertEqual(url, u'https://vsd:8443/api/v3_2/enterprises/%s' % enterprise.id)
-        self.assertEqual(method, u'PUT')
-        self.assertEqual(headers['Authorization'], u'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
-        self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
-        self.assertEqual(headers['Content-Type'], u'application/json')
+        self.assertEqual(url, 'https://vsd:8443/api/v3_2/enterprises/%s' % enterprise.id)
+        self.assertEqual(method, 'PUT')
+        self.assertEqual(headers['Authorization'], 'XREST dXNlcjo1MWYzMTA0Mi1iMDQ3LTQ4Y2EtYTg4Yi02ODM2ODYwOGUzZGE=')
+        self.assertEqual(headers['X-Nuage-Organization'], 'enterprise')
+        self.assertEqual(headers['Content-Type'], 'application/json')
 
-        self.assertEqual(obj.name, u"Another name")
-        self.assertEqual(enterprise.name, u"Another name")
+        self.assertEqual(obj.name,"Another name")
+        self.assertEqual(enterprise.name,"Another name")
         self.assertEqual(connection.response.status_code, 200)
 
     def test_update_raise_error(self):
         """ PUT /enterprises update enterprise raise error """
 
         enterprise = self.enterprise
-        enterprise.name = u"Another name"
+        enterprise.name ="Another name"
         mock = MockUtils.create_mock_response(status_code=404, data=enterprise, error=u"Enterprise not found")
 
         with patch('requests.request', mock):

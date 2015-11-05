@@ -21,22 +21,22 @@ class GetUserTests(TestCase):
         self.assertEquals(user.rest_name, 'me')
         self.assertEquals(user.get_resource_url(), 'https://example.com/api/v3_0/me')
 
-    def test_rest_resource_name(self):
+    def test_resource_name(self):
         """ Get user resource name """
 
-        self.assertEquals(User.rest_resource_name, 'me')
+        self.assertEquals(User.resource_name, 'me')
 
     def test_get_resource_url(self):
         """ Get user resource url """
 
         user = User()
-        self.assertEquals(user.get_resource_url(), u'https://vsd:8443/api/v3_2/me')
+        self.assertEquals(user.get_resource_url(), 'https://vsd:8443/api/v3_2/me')
 
     def test_get_resource_url_for_child_type(self):
         """ Get user for child type """
 
         user = User()
-        self.assertEquals(user.get_resource_url_for_child_type(Enterprise), u'https://vsd:8443/api/v3_2/enterprises')
+        self.assertEquals(user.get_resource_url_for_child_type(Enterprise), 'https://vsd:8443/api/v3_2/enterprises')
 
 
 class CompressionTests(TestCase):
@@ -46,15 +46,15 @@ class CompressionTests(TestCase):
 
         user = User()
         user.id = 3
-        user.user_name = u"Christophe"
-        user.password = u'sorry'
-        user.api_key = u'ABCD'
+        user.user_name ="Christophe"
+        user.password = 'sorry'
+        user.api_key = 'ABCD'
 
         to_dict = user.to_dict()
 
-        self.assertEquals(to_dict['userName'], u'Christophe')
-        self.assertEquals(to_dict['password'], u'sorry')
-        self.assertEquals(to_dict['APIKey'], u'ABCD')
+        self.assertEquals(to_dict['userName'], 'Christophe')
+        self.assertEquals(to_dict['password'], 'sorry')
+        self.assertEquals(to_dict['APIKey'], 'ABCD')
         self.assertEquals(to_dict['parentID'], None)
         self.assertEquals(to_dict['parentType'], None)
         self.assertEquals(to_dict['owner'], None)
@@ -65,17 +65,17 @@ class CompressionTests(TestCase):
 
         to_dict = dict()
         to_dict['ID'] = 3
-        to_dict['userName'] = u'Employee'
-        to_dict['password'] = u'anotherPassword'
-        to_dict['APIKey'] = u'12453'
+        to_dict['userName'] = 'Employee'
+        to_dict['password'] = 'anotherPassword'
+        to_dict['APIKey'] = '12453'
         #to_dict['creationDate'] = '2014-04-25 17:05:34'
 
         user = User()
         user.from_dict(to_dict)
 
         self.assertEquals(user.id, 3)
-        self.assertEquals(user.user_name, u'Employee')
-        self.assertEquals(user.password, u'anotherPassword')
-        self.assertEquals(user.api_key, u'12453')
+        self.assertEquals(user.user_name, 'Employee')
+        self.assertEquals(user.password, 'anotherPassword')
+        self.assertEquals(user.api_key, '12453')
         self.assertEquals(user.parent_id, None)
         self.assertEquals(user.parent_type, None)

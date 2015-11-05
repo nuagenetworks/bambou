@@ -24,7 +24,7 @@ class Impersonate(TestCase):
         """
         session = start_session()
 
-        session.impersonate(username=u'johndoe', enterprise=u'enterprise')
+        session.impersonate(username='johndoe', enterprise='enterprise')
 
         mock = MockUtils.create_mock_response(status_code=200, data=[])
 
@@ -36,7 +36,7 @@ class Impersonate(TestCase):
         headers = MockUtils.get_mock_parameter(mock=mock, name='headers')
 
         self.assertIn('X-Nuage-ProxyUser', headers)
-        self.assertEquals(headers['X-Nuage-ProxyUser'], u'johndoe@enterprise')
+        self.assertEquals(headers['X-Nuage-ProxyUser'], 'johndoe@enterprise')
         self.assertEquals(session.is_impersonating, True)
 
         session.stop_impersonate()

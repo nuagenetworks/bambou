@@ -22,32 +22,32 @@ class GetResourceTests(TestCase):
         """ Get object REST name """
 
         enterprise = Enterprise()
-        self.assertEquals(enterprise.rest_name, u'enterprise')
+        self.assertEquals(enterprise.rest_name, 'enterprise')
 
-    def test_rest_resource_name(self):
+    def test_resource_name(self):
         """ Get object resource name """
 
         enterprise = Enterprise()
-        self.assertEquals(Enterprise.rest_resource_name, u'enterprises')
+        self.assertEquals(Enterprise.resource_name, 'enterprises')
 
     def test_get_resource_url(self):
         """ Get object resource url """
 
         enterprise = Enterprise()
         enterprise.id = 4
-        self.assertEquals(enterprise.get_resource_url(), u'https://vsd:8443/api/v3_2/enterprises/4')
+        self.assertEquals(enterprise.get_resource_url(), 'https://vsd:8443/api/v3_2/enterprises/4')
 
     def test_get_resource_base_url(self):
         """ Get object resource base url """
 
-        self.assertEquals(Enterprise.rest_base_url(), u'https://vsd:8443/')
+        self.assertEquals(Enterprise.rest_base_url(), 'https://vsd:8443/')
 
     def test_get_resource_base_url(self):
         """ Get object resource base url """
 
         enterprise = Enterprise()
         enterprise.id = 4
-        self.assertEquals(enterprise.get_resource_url_for_child_type(Enterprise), u'https://vsd:8443/api/v3_2/enterprises/4/enterprises')
+        self.assertEquals(enterprise.get_resource_url_for_child_type(Enterprise), 'https://vsd:8443/api/v3_2/enterprises/4/enterprises')
 
     def test_object_with_id(self):
         """ Get object resource base url """
@@ -63,7 +63,7 @@ class CompressionTests(TestCase):
 
         enterprise = Enterprise()
         enterprise.id = 3
-        enterprise.name = u"NewEnterprise"
+        enterprise.name ="NewEnterprise"
 
         # List of objects
         admingroup = Group()
@@ -81,8 +81,8 @@ class CompressionTests(TestCase):
         to_dict = enterprise.to_dict()
 
 
-        self.assertEquals(sorted(to_dict.keys()), sorted(['groups', 'allowedForwardingClasses', 'name', 'ceo', u'parentType', u'parentID', u'owner', u'creationDate', u'ID', 'description']))
-        self.assertEquals(to_dict['name'], u'NewEnterprise')
+        self.assertEquals(sorted(to_dict.keys()), sorted(['groups', 'lastUpdatedDate', 'allowedForwardingClasses', 'name', 'ceo', 'parentType', 'parentID', 'owner', 'creationDate', 'ID', 'description']))
+        self.assertEquals(to_dict['name'], 'NewEnterprise')
         self.assertEquals(to_dict['ID'], 3)
         #self.assertEquals(to_dict['externalID'], None)
         #self.assertEquals(to_dict['localID'], None)
@@ -107,11 +107,13 @@ class CompressionTests(TestCase):
                                             'parentType': None,
                                             'password': None,
                                             'role': None,
-                                            'userName': None
+                                            'userName': None,
+                                            'lastUpdatedDate': None
                                         })
         self.assertEquals(to_dict['groups'], [{
                                                 'ID': None,
                                                  'creationDate': None,
+                                                 'lastUpdatedDate': None,
                                                  'name': 'Admins',
                                                  'owner': None,
                                                  'parentID': None,
@@ -120,6 +122,7 @@ class CompressionTests(TestCase):
                                              {
                                                 'ID': None,
                                                 'creationDate': None,
+                                                'lastUpdatedDate': None,
                                                 'name': 'Others',
                                                 'owner': None,
                                                 'parentID': None,
@@ -131,8 +134,8 @@ class CompressionTests(TestCase):
 
         to_dict = dict()
         to_dict['ID'] = 3
-        to_dict['owner'] = u'Alcatel'
-        to_dict['name'] = u'AnotherEnterprise'
+        to_dict['owner'] = 'Alcatel'
+        to_dict['name'] = 'AnotherEnterprise'
         to_dict['unknownField'] = True
         #to_dict['creationDate'] = '2014-04-25 17:05:34'
 
@@ -140,23 +143,23 @@ class CompressionTests(TestCase):
         enterprise.from_dict(to_dict)
 
         self.assertEquals(enterprise.id, 3)
-        self.assertEquals(enterprise.owner, u'Alcatel')
-        self.assertEquals(enterprise.name, u'AnotherEnterprise')
+        self.assertEquals(enterprise.owner, 'Alcatel')
+        self.assertEquals(enterprise.name, 'AnotherEnterprise')
 
     def test_initializes_with_data(self):
         """ Initializes model with data attribute """
 
         to_dict = dict()
         to_dict['ID'] = 3
-        to_dict['owner'] = u'Alcatel'
-        to_dict['name'] = u'AnotherEnterprise'
+        to_dict['owner'] = 'Alcatel'
+        to_dict['name'] = 'AnotherEnterprise'
         to_dict['unknownField'] = True
 
         enterprise = Enterprise(data=to_dict)
 
         self.assertEquals(enterprise.id, 3)
-        self.assertEquals(enterprise.owner, u'Alcatel')
-        self.assertEquals(enterprise.name, u'AnotherEnterprise')
+        self.assertEquals(enterprise.owner, 'Alcatel')
+        self.assertEquals(enterprise.name, 'AnotherEnterprise')
 
 
 class AttributeTests(TestCase):
@@ -168,14 +171,14 @@ class AttributeTests(TestCase):
 
         attributes = enterprise.get_attributes()
 
-        self.assertEqual(len(attributes), 10)
+        self.assertEqual(len(attributes), 11)
 
     def test_validate_attributes(self):
         """ Get validate attributes """
 
         enterprise = Enterprise()
         enterprise.name = "Test Enterprise"
-        enterprise.allowed_forwarding_classes = u'A'
+        enterprise.allowed_forwarding_classes = 'A'
 
         is_valid = enterprise.validate()
 
@@ -222,7 +225,7 @@ class CopyTests(TestCase):
     def test_copy(self):
         """ Copy instance """
 
-        enterprise = Enterprise(id=u'4', name=u'enterprise')
+        enterprise = Enterprise(id='4', name='enterprise')
 
         enterprise_copy = enterprise.copy()
 
@@ -234,9 +237,9 @@ class ComparisonTests(TestCase):
     def test_compare_instance(self):
         """ Compare python instance """
 
-        enterprise1 = Enterprise(id=u'4', name=u'enterprise')
-        enterprise2 = Enterprise(id=u'4', name=u'enterprise2')
-        enterprise3 = Enterprise(id=u'5', name=u'test')
+        enterprise1 = Enterprise(id='4', name='enterprise')
+        enterprise2 = Enterprise(id='4', name='enterprise2')
+        enterprise3 = Enterprise(id='5', name='test')
 
         self.assertTrue(enterprise1 == enterprise1)
         self.assertFalse(enterprise1 == enterprise2)
@@ -246,9 +249,9 @@ class ComparisonTests(TestCase):
     def test_instance_equals(self):
         """ Compare instance with equals """
 
-        enterprise1 = Enterprise(id=u'4', name=u'enterprise')
-        enterprise2 = Enterprise(id=u'4', name=u'enterprise2')
-        enterprise3 = Enterprise(id=u'5', name=u'test')
+        enterprise1 = Enterprise(id='4', name='enterprise')
+        enterprise2 = Enterprise(id='4', name='enterprise2')
+        enterprise3 = Enterprise(id='5', name='test')
 
         self.assertTrue(enterprise1.equals(enterprise1))
         self.assertTrue(enterprise1.equals(enterprise2))
@@ -258,9 +261,9 @@ class ComparisonTests(TestCase):
     def test_compare_rest_instance(self):
         """ Compare instance with rest_equals """
 
-        enterprise1 = Enterprise(id=u'4', name=u'enterprise')
-        enterprise2 = Enterprise(id=u'4', name=u'enterprise')
-        enterprise3 = Enterprise(id=u'5', name=u'test')
+        enterprise1 = Enterprise(id='4', name='enterprise')
+        enterprise2 = Enterprise(id='4', name='enterprise')
+        enterprise3 = Enterprise(id='5', name='test')
 
         self.assertTrue(enterprise1.rest_equals(enterprise1))
         self.assertTrue(enterprise1.rest_equals(enterprise2))

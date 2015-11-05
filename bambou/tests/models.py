@@ -14,7 +14,7 @@ class Enterprise(NURESTObject):
     __rest_name__ = "enterprise"
     __resource_name__ = "enterprises"
 
-    def __init__(self, name=u'NuageNetworks', **kwargs):
+    def __init__(self, name='NuageNetworks', **kwargs):
         """ Creates a new Enterprise
 
         """
@@ -30,7 +30,7 @@ class Enterprise(NURESTObject):
 
         self.expose_attribute(local_name='name', attribute_type=str, is_required=True)
         self.expose_attribute(local_name='description', attribute_type=str, max_length=255)
-        self.expose_attribute(local_name=u"allowed_forwarding_classes", remote_name=u"allowedForwardingClasses", attribute_type=str, choices=[u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'NONE'])
+        self.expose_attribute(local_name=u"allowed_forwarding_classes", remote_name=u"allowedForwardingClasses", attribute_type=str, choices=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'NONE'])
         self.expose_attribute(local_name='groups', remote_name='groups', attribute_type=list)
         self.expose_attribute(local_name='ceo', remote_name='ceo', attribute_type=object)
 
@@ -157,14 +157,14 @@ class User(NURESTRootObject):
     def get_resource_url(self):
         """ Get resource complete url """
 
-        name = self.__class__.rest_resource_name
+        name = self.__class__.resource_name
         url = self.__class__.rest_base_url()
         return "%s/%s" % (url, name)
 
     def get_resource_url_for_child_type(self, nurest_object_type):
         """ Get the resource url for the nurest_object type """
 
-        return "%s/%s" % (self.__class__.rest_base_url(), nurest_object_type.rest_resource_name)
+        return "%s/%s" % (self.__class__.rest_base_url(), nurest_object_type.resource_name)
 
 
 class NURESTTestSession(NURESTSession):

@@ -32,10 +32,10 @@ class Update(TestCase):
         headers = MockUtils.get_mock_parameter(mock, 'headers')
 
         self.assertEqual(connection.response.status_code, 204)
-        self.assertEqual(url, u'https://vsd:8443/api/v3_2/me')
-        self.assertEqual(method, u'PUT')
-        self.assertEqual(headers['Authorization'], u'XREST dXNlcjp0ZXN0')
-        self.assertEqual(headers['X-Nuage-Organization'], u'enterprise')
-        self.assertEqual(headers['Content-Type'], u'application/json')
+        self.assertEqual(url, 'https://vsd:8443/api/v3_2/me')
+        self.assertEqual(method, 'PUT')
+        self.assertEqual(headers['Authorization'], 'XREST dXNlcjp0ZXN0')
+        self.assertEqual(headers['X-Nuage-Organization'], 'enterprise')
+        self.assertEqual(headers['Content-Type'], 'application/json')
 
-        self.assertEqual(self.user.password, u"a94a8fe5ccb19ba61c4c0873d391e987982fbbd3")  # Encrypted password
+        self.assertEqual(self.user.password,"a94a8fe5ccb19ba61c4c0873d391e987982fbbd3")  # Encrypted password

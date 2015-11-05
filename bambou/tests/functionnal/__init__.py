@@ -15,14 +15,14 @@ def start_session(username="user", password="password", enterprise="enterprise",
     session = NURESTTestSession(username=username, password=password, enterprise=enterprise, api_url=api_url, version=version, api_prefix=api_prefix)
 
     user = User()
-    user.api_key = u"51f31042-b047-48ca-a88b-68368608e3da"
-    user.email = u"john.doe@enterprse.com"
-    user.enterprise_id = u"<enterprise_id>"
-    user.enterprise_name = u"enterprise"
-    user.firstname = u"John",
-    user.id = u"<user_id>"
-    user.lastname = u"Doe"
-    user.role = u"ROLE"
+    user.api_key ="51f31042-b047-48ca-a88b-68368608e3da"
+    user.email ="john.doe@enterprse.com"
+    user.enterprise_id ="<enterprise_id>"
+    user.enterprise_name ="enterprise"
+    user.firstname ="John",
+    user.id ="<user_id>"
+    user.lastname ="Doe"
+    user.role ="ROLE"
 
     # Set API KEY
     session._login_controller.api_key = user.api_key
