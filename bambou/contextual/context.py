@@ -73,8 +73,8 @@ class _ClassDelegate(classy):
             if not isinstance(k, basestring):
                 continue
             if not isinstance(v, (classmethod,staticmethod))and not _ignore(k):
-                redirect_attribute(cls, k, v)
-
+                if not cls.__name__ == '_ClassDelegate':
+                    redirect_attribute(cls, k, v)
 
 
 
