@@ -39,11 +39,6 @@ class NURESTResponse(object):
         self._headers = headers
         self.errors = dict()
 
-    def __str__(self):
-        """ Print request """
-
-        return "[%s]\n%s" % (self.status_code, self.data)
-
     # Properties
 
     @property

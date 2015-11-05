@@ -6,7 +6,7 @@ from tests import start_session
 from tests.models import Group, User
 
 
-class FlushFetcher(TestCase):
+class TestFlushFetcher(TestCase):
 
     @classmethod
     def setUpClass(self):
@@ -38,7 +38,7 @@ class FlushFetcher(TestCase):
         self.assertEquals(user.groups, [])
 
 
-class ListOperatorsFetcher(TestCase):
+class TestListOperatorsFetcher(TestCase):
 
     @classmethod
     def setUpClass(self):

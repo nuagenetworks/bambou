@@ -113,7 +113,6 @@ class NURESTRootObject(NURESTObject):
 
     def get_resource_url_for_child_type(self, nurest_object_type):
         """ Get the resource url for the nurest_object type """
-
         return "%s/%s" % (self.rest_base_url(), nurest_object_type.resource_name)
 
     def get_resource_url(self):

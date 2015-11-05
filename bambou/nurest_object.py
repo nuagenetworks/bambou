@@ -28,6 +28,8 @@
 
 import logging
 import weakref
+import datetime
+from uuid import uuid4
 from copy import deepcopy
 import json
 
@@ -40,7 +42,7 @@ from .utils import NURemoteAttribute
 from .config import BambouConfig
 
 
-class NUMetaRESTObject(type):
+class NUMetaRESTObject(type): # pragma: no cover
     """
     """
     @property
@@ -89,10 +91,10 @@ class NURESTObject(object):
                 parent_type: type of the parent
         """
 
+        self._local_id = str(uuid4())
         self._creation_date = None
         self._last_updated_date = None
         self._id = None
-        self._local_id = None
         self._owner = None
         self._parent_id = None
         self._parent_type = None
@@ -176,12 +178,6 @@ class NURESTObject(object):
         """ Get local id """
 
         return self._local_id
-
-    @local_id.setter
-    def local_id(self, local_id):
-        """ Set local id """
-
-        self._local_id = local_id
 
     @property
     def owner(self):
@@ -467,11 +463,11 @@ class NURESTObject(object):
             if parent.rest_name in rest_names:
                 return parent
 
-            parent = parent.parent
+            parent = parent.parent_object
 
         return None
 
-    def _genealogic_types(self):
+    def genealogic_types(self):
         """ Get genealogic types
 
             Returns:
@@ -482,12 +478,12 @@ class NURESTObject(object):
         parent = self
 
         while parent:
-            types.push(parent.rest_name)
-            parent = parent.parent
+            types.append(parent.rest_name)
+            parent = parent.parent_object
 
         return types
 
-    def _genealogic_ids(self):
+    def genealogic_ids(self):
         """ Get all genealogic ids
 
             Returns:
@@ -498,12 +494,12 @@ class NURESTObject(object):
         parent = self
 
         while parent:
-            ids.push(parent.id)
-            parent = parent.parent
+            ids.append(parent.id)
+            parent = parent.parent_object
 
         return ids
 
-    def _genealogy_contains_type(self, resource_name):
+    def genealogy_contains_type(self, resource_name):
         """ Check if parents contains an object of type resource_name
 
             Args:
@@ -513,10 +509,10 @@ class NURESTObject(object):
                 Returns True if a parent of type has been found. False otherwise.
         """
 
-        resource_names = self._genealogic_types()
+        resource_names = self.genealogic_types()
         return resource_name in resource_names
 
-    def _genealogy_contains_id(self, id):
+    def genealogy_contains_id(self, id):
         """ Check if parents contains an object of type resource_name
 
             Args:
@@ -526,16 +522,17 @@ class NURESTObject(object):
                 Returns True if a parent with specific id has been found. False otherwise.
         """
 
-        ids = self._genealogic_ids()
+        ids = self.genealogic_ids()
         return id in ids
 
-    def get_formated_creation_date(self, format='mmm dd yyyy HH:MM:ss'):
-        """ Return creation date with a given format. Default is 'mmm dd yyyy HH:MM:ss' """
+    def get_formated_creation_date(self, format='%b %Y %d %H:%I:%S'):
+        """ Return creation date with a given format. Default is '%b %Y %d %H:%I:%S' """
 
         if not self._creation_date:
-            return"No date"
+            return None
 
-        return self._creation_date.strftime('mmm dd yyyy HH:MM:ss')
+        date = datetime.datetime.utcfromtimestamp(self._creation_date)
+        return date.strftime(format)
 
     # Fetchers registry
 
@@ -562,44 +559,6 @@ class NURESTObject(object):
             return None
 
         return self._fetchers_registry[rest_name]
-
-    # Memory management
-
-    def discard(self):
-        """ Discard the current object and its children """
-
-        if self._is_dirty:
-            return
-
-        self._is_dirty = True
-        self.will_discard()
-
-        bambou_logger.debug("[Bambou] Discarding object %s of type %s" % (self.id, self.rest_name))
-
-        self.discard_all_fetchers()
-
-        self._parent = None
-        self._fetchers_registry = dict()
-
-    def will_discard(self):
-        """ """
-        pass
-
-    def discard_fetcher_for_rest_name(self, rest_name):
-        """ Discard children with a given rest name
-
-            Args:
-                rest_name: the rest name
-
-        """
-        bambou_logger.debug("[Bambou] %s with id %s is discarding children %s" % (self.rest_name, self._id, rest_name))
-        self._fetchers_registry[rest_name] = []
-
-    def discard_all_fetchers(self):
-        """ Discard current object children """
-
-        for rest_name in self._fetchers_registry.keys():
-            self.discard_fetcher_for_rest_name(rest_name)
 
     # Children management
 
@@ -646,7 +605,7 @@ class NURESTObject(object):
                 index = children.index(local_child)
                 break
 
-        if index:
+        if index is not None:
             children[index] = child
 
     # Compression / Decompression
@@ -700,8 +659,7 @@ class NURESTObject(object):
 
                 dictionary[remote_name] = value
             else:
-                # print('Attribute %s could not be found for object %s' % (local_name, self))
-                pass
+                pass # pragma: no cover
 
         return dictionary
 
@@ -728,7 +686,7 @@ class NURESTObject(object):
                 setattr(self, local_name, remote_value)
             else:
                 # print('Attribute %s could not be added to object %s' % (remote_name, self))
-                pass
+                pass # pragma: no cover
 
     # HTTP Calls
 

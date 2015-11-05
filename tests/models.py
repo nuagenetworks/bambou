@@ -27,12 +27,15 @@ class Enterprise(NURESTObject):
         self.groups = None
         self.ceo = None
         self.invisible = True
+        self.token = None
 
         self.expose_attribute(local_name='name', attribute_type=str, is_required=True)
         self.expose_attribute(local_name='description', attribute_type=str, max_length=255)
         self.expose_attribute(local_name=u"allowed_forwarding_classes", remote_name=u"allowedForwardingClasses", attribute_type=str, choices=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'NONE'])
         self.expose_attribute(local_name='groups', remote_name='groups', attribute_type=list)
         self.expose_attribute(local_name='ceo', remote_name='ceo', attribute_type=object)
+
+        self.expose_attribute(local_name='token', remote_name='token', attribute_type=str, min_length=5, max_length=10)
 
         self._compute_args(**kwargs)
 
