@@ -56,7 +56,7 @@ class NUMetaRESTObject(type):
         return cls.__rest_name__
 
     @property
-    def rest_resource_name(cls):
+    def resource_name(cls):
         """ Represents the resource name
         """
         if cls.__name__ == "NURESTRootObject" or cls.__name__ == "NURESTObject":
@@ -241,7 +241,7 @@ class NURESTObject(object):
         return self.__class__.rest_name
 
     @property
-    def rest_resource_name(self):
+    def resource_name(self):
         """ Resource name of the object.
 
             It will compute the plural if needed
@@ -249,7 +249,7 @@ class NURESTObject(object):
             Returns:
                 Returns a string that represents the resouce name of the object
         """
-        return self.__class__.rest_resource_name
+        return self.__class__.resource_name
 
     @property
     def fetchers(self):
@@ -313,7 +313,7 @@ class NURESTObject(object):
     def get_resource_url(self):
         """ Get resource complete url """
 
-        name = self.__class__.rest_resource_name
+        name = self.__class__.resource_name
         url = self.__class__.rest_base_url()
 
         if self.id is not None:
@@ -324,7 +324,7 @@ class NURESTObject(object):
     def get_resource_url_for_child_type(self, nurest_object_type):
         """ Get the resource url for the nurest_object type """
 
-        return "%s/%s" % (self.get_resource_url(), nurest_object_type.rest_resource_name)
+        return "%s/%s" % (self.get_resource_url(), nurest_object_type.resource_name)
 
 
     def __str__(self):
@@ -533,7 +533,7 @@ class NURESTObject(object):
         """ Return creation date with a given format. Default is 'mmm dd yyyy HH:MM:ss' """
 
         if not self._creation_date:
-            return u"No date"
+            return"No date"
 
         return self._creation_date.strftime('mmm dd yyyy HH:MM:ss')
 
