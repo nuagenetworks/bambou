@@ -3,9 +3,9 @@
 from unittest import TestCase
 from mock import patch
 
-from bambou.tests import start_session
-from bambou.tests.models import User
-from bambou.tests.utils import MockUtils
+from tests import start_session
+from tests.models import User
+from tests.utils import MockUtils
 
 
 class Impersonate(TestCase):

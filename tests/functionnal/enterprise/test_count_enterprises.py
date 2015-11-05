@@ -4,8 +4,8 @@ from unittest import TestCase
 from mock import patch
 
 from bambou.exceptions import BambouHTTPError
-from bambou.tests.utils import MockUtils
-from bambou.tests.functionnal import start_session
+from tests.utils import MockUtils
+from tests.functionnal import start_session
 
 
 class Count(TestCase):

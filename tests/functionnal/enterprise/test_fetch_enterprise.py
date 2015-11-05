@@ -4,9 +4,9 @@ from unittest import TestCase
 from mock import patch
 
 from bambou.exceptions import BambouHTTPError, InternalConsitencyError
-from bambou.tests.utils import MockUtils
-from bambou.tests.functionnal import start_session, get_valid_enterprise
-from bambou.tests.models import Enterprise
+from tests.utils import MockUtils
+from tests.functionnal import start_session, get_valid_enterprise
+from tests.models import Enterprise
 
 class Fetch(TestCase):
 

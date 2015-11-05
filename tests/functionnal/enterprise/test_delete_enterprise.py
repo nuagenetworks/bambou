@@ -4,8 +4,8 @@ from unittest import TestCase
 from mock import patch
 
 from bambou.exceptions import BambouHTTPError
-from bambou.tests.utils import MockUtils
-from bambou.tests.functionnal import start_session, get_valid_enterprise
+from tests.utils import MockUtils
+from tests.functionnal import start_session, get_valid_enterprise
 
 
 class Delete(TestCase):

@@ -1,0 +1,11 @@
+[run]
+timid = True
+concurrency = thread
+include =
+    bambou/*
+
+[report]
+# show_missing = true
+omit=
+    */__init__.py
+    */contextual/*

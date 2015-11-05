@@ -2,8 +2,8 @@
 
 from unittest import TestCase
 
-from bambou.tests import start_session
-from bambou.tests.models import NURESTTestSession
+from tests import start_session
+from tests.models import NURESTTestSession
 from mock import patch
 
 class SessionTests(TestCase):

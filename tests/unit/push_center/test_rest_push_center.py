@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 from bambou import NURESTPushCenter
-from bambou.tests import start_session
+from tests import start_session
 
 
 class PushCenterSingletonTests(TestCase):

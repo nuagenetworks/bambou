@@ -3,9 +3,9 @@
 from unittest import TestCase
 from mock import patch
 
-from bambou.tests.utils import MockUtils
-from bambou.tests.functionnal import start_session, get_valid_group
-from bambou.tests.models import Employee
+from tests.utils import MockUtils
+from tests.functionnal import start_session, get_valid_group
+from tests.models import Employee
 
 
 class Assign(TestCase):

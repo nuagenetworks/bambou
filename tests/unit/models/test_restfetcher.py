@@ -2,8 +2,8 @@
 
 from unittest import TestCase
 
-from bambou.tests import start_session
-from bambou.tests.models import Group, User
+from tests import start_session
+from tests.models import Group, User
 
 
 class FlushFetcher(TestCase):

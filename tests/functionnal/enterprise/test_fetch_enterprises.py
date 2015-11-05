@@ -4,8 +4,8 @@ from unittest import TestCase
 from mock import patch
 
 from bambou.exceptions import BambouHTTPError
-from bambou.tests.utils import MockUtils
-from bambou.tests.functionnal import start_session, get_valid_enterprise
+from tests.utils import MockUtils
+from tests.functionnal import start_session, get_valid_enterprise
 
 
 class Fetch(TestCase):
@@ -134,14 +134,12 @@ class Fetch(TestCase):
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
         with patch('requests.request', mock):
-            print '......'
+
             (fetcher, user, enterprises) = self.user.enterprises.fetch()
-            print 'xxxxx'
 
             enterprise = self.user.enterprises[2]
             enterprise.name = 'This name should not appear because we will refetch everything!'
 
-            print '*****'
             (fetcher, user, enterprises) = self.user.enterprises.fetch()
             connection = fetcher.current_connection
 

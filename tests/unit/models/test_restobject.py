@@ -2,8 +2,8 @@
 
 from unittest import TestCase
 
-from bambou.tests import start_session
-from bambou.tests.models import Enterprise, EnterprisesFetcher, Group, GroupsFetcher, User
+from tests import start_session
+from tests.models import Enterprise, EnterprisesFetcher, Group, GroupsFetcher, User
 
 
 class GetResourceTests(TestCase):
