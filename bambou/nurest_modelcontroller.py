@@ -30,7 +30,8 @@
 class NURESTModelController(object):
     """ Access any object via its remote name """
 
-    _model_registry = dict()
+    _model_rest_name_registry = {}
+    _model_resource_name_registry = {}
 
     @classmethod
     def register_model(cls, model):
@@ -42,12 +43,15 @@ class NURESTModelController(object):
         """
 
         rest_name = model.rest_name
+        resource_name = model.resource_name
 
-        if rest_name not in cls._model_registry:
-            cls._model_registry[rest_name] = [model]
+        if rest_name not in cls._model_rest_name_registry:
+            cls._model_rest_name_registry[rest_name] = [model]
+            cls._model_resource_name_registry[resource_name] = [model]
 
-        elif model not in cls._model_registry[rest_name]:
-            cls._model_registry[rest_name].append(model)
+        elif model not in cls._model_rest_name_registry[rest_name]:
+            cls._model_rest_name_registry[rest_name].append(model)
+            cls._model_resource_name_registry[resource_name].append(model)
 
     @classmethod
     def get_all_models(cls):
@@ -58,36 +62,88 @@ class NURESTModelController(object):
                 An empty list if no entries found for the remote name
         """
 
-        return cls._model_registry.values()
+        return cls._model_rest_name_registry.values()
+
+    ## Get models by rest_name
 
     @classmethod
-    def get_models(cls, rest_name):
-        """ Retrieve all models from a given remote name
+    def get_models_with_rest_name(cls, rest_name):
+        """ Retrieve all models from a given rest name
 
             Args:
-                rest_name: the remote name entry
+                rest_name: the rest name entry
 
             Returns:
                 A list of models corresponding to remote name arg.
                 An empty list if no entries found for the remote name
         """
 
-        if rest_name in cls._model_registry:
-            return cls._model_registry[rest_name]
+        if rest_name in cls._model_rest_name_registry:
+            return cls._model_rest_name_registry[rest_name]
 
         return []
 
     @classmethod
-    def get_first_model(cls, rest_name):
+    def get_first_model_with_rest_name(cls, rest_name):
         """ Get the first model corresponding to a rest_name
 
             Args:
-                rest_name: the remote name
+                rest_name: the rest name
         """
 
-        models = cls.get_models(rest_name)
+        models = cls.get_models_with_rest_name(rest_name)
 
         if len(models) > 0:
             return models[0]
 
         return None
+
+    ## Get models by resource_name
+
+    @classmethod
+    def get_models_with_resource_name(cls, resource_name):
+        """ Retrieve all models from a given resource_name
+
+            Args:
+                resource_name: the resource name of the model
+
+            Returns:
+                A list of models corresponding to remote name arg.
+                An empty list if no entries found for the remote name
+        """
+
+        if resource_name in cls._model_resource_name_registry:
+            return cls._model_resource_name_registry[resource_name]
+
+        return []
+
+    @classmethod
+    def get_first_model_with_resource_name(cls, resource_name):
+        """ Get the first model corresponding to a resource_name
+
+            Args:
+                resource_name: the resource name
+        """
+
+        models = cls.get_models_with_resource_name(resource_name)
+
+        if len(models) > 0:
+            return models[0]
+
+        return None
+
+
+
+    # will be deprecated
+    @classmethod
+    def get_models(cls, rest_name):
+        """
+        """
+        return self.get_models_with_rest_name(rest_name)
+
+    # will be deprecated
+    @classmethod
+    def get_first_model(cls, rest_name):
+        """
+        """
+        return self.get_first_model_with_rest_name(rest_name)
