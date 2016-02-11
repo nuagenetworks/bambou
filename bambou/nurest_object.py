@@ -105,6 +105,7 @@ class NURESTObject(object):
         self._attributes = dict()
 
         self.expose_attribute(local_name='id', remote_name=BambouConfig.get_id_remote_name(), attribute_type=BambouConfig.get_id_type(), is_identifier=True)
+        self.expose_attribute(local_name='external_id', remote_name='externalID', attribute_type=str)
         self.expose_attribute(local_name='parent_id', remote_name='parentID', attribute_type=str)
         self.expose_attribute(local_name='parent_type', remote_name='parentType', attribute_type=str)
         self.expose_attribute(local_name='creation_date', remote_name='creationDate', attribute_type=float, is_editable=False)
