@@ -54,7 +54,7 @@ class _ClassDelegate(classy):
 
     get = None  # dummy
 
-    decorate(classmethod)
+    @classmethod
     def __class_init__(cls, name, bases, cdict, supr):
         meta = type(cls)
         if getattr(meta, '__for_class__', None) is not cls:
@@ -121,7 +121,7 @@ class State(_ClassDelegate):
 
 
 
-    decorate(staticmethod)
+    @staticmethod
     def get(key=None):
         """Return the current state (no args) or a current rule (w/key)"""
         # this method is replaced later below
