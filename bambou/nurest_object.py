@@ -103,25 +103,26 @@ class NURESTObject(object):
         self._creation_date = None
         self._external_id = None
         self._id = None
-        self._local_id = None
-        self._owner = None
-        self._parent_id = None
-        self._parent_type = None
-        self._parent = None
+        self._is_dirty = False
         self._last_updated_by = None
         self._last_updated_date = None
-        self._is_dirty = False
+        self._local_id = None
+        self._owner = None
+        self._parent = None
+        self._parent_id = None
+        self._parent_type = None
 
         self._attribute_errors = dict()
         self._attributes = dict()
 
+        self.expose_attribute(local_name=u'creation_date', remote_name=u'creationDate', attribute_type=time, is_editable=False)
+        self.expose_attribute(local_name=u'external_id', remote_name=u'externalID', attribute_type=str)
         self.expose_attribute(local_name=u'id', remote_name=u'ID', attribute_type=str, is_identifier=True)
+        self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
+        self.expose_attribute(local_name=u'last_updated_date', remote_name=u'lastUpdatedDate', attribute_type=time, is_readonly=True)
+        self.expose_attribute(local_name=u'owner', attribute_type=str, is_readonly=True)
         self.expose_attribute(local_name=u'parent_id', remote_name=u'parentID', attribute_type=str)
         self.expose_attribute(local_name=u'parent_type', remote_name=u'parentType', attribute_type=str)
-        self.expose_attribute(local_name=u'creation_date', remote_name=u'creationDate', attribute_type=time, is_editable=False)
-        self.expose_attribute(local_name=u'owner', attribute_type=str, is_readonly=True)
-        self.expose_attribute(local_name=u'last_updated_date', remote_name=u'lastUpdatedDate', attribute_type=time, is_readonly=True)
-        self.expose_attribute(local_name=u'last_updated_by', remote_name=u'lastUpdatedBy', attribute_type=str, is_readonly=True)
 
         self._fetchers_registry = dict()
 
