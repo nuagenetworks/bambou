@@ -60,23 +60,6 @@ HTTP_METHOD_PUT = 'PUT'
 HTTP_METHOD_DELETE = 'DELETE'
 
 
-## TODO: remove this at some point. this is the SSL ugly patch
-from requests.packages.urllib3.poolmanager import PoolManager
-import ssl
-
-## Monkey patch to use PROTOCOL_TLSv1 by default in requests
-from functools import wraps
-def sslwrap(func):
-    @wraps(func)
-    def bar(*args, **kw):
-        kw['ssl_version'] = ssl.PROTOCOL_TLSv1
-        return func(*args, **kw)
-    return bar
-
-PoolManager.__init__ = sslwrap(PoolManager.__init__)
-## end of monkey patch
-
-
 class NURESTConnection(object):
     """ Connection that enable HTTP requests """
 
