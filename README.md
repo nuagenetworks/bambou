@@ -1,5 +1,7 @@
 # bambou
 
+[![Join the chat at https://gitter.im/nuagenetworks/bambou](https://badges.gitter.im/nuagenetworks/bambou.svg)](https://gitter.im/nuagenetworks/bambou?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Bends but does not break!
 
 
