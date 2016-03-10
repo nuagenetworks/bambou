@@ -26,7 +26,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-
 class BambouHTTPError(Exception):
     """ Bambou HTTPError
 
@@ -39,7 +38,6 @@ class BambouHTTPError(Exception):
 
         """
         self.connection = connection
-        request = connection.request
         response = connection.response
 
         super(BambouHTTPError, self).__init__("[HTTP %s(%s)] %s" % (response.status_code, response.reason, response.errors))

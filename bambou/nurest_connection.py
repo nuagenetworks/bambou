@@ -77,7 +77,7 @@ class NURESTConnection(object):
 
         self._uses_authentication = True
         self._has_timeouted = False
-        #self._is_cancelled = False
+        # self._is_cancelled = False
         self._ignore_request_idle = False
         self._xhr_timeout = 3000
         self._response = None
@@ -397,24 +397,24 @@ class NURESTConnection(object):
         timeout = self.timeout
 
         try:  # TODO : Remove this ugly try/except after fixing Java issue: http://mvjira.mv.usa.alcatel.com/browse/VSD-546
-            response = requests.request(  method=method,
-                                          url=url,
-                                          data=data,
-                                          headers=headers,
-                                          verify=verify,
-                                          timeout=timeout,
-                                          params=params,
-                                          cert=certificate)
+            response = requests.request(method=method,
+                                        url=url,
+                                        data=data,
+                                        headers=headers,
+                                        verify=verify,
+                                        timeout=timeout,
+                                        params=params,
+                                        cert=certificate)
         except requests.exceptions.SSLError:
             try:
-                response = requests.request(  method=method,
-                                              url=url,
-                                              data=data,
-                                              headers=headers,
-                                              verify=verify,
-                                              timeout=timeout,
-                                              params=params,
-                                              cert=certificate)
+                response = requests.request(method=method,
+                                            url=url,
+                                            data=data,
+                                            headers=headers,
+                                            verify=verify,
+                                            timeout=timeout,
+                                            params=params,
+                                            cert=certificate)
             except requests.exceptions.Timeout:
                 return self._did_timeout()
 

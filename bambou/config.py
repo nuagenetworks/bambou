@@ -146,4 +146,3 @@ class BambouConfig(object):
             return cls._config_parser.getboolean(class_name, property_name)
         else:
             return cls._config_parser.get(class_name, property_name)
-

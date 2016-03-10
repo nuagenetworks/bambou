@@ -149,7 +149,6 @@ class NURESTSession(object):
         """
         return opname[ord(frame.f_code.co_code[frame.f_lasti + 3])] is "SETUP_WITH"
 
-
     def start(self):
         """
             Starts the session.

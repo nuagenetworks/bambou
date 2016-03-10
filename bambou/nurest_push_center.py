@@ -36,9 +36,11 @@ from .nurest_request import NURESTRequest
 
 from bambou import pushcenter_logger
 
+
 class StoppableThread(threading.Thread):
-    """Thread class with a stop() method. The thread itself has to check
-    regularly for the stopped() condition."""
+    """ Thread class with a stop() method. The thread itself has to check
+        regularly for the stopped() condition.
+    """
 
     def __init__(self, *args, **kwargs):
         super(StoppableThread, self).__init__(*args, **kwargs)
@@ -234,7 +236,7 @@ class NURESTPushCenter(object):
 
         pushcenter_logger.info('Bambou Sending >>>>>>\n%s %s' % (request.method, request.url))
 
-        #connection.ignore_request_idle = True
+        # connection.ignore_request_idle = True
         connection.start()
 
     def add_delegate(self, callback):
@@ -258,7 +260,7 @@ class NURESTPushCenter(object):
                 callback(function): method to trigger when push center receives events
         """
 
-        if not callback in self._delegate_methods:
+        if callback not in self._delegate_methods:
             return
 
         self._delegate_methods.remove(callback)

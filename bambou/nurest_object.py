@@ -26,12 +26,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import logging
 import weakref
 import datetime
 from uuid import uuid4
 from copy import deepcopy
-import json
 
 from bambou import bambou_logger
 from .exceptions import BambouHTTPError, InternalConsitencyError
@@ -42,7 +40,7 @@ from .utils import NURemoteAttribute
 from .config import BambouConfig
 
 
-class NUMetaRESTObject(type): # pragma: no cover
+class NUMetaRESTObject(type):  # pragma: no cover
     """
     """
     @property
@@ -322,7 +320,6 @@ class NURESTObject(object):
 
         return "%s/%s" % (self.get_resource_url(), nurest_object_type.resource_name)
 
-
     def __str__(self):
         """ Prints a NURESTObject """
 
@@ -346,9 +343,9 @@ class NURESTObject(object):
             value = getattr(self, local_name, None)
 
             if value is None and attribute.is_required:
-                self._attribute_errors[local_name] = {  'title': 'Invalid input',
-                                                        'description': 'This value is mandatory.',
-                                                        'remote_name': attribute.remote_name}
+                self._attribute_errors[local_name] = {'title': 'Invalid input',
+                                                      'description': 'This value is mandatory.',
+                                                      'remote_name': attribute.remote_name}
                 continue
 
             if value is None:
@@ -356,27 +353,27 @@ class NURESTObject(object):
 
             if type(value) != attribute.attribute_type:
                 if attribute.attribute_type != str or type(value) != unicode:
-                    self._attribute_errors[local_name] = {  'title': 'Wrong type',
-                                                            'description': 'Attribute %s type should be %s but is %s' % (attribute.remote_name, attribute.attribute_type, type(value)),
-                                                            'remote_name': attribute.remote_name}
+                    self._attribute_errors[local_name] = {'title': 'Wrong type',
+                                                          'description': 'Attribute %s type should be %s but is %s' % (attribute.remote_name, attribute.attribute_type, type(value)),
+                                                          'remote_name': attribute.remote_name}
                     continue
 
             if attribute.min_length and len(value) < attribute.min_length:
-                self._attribute_errors[local_name] = {  'title': 'Invalid lenght',
-                                                        'description': 'Attribute %s minimum size should be %s but is %s' % (attribute.remote_name, attribute.min_length, len(value)),
-                                                        'remote_name': attribute.remote_name}
+                self._attribute_errors[local_name] = {'title': 'Invalid lenght',
+                                                      'description': 'Attribute %s minimum size should be %s but is %s' % (attribute.remote_name, attribute.min_length, len(value)),
+                                                      'remote_name': attribute.remote_name}
                 continue
 
             if attribute.max_length and len(value) > attribute.max_length:
-                self._attribute_errors[local_name] = {  'title': 'Invalid lenght',
-                                                        'description': 'Attribute %s maximum size should be %s but is %s' % (attribute.remote_name, attribute.max_length, len(value)),
-                                                        'remote_name': attribute.remote_name}
+                self._attribute_errors[local_name] = {'title': 'Invalid lenght',
+                                                      'description': 'Attribute %s maximum size should be %s but is %s' % (attribute.remote_name, attribute.max_length, len(value)),
+                                                      'remote_name': attribute.remote_name}
                 continue
 
             if attribute.choices and value not in attribute.choices:
-                self._attribute_errors[local_name] = {  'title': 'Invalid input',
-                                                        'description': 'Invalid input',
-                                                        'remote_name': attribute.remote_name}
+                self._attribute_errors[local_name] = {'title': 'Invalid input',
+                                                      'description': 'Invalid input',
+                                                      'remote_name': attribute.remote_name}
                 continue
 
         return self.is_valid()
@@ -659,7 +656,7 @@ class NURESTObject(object):
 
                 dictionary[remote_name] = value
             else:
-                pass # pragma: no cover
+                pass  # pragma: no cover
 
         return dictionary
 
@@ -686,7 +683,7 @@ class NURESTObject(object):
                 setattr(self, local_name, remote_value)
             else:
                 # print('Attribute %s could not be added to object %s' % (remote_name, self))
-                pass # pragma: no cover
+                pass  # pragma: no cover
 
     # HTTP Calls
 
@@ -820,7 +817,7 @@ class NURESTObject(object):
         has_callbacks = connection.has_callbacks()
         should_post = not has_callbacks
 
-        if  connection.handle_response_for_connection(should_post=should_post) and has_callbacks:
+        if connection.handle_response_for_connection(should_post=should_post) and has_callbacks:
             callback = connection.callbacks['local']
             callback(connection)
 
@@ -971,10 +968,10 @@ class NURESTObject(object):
 
         if async:
             return self.send_request(request=request,
-                              async=async,
-                              local_callback=self._did_perform_standard_operation,
-                              remote_callback=callback,
-                              user_info=user_info)
+                                     async=async,
+                                     local_callback=self._did_perform_standard_operation,
+                                     remote_callback=callback,
+                                     user_info=user_info)
         else:
             connection = self.send_request(request=request,
                                            user_info=user_info)

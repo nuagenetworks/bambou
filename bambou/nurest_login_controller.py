@@ -65,7 +65,6 @@ class NURESTLoginController(object):
 
         return self._is_impersonating
 
-
     @property
     def impersonation(self):
         """ Get impersonation information
@@ -216,7 +215,6 @@ class NURESTLoginController(object):
                 async: Boolean to say whether or not the controller is async.
         """
         self._async = async
-
 
     # Methods
 

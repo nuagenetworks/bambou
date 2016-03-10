@@ -26,7 +26,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-
 class NURESTModelController(object):
     """ Access any object via its remote name """
 
@@ -64,7 +63,7 @@ class NURESTModelController(object):
 
         return cls._model_rest_name_registry.values()
 
-    ## Get models by rest_name
+    # Get models by rest_name
 
     @classmethod
     def get_models_with_rest_name(cls, rest_name):
@@ -98,7 +97,7 @@ class NURESTModelController(object):
 
         return None
 
-    ## Get models by resource_name
+    # Get models by resource_name
 
     @classmethod
     def get_models_with_resource_name(cls, resource_name):
@@ -132,18 +131,16 @@ class NURESTModelController(object):
 
         return None
 
-
-
     # will be deprecated
     @classmethod
     def get_models(cls, rest_name):
         """
         """
-        return self.get_models_with_rest_name(rest_name)
+        return cls.get_models_with_rest_name(rest_name)
 
     # will be deprecated
     @classmethod
     def get_first_model(cls, rest_name):
         """
         """
-        return self.get_first_model_with_rest_name(rest_name)
+        return cls.get_first_model_with_rest_name(rest_name)

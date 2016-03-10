@@ -26,7 +26,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-
 class NURESTRequest(object):
     """ Request that will be send via the connection """
 
@@ -120,4 +119,3 @@ class NURESTRequest(object):
         """ Set header value """
 
         self._headers[header] = value
-

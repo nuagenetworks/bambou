@@ -33,6 +33,7 @@ from .nurest_connection import HTTP_METHOD_GET, HTTP_METHOD_HEAD
 
 from bambou.config import BambouConfig
 
+
 class NURESTFetcher(list):
     """ Object fetcher for childrens
 
