@@ -342,7 +342,7 @@ class NURESTObject(object):
 
             value = getattr(self, local_name, None)
 
-            if attribute.is_required and value is None or value == "":
+            if attribute.is_required and (value is None or value == ""):
                 self._attribute_errors[local_name] = {'title': 'Invalid input',
                                                       'description': 'This value is mandatory.',
                                                       'remote_name': attribute.remote_name}
