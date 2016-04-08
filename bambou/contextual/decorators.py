@@ -1,4 +1,4 @@
-from types import ClassType, FunctionType
+from types import FunctionType
 import sys, os
 __all__ = [
     'decorate_class', 'metaclass_is_decorator', 'metaclass_for_bases',
@@ -103,12 +103,12 @@ def %(wrapname)s(%(wrapspec)s):
 
     filename = "<%s wrapping %s at 0x%08X>" % (qname(wrapper), qname(func), id(func))
     d ={}
-    exec compile(body, filename, "exec") in func.func_globals, d
+    exec(compile(body, filename, "exec"), func.__globals__, d)
 
     f = d[wrapname](func, *args, **kw)
     cache_source(filename, body, f)
 
-    f.func_defaults = func.func_defaults
+    f.__defaults__ = func.__defaults__
     f.__doc__  = func.__doc__
     f.__dict__ = func.__dict__
     return f
@@ -221,7 +221,7 @@ def template_function(wrapper=None):
             return wrap(func, "test")
 
     The above code will return individually-generated wrapper functions whose
-    signature, defaults, ``__name__``, ``__module__``, and ``func_globals``
+    signature, defaults, ``__name__``, ``__module__``, and ``__globals__``
     match those of the wrapped functions.
 
     You can use define any arguments you wish in the wrapping function, as long
@@ -446,7 +446,7 @@ def decorate_class(decorator, depth=2, frame=None, allow_duplicates=False):
         return
 
     previousMetaclass = caller_locals.get('__metaclass__')
-    defaultMetaclass  = caller_globals.get('__metaclass__', ClassType)
+    defaultMetaclass  = caller_globals.get('__metaclass__', type)
 
 
     def advise(name,bases,cdict):
@@ -545,7 +545,7 @@ def metaclass_for_bases(bases, explicit_mc=None):
         # easy case
         return meta[0]
 
-    classes = [c for c in meta if c is not ClassType]
+    classes = [c for c in meta if c is not type]
     candidates = []
 
     for m in classes:
@@ -560,7 +560,7 @@ def metaclass_for_bases(bases, explicit_mc=None):
 
     if not candidates:
         # they're all "classic" classes
-        return ClassType
+        return type
 
     elif len(candidates)>1:
         # We could auto-combine, but for now we won't...
