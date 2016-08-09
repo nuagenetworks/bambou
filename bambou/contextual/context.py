@@ -1,6 +1,7 @@
 import sys
-from thread import get_ident
+from _thread import get_ident
 from .decorators import rewrap, cache_source, classy, decorate
+from future.utils import raise_with_traceback
 
 __all__ = [
     'Service', 'replaces', 'setting', 'InputConflict', 'DynamicRuleError',
@@ -434,7 +435,7 @@ class _GeneratorContextManager(object):
 
                 raise RuntimeError("generator didn't stop after throw()")
 
-            except StopIteration, exc:
+            except StopIteration as exc:
                 # Suppress the exception *unless* it's the same exception that
                 # was passed to throw().  This prevents a StopIteration
                 # raised inside the "with" statement from being suppressed
@@ -483,7 +484,7 @@ def reraise():
     typ,val,tb = _exc_info.get(get_ident(), nones)
     if typ:
         try:
-            raise typ,val,tb
+            raise_with_traceback(typ(val))
         finally:
             del typ,val,tb
 
@@ -660,19 +661,19 @@ class setting(object):
     """Decorator that turns a function into a contextual variable"""
 
     __class__ = type(nop)
-    func_code = nop.func_code
+    func_code = nop.__code__
     func_defaults = ()
 
     __argnames__ = ('value','expr'),
 
     def __init__(self, func, wrap=None):
-        if func.func_code.co_argcount != len(self.__argnames__):
+        if func.__code__.co_argcount != len(self.__argnames__):
             raise TypeError(
                 type(self).__name__+" function must have exactly %d argument(s)"
                 % len(self.__argnames__)
             )
         for num, (var, names) in enumerate(
-            zip(func.func_code.co_varnames, self.__argnames__)
+            zip(func.__code__.co_varnames, self.__argnames__)
         ):
             if var not in names:
                 raise TypeError(
@@ -716,7 +717,7 @@ class setting(object):
         return self.__name__
 
     def __mod__(self, other):
-        if self.__function__.func_code.co_varnames[
+        if self.__function__.__code__.co_varnames[
             len(type(self).__argnames__)-1
         ]=='expr':
             return 'lambda: '+other
@@ -736,7 +737,8 @@ class setting(object):
 
 
 
-def _with_prefix((pre, func), suffix):
+def _with_prefix(pre_func, suffix):
+    pre, func = pre_func
     return func(pre+suffix)
 
 def _prefixer(prefix, func):
@@ -781,7 +783,7 @@ class registry(setting):
     """Decorator that turns a function into a contextual registry"""
 
     __argnames__ = ('suffix',), ('value','expr')
-    func_code = (lambda key, default: None).func_code
+    func_code = (lambda key, default: None).__code__
     func_defaults = (None,)
 
     def __init__(self, func, ns=None, name='', wrap=None):
