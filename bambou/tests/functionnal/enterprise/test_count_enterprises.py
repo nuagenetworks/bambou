@@ -99,7 +99,7 @@ class Count(TestCase):
             (fetcher, user, count) = self.user.enterprises.count(page=3)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
-        self.assertEqual(headers['X-Nuage-Page'], 3)
+        self.assertEqual(headers['X-Nuage-Page'], '3')
 
     def test_count_with_page_size(self):
         """ HEAD /enterprises count enterprises with page size """
@@ -113,7 +113,7 @@ class Count(TestCase):
             (fetcher, user, count) = self.user.enterprises.count(page_size=10)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
-        self.assertEqual(headers['X-Nuage-PageSize'], 10)
+        self.assertEqual(headers['X-Nuage-PageSize'], '10')
 
     def test_count_all_should_raise_exception(self):
         """ HEAD /enterprises count all enterprises should raise exception """
