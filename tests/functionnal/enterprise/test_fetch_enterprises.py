@@ -105,7 +105,7 @@ class Fetch(TestCase):
             (fetcher, user, enterprises) = self.user.enterprises.fetch(page=2)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
-        self.assertEqual(headers['X-Nuage-Page'], 2)
+        self.assertEqual(headers['X-Nuage-Page'], '2')
 
     def test_fetch_with_page_size(self):
         """ GET /enterprises retrieve enterprises with page size """
@@ -116,7 +116,7 @@ class Fetch(TestCase):
             (fetcher, user, enterprises) = self.user.enterprises.fetch(page_size=10)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
-        self.assertEqual(headers['X-Nuage-PageSize'], 10)
+        self.assertEqual(headers['X-Nuage-PageSize'], '10')
 
     def test_fetch_all_should_not_raise_exception(self):
         """ GET /enterprises retrieve all enterprises should not raise exception """
