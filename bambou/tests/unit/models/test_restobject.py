@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from bambou.tests import start_session
-from bambou.tests.models import Enterprise, EnterprisesFetcher, Group, GroupsFetcher, User
+from bambou.tests.models import Enterprise, Group, User
 
 
 class GetResourceTests(TestCase):
@@ -27,7 +27,6 @@ class GetResourceTests(TestCase):
     def test_rest_resource_name(self):
         """ Get object resource name """
 
-        enterprise = Enterprise()
         self.assertEquals(Enterprise.rest_resource_name, u'enterprises')
 
     def test_get_resource_url(self):
@@ -40,9 +39,9 @@ class GetResourceTests(TestCase):
     def test_get_resource_base_url(self):
         """ Get object resource base url """
 
-        self.assertEquals(Enterprise.rest_base_url(), u'https://vsd:8443/')
+        self.assertEquals(Enterprise.rest_base_url(), u'https://vsd:8443/nuage/api/v3_2')
 
-    def test_get_resource_base_url(self):
+    def test_get_resource_base_url_with_id(self):
         """ Get object resource base url """
 
         enterprise = Enterprise()
@@ -80,10 +79,10 @@ class CompressionTests(TestCase):
 
         to_dict = enterprise.to_dict()
 
-        self.assertEquals(to_dict.keys(), ['groups', u'allowedForwardingClasses', 'name', 'ceo', u'parentType', u'lastUpdatedBy', u'lastUpdatedDate', u'parentID', u'owner', u'creationDate', u'ID', 'description'])
+        self.assertEquals(to_dict.keys(), ['groups', u'allowedForwardingClasses', 'name', 'ceo', u'parentType', u'lastUpdatedBy', u'externalID', u'lastUpdatedDate', u'parentID', u'owner', u'creationDate', u'ID', 'description'])
         self.assertEquals(to_dict['name'], u'NewEnterprise')
         self.assertEquals(to_dict['ID'], 3)
-        #self.assertEquals(to_dict['externalID'], None)
+        self.assertEquals(to_dict['externalID'], None)
         #self.assertEquals(to_dict['localID'], None)
         self.assertEquals(to_dict['parentID'], None)
         self.assertEquals(to_dict['parentType'], None)
@@ -102,6 +101,7 @@ class CompressionTests(TestCase):
                                             'firstName': 'John',
                                             'lastName': 'Doe',
                                             u'lastUpdatedBy': None,
+                                            u'externalID': None,
                                             u'lastUpdatedDate': None,
                                             u'owner': None,
                                             u'parentID': None,
@@ -110,26 +110,25 @@ class CompressionTests(TestCase):
                                             'role': None,
                                             'userName': None
                                         })
-        self.assertEquals(to_dict['groups'], [{
-                                                u'ID': None,
-                                                 u'creationDate': None,
-                                                 u'lastUpdatedBy': None,
-                                                 u'lastUpdatedDate': None,
-                                                 'name': 'Admins',
-                                                 u'owner': None,
-                                                 u'parentID': None,
-                                                 u'parentType': None
-                                             },
-                                             {
-                                                u'ID': None,
-                                                u'creationDate': None,
-                                                u'lastUpdatedBy': None,
-                                                u'lastUpdatedDate': None,
-                                                'name': 'Others',
-                                                u'owner': None,
-                                                u'parentID': None,
-                                                u'parentType': None
-                                            }])
+        self.assertEquals(to_dict['groups'], [{u'ID': None,
+                                               u'creationDate': None,
+                                               u'externalID': None,
+                                               u'lastUpdatedBy': None,
+                                               u'lastUpdatedDate': None,
+                                               'name': 'Admins',
+                                               u'owner': None,
+                                               u'parentID': None,
+                                               u'parentType': None},
+                                              {u'ID': None,
+                                               u'creationDate': None,
+                                               u'externalID': None,
+                                               u'lastUpdatedBy': None,
+                                               u'lastUpdatedDate': None,
+                                               'name': 'Others',
+                                               u'owner': None,
+                                               u'parentID': None,
+                                               u'parentType': None}])
+
 
     def test_from_dict(self):
         """ Fill object from a dictionary """
@@ -173,7 +172,7 @@ class AttributeTests(TestCase):
 
         attributes = enterprise.get_attributes()
 
-        self.assertEqual(len(attributes), 12)
+        self.assertEqual(len(attributes), 13)
 
     def test_validate_attributes(self):
         """ Get validate attributes """
