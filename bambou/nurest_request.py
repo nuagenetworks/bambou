@@ -45,7 +45,7 @@ class NURESTRequest(object):
             self.set_header('X-Nuage-Filter', filter)
 
         if page:
-            self.set_header('X-Nuage-Page', page)
+            self.set_header('X-Nuage-Page', str(page))
 
         if order_by:
             self.set_header('X-Nuage-OrderBy', order_by)
@@ -119,6 +119,14 @@ class NURESTRequest(object):
 
     def set_header(self, header, value):
         """ Set header value """
-
+        # requests>=2.11 only accepts `str` or `bytes` header values
+        # raising an exception here, instead of leaving it to `requests` makes
+        # it easy to know where we passed a wrong header type in the code.
+        if isinstance(value, unicode):
+            # FIXME: this is very python 2.x specific, it needs to be changed
+            # when making bambou python 3.x compliant.
+            value = value.encode()
+        elif not isinstance(value, (str, bytes)):
+            raise TypeError("header values must be str or bytes, but %s value has type %s" % (header, type(value)))
         self._headers[header] = value
 

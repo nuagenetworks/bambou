@@ -215,10 +215,10 @@ class NURESTFetcher(list):
             request.set_header('X-Nuage-OrderBy', order_by)
 
         if page:
-            request.set_header('X-Nuage-Page', page)
+            request.set_header('X-Nuage-Page', str(page))
 
         if page_size:
-            request.set_header('X-Nuage-PageSize', page_size)
+            request.set_header('X-Nuage-PageSize', str(page_size))
 
         if len(group_by) > 0:
             header = ", ".join(group_by)
