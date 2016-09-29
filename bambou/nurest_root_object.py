@@ -128,10 +128,10 @@ class NURESTRootObject(NURESTObject):
 
         self._new_password = new_password
 
-    def save(self, async=False, callback=None):
+    def save(self, async=False, callback=None, encrypted=True):
         """ Updates the user and perform the callback method """
 
-        if self._new_password:
+        if self._new_password and encrypted:
             self.password = Sha1.encrypt(self._new_password)
 
         controller = _NURESTSessionCurrentContext.session.login_controller

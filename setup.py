@@ -25,11 +25,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from setuptools  import setup
+from setuptools import setup
 
 setup(
     name='bambou',
-    version='2.1.1',
+    version='2.1.2',
     author='Christophe Serafin, Antoine Mercadal',
     author_email='christophe.serafin@nuagenetworks.net, antoine@nuagenetworks.net',
     packages=['bambou', 'bambou.utils', 'bambou.contextual'],
