@@ -236,7 +236,7 @@ class NURESTFetcher(list):
         if order_by:
             request.set_header('X-Nuage-OrderBy', order_by)
 
-        if page:
+        if page is not None:
             request.set_header('X-Nuage-Page', str(page))
 
         if page_size:
