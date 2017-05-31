@@ -29,7 +29,7 @@ from setuptools import setup
 
 setup(
     name='bambou',
-    version='2.1.2',
+    version='2.1.3',
     author='Christophe Serafin, Antoine Mercadal',
     author_email='christophe.serafin@nuagenetworks.net, antoine@nuagenetworks.net',
     packages=['bambou', 'bambou.utils', 'bambou.contextual'],
