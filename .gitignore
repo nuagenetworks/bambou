@@ -41,3 +41,6 @@ nosetests.xml
 MANIFEST
 
 .DS_Store
+
+
+.idea
