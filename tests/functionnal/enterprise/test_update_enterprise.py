@@ -26,7 +26,7 @@ class Update(TestCase):
         enterprise.name ="Another name"
         mock = MockUtils.create_mock_response(status_code=200, data=enterprise)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (obj, connection) = enterprise.save()
 
         method = MockUtils.get_mock_parameter(mock, 'method')
@@ -50,6 +50,6 @@ class Update(TestCase):
         enterprise.name ="Another name"
         mock = MockUtils.create_mock_response(status_code=404, data=enterprise, error=u"Enterprise not found")
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             with self.assertRaises(BambouHTTPError):
                 (obj, connection) = enterprise.save()

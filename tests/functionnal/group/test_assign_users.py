@@ -27,7 +27,7 @@ class Assign(TestCase):
         employee1 = Employee(firstname=u"Steven", lastname=u"Gerrard")
         employee2 = Employee(firstname=u"Gerrard", lastname=u"Lampard")
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (objects, connection) = self.group.assign([employee1, employee2], Employee)
 
         method = MockUtils.get_mock_parameter(mock, 'method')
@@ -53,7 +53,7 @@ class Assign(TestCase):
         employee1 = Employee(firstname=u"Steven", lastname=u"Gerrard")
         employee2 = Employee(firstname=u"Gerrard", lastname=u"Lampard")
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (objects, connection) = self.group.assign([employee1, employee2], Employee, commit=False)
 
         self.assertEqual(objects, [employee1, employee2])

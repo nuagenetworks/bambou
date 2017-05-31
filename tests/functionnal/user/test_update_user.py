@@ -24,7 +24,7 @@ class Update(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=204, data=None)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (obj, connection) = self.user.save()
 
         method = MockUtils.get_mock_parameter(mock, 'method')

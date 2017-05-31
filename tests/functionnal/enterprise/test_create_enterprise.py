@@ -25,7 +25,7 @@ class Create(TestCase):
         enterprise = get_valid_enterprise(id=1, name=u"Enterprise")
         mock = MockUtils.create_mock_response(status_code=201, data=enterprise)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (obj, connection) = user.create_child(enterprise)
 
         method = MockUtils.get_mock_parameter(mock, 'method')
@@ -53,7 +53,7 @@ class Create(TestCase):
         enterprise = get_valid_enterprise(id=1, name=u"Enterprise")
         mock = MockUtils.create_mock_response(status_code=201, data=enterprise)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (obj, connection) = user.create_child(enterprise, commit=False)
 
         self.assertNotIn(obj, user.enterprises)
@@ -66,6 +66,6 @@ class Create(TestCase):
         enterprise = get_valid_enterprise(id=1, name=u"Enterprise")
         mock = MockUtils.create_mock_response(status_code=409, data=enterprise, error=u"Name already exists")
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             with self.assertRaises(BambouHTTPError):
                 (obj, connection) = user.create_child(enterprise)

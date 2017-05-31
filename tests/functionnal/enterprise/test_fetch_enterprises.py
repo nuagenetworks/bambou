@@ -27,7 +27,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, enterprises) = self.user.enterprises.fetch()
             connection = fetcher.current_connection
 
@@ -51,7 +51,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, enterprises) = self.user.enterprises.fetch(commit=False)
             connection = fetcher.current_connection
 
@@ -65,7 +65,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=[self.enterprises[1]])
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, enterprises) = self.user.enterprises.fetch(filter=u"name == 'Enterprise 2'")
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
@@ -78,7 +78,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, enterprises) = self.user.enterprises.fetch(group_by=['field1', 'field2'])
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
@@ -90,7 +90,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, enterprises) = self.user.enterprises.fetch(order_by='name ASC')
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
@@ -101,7 +101,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, enterprises) = self.user.enterprises.fetch(page=2)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
@@ -112,7 +112,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, enterprises) = self.user.enterprises.fetch(page_size=10)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
@@ -123,7 +123,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=500, data=[], error=u"Internal error")
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             with self.assertRaises(BambouHTTPError):
                 (fetcher, user, enterprises) = self.user.enterprises.fetch()
                 connection = fetcher.current_connection
@@ -133,7 +133,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
 
             (fetcher, user, enterprises) = self.user.enterprises.fetch()
 
@@ -154,12 +154,12 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, enterprises) = self.user.enterprises.fetch()
 
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises[1:])
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, enterprises) = self.user.enterprises.fetch()
             connection = fetcher.current_connection
 
@@ -171,7 +171,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, enterprises) = self.user.enterprises.fetch(query_parameters={"query_param": "query_value"})
             connection = fetcher.current_connection
 
@@ -182,7 +182,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             enterprises = self.user.enterprises.get(query_parameters={"query_param": "query_value"})
             connection = self.user.enterprises.current_connection
 
@@ -193,7 +193,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             enterprises = self.user.enterprises.get_first(query_parameters={"query_param": "query_value"})
             connection = self.user.enterprises.current_connection
 
@@ -204,7 +204,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, enterprises) = self.user.enterprises.count(query_parameters={"query_param": "query_value"})
             connection = fetcher.current_connection
 
@@ -215,7 +215,7 @@ class Fetch(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprises)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             enterprises = self.user.enterprises.get_count(query_parameters={"query_param": "query_value"})
             connection = self.user.enterprises.current_connection
 
