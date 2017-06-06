@@ -25,7 +25,7 @@ class Fetch(TestCase):
         enterprise = Enterprise(id=1)
         mock = MockUtils.create_mock_response(status_code=200, data=self.enterprise)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (obj, connection) = enterprise.fetch()
 
         method = MockUtils.get_mock_parameter(mock, 'method')

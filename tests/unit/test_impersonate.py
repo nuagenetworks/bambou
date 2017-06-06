@@ -30,7 +30,7 @@ class Impersonate(TestCase):
 
         user = User()
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             user.enterprises.fetch()
 
         headers = MockUtils.get_mock_parameter(mock=mock, name='headers')
@@ -42,7 +42,7 @@ class Impersonate(TestCase):
         session.stop_impersonate()
         self.assertEquals(session.is_impersonating, False)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             user.enterprises.fetch()
 
         headers = MockUtils.get_mock_parameter(mock=mock, name='headers')

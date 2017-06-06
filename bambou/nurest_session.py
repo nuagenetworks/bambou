@@ -10,6 +10,7 @@ from bambou import bambou_logger
 from contextlib import contextmanager
 from opcode import opname
 import inspect
+import requests
 
 
 class NURESTSession(object):
@@ -63,6 +64,8 @@ class NURESTSession(object):
 
         self._push_center = NURESTPushCenter()
         self._push_center.url = self._login_controller.url
+
+        self.requests_session = requests.Session()
 
     # Class Methods
 

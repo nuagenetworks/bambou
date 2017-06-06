@@ -370,7 +370,7 @@ class NURESTConnection(object):
         bambou_logger.debug('> headers: %s' % headers)
         bambou_logger.debug('> data:\n  %s' % json.dumps(self._request.data, indent=4))
 
-        response = self.__make_request(method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
+        response = self.__make_request(requests_session=_NURESTSessionCurrentContext.session.requests_session, method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
 
         retry_request = False
 
@@ -386,18 +386,18 @@ class NURESTConnection(object):
             retry_request = True
 
         if retry_request:
-            response = self.__make_request(method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
+            response = self.__make_request(requests_session=_NURESTSessionCurrentContext.session.requests_session, method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
 
         return self._did_receive_response(response)
 
-    def __make_request(self, method, url, params, data, headers, certificate):
+    def __make_request(self, requests_session, method, url, params, data, headers, certificate):
         """ Encapsulate requests call
         """
         verify = False
         timeout = self.timeout
 
         try:  # TODO : Remove this ugly try/except after fixing Java issue: http://mvjira.mv.usa.alcatel.com/browse/VSD-546
-            response = requests.request(method=method,
+            response = requests_session.request(method=method,
                                         url=url,
                                         data=data,
                                         headers=headers,
@@ -407,7 +407,7 @@ class NURESTConnection(object):
                                         cert=certificate)
         except requests.exceptions.SSLError:
             try:
-                response = requests.request(method=method,
+                response = requests_session.request(method=method,
                                             url=url,
                                             data=data,
                                             headers=headers,

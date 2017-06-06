@@ -26,7 +26,7 @@ class Count(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, count) = self.user.enterprises.count()
 
         method = MockUtils.get_mock_parameter(mock, 'method')
@@ -51,7 +51,7 @@ class Count(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, count) = self.user.enterprises.count(filter=u"name == 'Enterprise 2'")
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
@@ -66,7 +66,7 @@ class Count(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, count) = self.user.enterprises.count(order_by='name ASC')
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
@@ -80,7 +80,7 @@ class Count(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, count) = self.user.enterprises.count(group_by=['field1', 'field2'])
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
@@ -95,7 +95,7 @@ class Count(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, count) = self.user.enterprises.count(page=3)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
@@ -109,7 +109,7 @@ class Count(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (fetcher, user, count) = self.user.enterprises.count(page_size=10)
 
         headers = MockUtils.get_mock_parameter(mock, 'headers')
@@ -121,7 +121,7 @@ class Count(TestCase):
         user = self.user
         mock = MockUtils.create_mock_response(status_code=500, data=[], error=u"Internal error")
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             with self.assertRaises(BambouHTTPError):
                 (fetcher, user, count) = self.user.enterprises.count()
 
@@ -133,7 +133,7 @@ class Count(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=200, data=None, headers=headers)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             count = self.user.enterprises.get_count()
 
         self.assertEqual(count, 4)

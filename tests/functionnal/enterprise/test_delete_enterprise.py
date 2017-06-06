@@ -24,7 +24,7 @@ class Delete(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=204, data=self.enterprise)
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             (obj, connection) = self.enterprise.delete(response_choice=1)
 
         method = MockUtils.get_mock_parameter(mock, 'method')
@@ -46,6 +46,6 @@ class Delete(TestCase):
 
         mock = MockUtils.create_mock_response(status_code=400, data=self.enterprise, error=u"Internal error")
 
-        with patch('requests.request', mock):
+        with patch('requests.Session.request', mock):
             with self.assertRaises(BambouHTTPError):
                 (obj, connection) = self.enterprise.delete(response_choice=1)
