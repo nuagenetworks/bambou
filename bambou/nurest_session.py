@@ -10,6 +10,7 @@ from .nurest_push_center import NURESTPushCenter
 from bambou import bambou_logger
 from contextlib import contextmanager
 import requests
+import sys
 
 
 class NURESTSession(object):
@@ -159,6 +160,11 @@ class NURESTSession(object):
         """
 
         print('start')
+        if NURESTSession.session_stack:
+            # TODO: put this in a logger
+            print('Trying to start a new session inside a context. This is not an allowed configuration. Exiting to prevent bad things from happening...')
+            sys.exit(-1)
+
         if NURESTSession.current_session is not None:
             NURESTSession.current_session.reset()
 

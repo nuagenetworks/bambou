@@ -382,7 +382,7 @@ class FetchersTests(TestCase):
         user = User()
 
         rest_names = user.children_rest_names
-        self.assertEquals(rest_names, ['group', 'enterprise'])
+        self.assertEquals(sorted(rest_names), sorted(['group', 'enterprise']))
         self.assertEquals(user.fetcher_for_rest_name('group'), [])
         self.assertEquals(user.fetcher_for_rest_name('enterprise'), [])
 

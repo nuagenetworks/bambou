@@ -308,10 +308,8 @@ class NURESTConnection(object):
 
     def _did_receive_response(self, response):
         """ Called when a response is received """
-
         try:
             data = response.json()
-
         except:
             data = None
 
@@ -367,6 +365,7 @@ class NURESTConnection(object):
             self._request.set_header('Authorization', controller.get_authentication_header(user_name, api_key))
 
         if controller.is_impersonating:
+            print('WHOOOHAAA I AM IMPERSONATING')
             self._request.set_header('X-Nuage-ProxyUser', controller.impersonation)
 
         headers = self._request.headers

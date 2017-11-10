@@ -31,7 +31,7 @@ class MockUtils(object):
 
         response = Response()
         response.status_code = status_code
-        response._content = json.dumps(content)
+        response._content = json.dumps(content).encode('utf-8')
 
         if headers:
             response.headers = headers
