@@ -25,6 +25,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 try:
     import configparser
 except ImportError:
@@ -140,7 +143,7 @@ class BambouConfig(object):
         if not cls._config_parser.has_option(class_name, property_name):
             return None
 
-        if attr_type in (int, long):
+        if attr_type in (int, int):
             return cls._config_parser.getint(class_name, property_name)
         elif attr_type is bool:
             return cls._config_parser.getboolean(class_name, property_name)

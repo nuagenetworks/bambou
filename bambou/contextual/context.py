@@ -103,7 +103,7 @@ class State(_ClassDelegate):
         """Make this state current and return the old one"""
         raise NotImplementedError("Can't switch to the root state")
 
-    def child(self, *rules):
+    def child(self):
         """Return a new child state of this one, with `rules` in effect"""
         raise NotImplementedError   # this method is replaced on each instance
 
@@ -310,7 +310,7 @@ def _let_there_be_state():
             return values.setdefault(key, value)
 
 
-        def child():
+        def child(self):
             """Return a new child state"""
             s = new_state(getRule, distances, publish)
             s.parent = this
@@ -367,6 +367,7 @@ def _let_there_be_state():
             exited.append(1)
             values.clear()
             return call_exitfuncs(typ, val, tb)
+
 
         active_child = []
         my_parent = []
@@ -528,7 +529,7 @@ def call_with(ctxmgr):
     """
     return with_.__get__(ctxmgr, type(ctxmgr))
 
-
+StateIns = State()
 
 
 
@@ -555,7 +556,7 @@ class Service(_ClassDelegate):
 
     def new(cls, factory=None):
         factory = factory or cls
-        state = State.child().__enter__()
+        state = StateIns.child().__enter__()
         try:
             # we use a lambda below to ensure that the rule is unique; that way,
             # we are guaranteed to get a *new* instance of the service in the

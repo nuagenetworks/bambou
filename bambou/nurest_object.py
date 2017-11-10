@@ -26,6 +26,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+from builtins import str
+from builtins import next
+from builtins import object
 import weakref
 import datetime
 from uuid import uuid4
@@ -38,6 +41,7 @@ from .nurest_request import NURESTRequest
 from .nurest_session import _NURESTSessionCurrentContext
 from .utils import NURemoteAttribute
 from .config import BambouConfig
+from future.utils import with_metaclass
 
 
 class NUMetaRESTObject(type):  # pragma: no cover
@@ -68,12 +72,10 @@ class NUMetaRESTObject(type):  # pragma: no cover
         return cls.__resource_name__
 
 
-class NURESTObject(object):
+class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
     """ Determines an object as a NURESTObject one
         Provides basic saving and fetching utilities
     """
-
-    __metaclass__ = NUMetaRESTObject
     __rest_name__ = None
     __resource_name__ = None
 
@@ -122,14 +124,14 @@ class NURESTObject(object):
                 kwargs: a list of arguments
         """
 
-        for name, remote_attribute in self._attributes.items():
+        for name, remote_attribute in list(self._attributes.items()):
             default_value = BambouConfig.get_default_attribute_value(self.__class__, name, remote_attribute.attribute_type)
             setattr(self, name, default_value)
 
         if len(data) > 0:
             self.from_dict(data)
 
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
 
@@ -256,7 +258,7 @@ class NURESTObject(object):
                 >>> print entity.fetchers
                 [<NUSubEntitiesFetcher at xxxx>, <NUOtherEntitiesFetcher at yyyy>]
         """
-        return deepcopy(self._fetchers_registry.values())
+        return deepcopy(list(self._fetchers_registry.values()))
 
     # Children
 
@@ -338,7 +340,7 @@ class NURESTObject(object):
         """
         self._attribute_errors = dict()  # Reset validation errors
 
-        for local_name, attribute in self._attributes.iteritems():
+        for local_name, attribute in self._attributes.items():
 
             value = getattr(self, local_name, None)
 
@@ -352,7 +354,7 @@ class NURESTObject(object):
                 continue  # without error
 
             if type(value) != attribute.attribute_type:
-                if attribute.attribute_type != str or type(value) != unicode:
+                if attribute.attribute_type != str or type(value) != str:
                     self._attribute_errors[local_name] = {'title': 'Wrong type',
                                                           'description': 'Attribute %s type should be %s but is %s' % (attribute.remote_name, attribute.attribute_type, type(value)),
                                                           'remote_name': attribute.remote_name}
@@ -427,7 +429,7 @@ class NURESTObject(object):
                 Returns a dictionnary containing attribute information
         """
 
-        return self._attributes.values()
+        return list(self._attributes.values())
 
     def get_attribute_infos(self, local_name):
         """ Get exposed attribute information
@@ -634,7 +636,7 @@ class NURESTObject(object):
 
         dictionary = dict()
 
-        for local_name, attribute in self._attributes.iteritems():
+        for local_name, attribute in self._attributes.items():
             remote_name = attribute.remote_name
 
             if hasattr(self, local_name):
@@ -674,10 +676,10 @@ class NURESTObject(object):
                 "name: my group - private: False"
         """
 
-        for remote_name, remote_value in dictionary.iteritems():
+        for remote_name, remote_value in dictionary.items():
             # Check if a local attribute is exposed with the remote_name
             # if no attribute is exposed, return None
-            local_name = next((name for name, attribute in self._attributes.iteritems() if attribute.remote_name == remote_name), None)
+            local_name = next((name for name, attribute in self._attributes.items() if attribute.remote_name == remote_name), None)
 
             if local_name:
                 setattr(self, local_name, remote_value)

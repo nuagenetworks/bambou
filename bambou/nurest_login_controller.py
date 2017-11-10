@@ -26,6 +26,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+from __future__ import unicode_literals
+from builtins import object
 from base64 import urlsafe_b64encode
 
 
@@ -248,12 +250,10 @@ class NURESTLoginController(object):
             return "XREST %s" % urlsafe_b64encode("%s:%s" % (user, ""))
 
         if api_key:
-            return "XREST %s" % urlsafe_b64encode("%s:%s" % (user, api_key))
+            return "XREST %s" % urlsafe_b64encode("{}:{}".format(user, api_key).encode('utf-8')).decode('utf-8')
 
-        if isinstance(password, unicode):
-            password = password.encode("utf-8")
 
-        return "XREST %s" % urlsafe_b64encode("%s:%s" % (user, password))
+        return "XREST %s" % urlsafe_b64encode("{}:{}".format(user, password).encode('utf-8')).decode('utf-8')
 
     def reset(self):
         """ Reset controller

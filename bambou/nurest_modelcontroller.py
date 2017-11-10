@@ -26,6 +26,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+from builtins import object
 class NURESTModelController(object):
     """ Access any object via its remote name """
 
@@ -61,7 +62,7 @@ class NURESTModelController(object):
                 An empty list if no entries found for the remote name
         """
 
-        return cls._model_rest_name_registry.values()
+        return list(cls._model_rest_name_registry.values())
 
     # Get models by rest_name
 
