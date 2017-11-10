@@ -38,7 +38,7 @@ from bambou import bambou_logger
 from .exceptions import BambouHTTPError, InternalConsitencyError
 from .nurest_connection import NURESTConnection, HTTP_METHOD_DELETE, HTTP_METHOD_PUT, HTTP_METHOD_POST, HTTP_METHOD_GET
 from .nurest_request import NURESTRequest
-from .nurest_session import _NURESTSessionCurrentContext
+from .nurest_session import NURESTSession
 from .utils import NURemoteAttribute
 from .config import BambouConfig
 from future.utils import with_metaclass
@@ -288,7 +288,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
     def rest_base_url(cls):
         """ Override this method to set object base url """
 
-        controller = _NURESTSessionCurrentContext.session.login_controller
+        controller = NURESTSession.get_current_session().login_controller
         return controller.url
 
     @classmethod

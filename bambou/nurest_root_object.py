@@ -31,7 +31,7 @@ import json
 from .nurest_connection import HTTP_METHOD_PUT, HTTP_METHOD_GET
 from .nurest_request import NURESTRequest
 from .nurest_object import NURESTObject
-from .nurest_session import _NURESTSessionCurrentContext
+from .nurest_session import NURESTSession
 
 from .utils import Sha1
 
@@ -134,7 +134,7 @@ class NURESTRootObject(NURESTObject):
         if self._new_password and encrypted:
             self.password = Sha1.encrypt(self._new_password)
 
-        controller = _NURESTSessionCurrentContext.session.login_controller
+        controller = NURESTSession.get_current_session().login_controller
         controller.password = self._new_password
         controller.api_key = None
 
@@ -152,7 +152,7 @@ class NURESTRootObject(NURESTObject):
 
         self._new_password = None
 
-        controller = _NURESTSessionCurrentContext.session.login_controller
+        controller = NURESTSession.get_current_session().login_controller
         controller.password = None
         controller.api_key = self.api_key
 

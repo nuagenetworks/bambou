@@ -211,9 +211,9 @@ class NURESTPushCenter(object):
 
     def _listen(self, uuid=None, session=None):
         """ Listen a connection uuid """
-        if session:
-            from .nurest_session import _NURESTSessionCurrentContext
-            _NURESTSessionCurrentContext.session = session
+        ## if session:
+        ##     from .nurest_session import _NURESTSessionCurrentContext
+        ##     _NURESTSessionCurrentContext.session = session
 
         if self.url is None:
             raise Exception("NURESTPushCenter needs to have a valid URL. please use setURL: before starting it.")
