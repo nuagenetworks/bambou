@@ -7,11 +7,8 @@ from builtins import str
 from builtins import object
 from .nurest_login_controller import NURESTLoginController
 from .nurest_push_center import NURESTPushCenter
-from bambou.contextual import context
 from bambou import bambou_logger
 from contextlib import contextmanager
-from opcode import opname
-import inspect
 import requests
 
 
@@ -42,6 +39,8 @@ class NURESTSession(object):
     """
     
     current_context = None
+    current_session = None
+    session_stack = []
 
     def __init__(self, username, password, enterprise, api_url, api_prefix, version, certificate=None):
         """ Initializes a new sesssion
@@ -68,7 +67,6 @@ class NURESTSession(object):
 
         self._push_center = NURESTPushCenter()
         self._push_center.url = self._login_controller.url
-
         self.requests_session = requests.Session()
 
     # Class Methods
@@ -82,10 +80,10 @@ class NURESTSession(object):
                 (bambou.NURESTSession): the current session
 
         """
-        if NURESTSession.current_context is None:
-            return _NURESTSessionCurrentContext.session
+        if len(NURESTSession.session_stack) > 0:
+            return NURESTSession.session_stack[-1]
         else:
-            return NURESTSession.current_context.session
+            return NURESTSession.current_session
 
     # Properties
 
@@ -161,9 +159,12 @@ class NURESTSession(object):
         """
 
         print('start')
+        if NURESTSession.current_session is not None:
+            NURESTSession.current_session.reset()
+
+        NURESTSession.current_session = self
 
         self._authenticate()
-        _NURESTSessionCurrentContext.session = self
         return self
 
     def reset(self):
@@ -219,16 +220,16 @@ class NURESTSession(object):
 
     def __enter__(self):
         print('__enter__')
-        self.current_context = _NURESTSessionCurrentContext.new()
-        self.current_context.__enter__()
-        self.current_context.session = self
+        print('__enter__: session stack length = ' + str(len(NURESTSession.session_stack)))
+        NURESTSession.session_stack.append(self)
+        # self._authenticate()
+        print('__enter__: session stack length = ' + str(len(NURESTSession.session_stack)))
         return self
 
     def __exit__ (self, exc_type, exc_value, traceback):
-        self.current_context.__exit__(None, None, None)
         self.reset()
 
-
-class _NURESTSessionCurrentContext (context.Service):
-
-    session = None
+        # Pop our session from the context stack
+        print('__exit__: session stack length = ' + str(len(NURESTSession.session_stack)))
+        NURESTSession.session_stack.pop(-1)
+        print('__exit__: session stack length = ' + str(len(NURESTSession.session_stack)))

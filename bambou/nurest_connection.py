@@ -341,8 +341,11 @@ class NURESTConnection(object):
     def _make_request(self, session=None):
         """ Make a synchronous request """
 
-        from .nurest_session import _NURESTSessionCurrentContext
-        _NURESTSessionCurrentContext.session = session
+        ### from .nurest_session import NURESTSession
+        ### _NURESTSessionCurrentContext.session = session
+
+        if session is None:
+            session = NURESTSession.get_current_session()
 
         self._has_timeouted = False
 
@@ -373,7 +376,7 @@ class NURESTConnection(object):
         bambou_logger.debug('> headers: %s' % headers)
         bambou_logger.debug('> data:\n  %s' % json.dumps(self._request.data, indent=4))
 
-        response = self.__make_request(requests_session=_NURESTSessionCurrentContext.session.requests_session, method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
+        response = self.__make_request(requests_session=session.requests_session, method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
 
         retry_request = False
 
@@ -382,14 +385,14 @@ class NURESTConnection(object):
             bambou_logger.debug('Bambou got [%s] response. Trying to force response choice' % HTTP_CODE_MULTIPLE_CHOICES)
             retry_request = True
 
-        elif response.status_code == HTTP_CODE_AUTHENTICATION_EXPIRED and _NURESTSessionCurrentContext.session:
+        elif response.status_code == HTTP_CODE_AUTHENTICATION_EXPIRED and session:
             bambou_logger.debug('Bambou got [%s] response . Trying to reconnect your session that has expired' % HTTP_CODE_AUTHENTICATION_EXPIRED)
-            _NURESTSessionCurrentContext.session.reset()
-            _NURESTSessionCurrentContext.session.start()
+            session.reset()
+            session.start()
             retry_request = True
 
         if retry_request:
-            response = self.__make_request(requests_session=_NURESTSessionCurrentContext.session.requests_session, method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
+            response = self.__make_request(requests_session=session.requests_session, method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
 
         return self._did_receive_response(response)
 
