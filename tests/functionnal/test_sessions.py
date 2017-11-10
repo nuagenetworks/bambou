@@ -44,20 +44,20 @@ class SessionTests(TestCase):
             self.assertSessionEquals(session2, NURESTTestSession.get_current_session())
 
     def test_multi_session_with_statement(self):
-        """ Use multi session with statement """
+        """ Use multi session with statement single"""
 
         with patch.object(NURESTTestSession, "_authenticate", return_value=True):
             session1 = start_session(username="user1", password="password1", enterprise="enterprise1", api_url="https://vsd:8443", version="3.2")
             session2 = start_session(username="user2", password="password2", enterprise="ent2", api_url="https://vsd:8443", version="3.1")
             session2.start()
 
-            with session1.start():
+            with session1:
                 self.assertSessionEquals(session1, NURESTTestSession.get_current_session())
 
             self.assertSessionEquals(session2, NURESTTestSession.get_current_session())
 
     def test_multi_session_with_multiple_statements(self):
-        """ Use multi session with statement """
+        """ Use multi session with statement double"""
 
         with patch.object(NURESTTestSession, "_authenticate", return_value=True):
             session1 = start_session(username="user1", password="password1", enterprise="enterprise1", api_url="https://vsd:8443", version="3.2")
@@ -66,10 +66,10 @@ class SessionTests(TestCase):
 
             session2.start()
 
-            with session1.start():
+            with session1:
                 self.assertSessionEquals(session1, NURESTTestSession.get_current_session())
 
-                with session3.start():
+                with session3:
                     self.assertSessionEquals(session3, NURESTTestSession.get_current_session())
 
             self.assertSessionEquals(session2, NURESTTestSession.get_current_session())
@@ -80,6 +80,7 @@ class SessionTests(TestCase):
         """
         with patch.object(NURESTTestSession, "_authenticate", return_value=True):
             session1 = start_session(username="user1", password="password1", enterprise="enterprise1", api_url="https://vsd:8443", version="3.2")
+            print('after start_session, before calling start')
             session1.start()
             self.assertSessionEquals(session1, NURESTTestSession.get_current_session())
 
@@ -88,10 +89,10 @@ class SessionTests(TestCase):
             session4 = start_session(username="user4", password="password4", enterprise="enterprise4", api_url="https://vsd:8443", version="3.4")
             session5 = start_session(username="user5", password="password5", enterprise="enterprise5", api_url="https://vsd:8443", version="3.5")
 
-            with session2.start():
+            with session2:
                 self.assertSessionEquals(session2, NURESTTestSession.get_current_session())
 
-                with session3.start():
+                with session3:
                     self.assertSessionEquals(session3, NURESTTestSession.get_current_session())
 
                 self.assertSessionEquals(session2, NURESTTestSession.get_current_session())
@@ -99,7 +100,7 @@ class SessionTests(TestCase):
             session1.start()
             self.assertSessionEquals(session1, NURESTTestSession.get_current_session())
 
-            with session4.start():
+            with session4:
                 self.assertSessionEquals(session4, NURESTTestSession.get_current_session())
 
             session1.start()
