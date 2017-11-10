@@ -26,6 +26,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+from builtins import object
 class NURESTResponse(object):
     """ Response that will be received via the connection """
 

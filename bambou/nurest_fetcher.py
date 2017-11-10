@@ -26,6 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from builtins import str
 import weakref
 from .exceptions import BambouHTTPError, InternalConsitencyError
 from .nurest_request import NURESTRequest

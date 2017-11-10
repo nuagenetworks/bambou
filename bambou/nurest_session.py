@@ -3,6 +3,8 @@
 
 # Copyright 2014 Alcatel-Lucent USA Inc.
 
+from builtins import str
+from builtins import object
 from .nurest_login_controller import NURESTLoginController
 from .nurest_push_center import NURESTPushCenter
 from bambou.contextual import context
@@ -38,6 +40,8 @@ class NURESTSession(object):
             >>>     session.user.entities.get()
             [<NUEntity at 2>]
     """
+    
+    current_context = None
 
     def __init__(self, username, password, enterprise, api_url, api_prefix, version, certificate=None):
         """ Initializes a new sesssion
@@ -78,7 +82,10 @@ class NURESTSession(object):
                 (bambou.NURESTSession): the current session
 
         """
-        return _NURESTSessionCurrentContext.session
+        if NURESTSession.current_context is None:
+            return _NURESTSessionCurrentContext.session
+        else:
+            return NURESTSession.current_context.session
 
     # Properties
 
@@ -146,12 +153,6 @@ class NURESTSession(object):
         self.login_controller.api_key = self._root_object.api_key
         bambou_logger.debug("[NURESTSession] Started session with username %s in enterprise %s" % (self.login_controller.user, self.login_controller.enterprise))
 
-    def _in_with_statement(self, frame):
-        """
-        Well, you'll have to trust me on this one.
-        """
-        return opname[ord(frame.f_code.co_code[frame.f_lasti + 3])] is "SETUP_WITH"
-
     def start(self):
         """
             Starts the session.
@@ -159,19 +160,11 @@ class NURESTSession(object):
             Starting the session will actually get the API key of the current user
         """
 
-        try:
-            frame = inspect.stack()[1][0]
-        except IndexError:
-            _NURESTSessionCurrentContext.session = self
-            self._authenticate()
-            return self
+        print('start')
 
-        if self._in_with_statement(frame):
-            return _NURESTSessionContext.new(self)
-        else:
-            _NURESTSessionCurrentContext.session = self
-            self._authenticate()
-            return self
+        self._authenticate()
+        _NURESTSessionCurrentContext.session = self
+        return self
 
     def reset(self):
         """
@@ -224,18 +217,16 @@ class NURESTSession(object):
         current_session = NURESTSession.get_current_session()
         return current_session and self.equals(current_session)
 
+    def __enter__(self):
+        print('__enter__')
+        self.current_context = _NURESTSessionCurrentContext.new()
+        self.current_context.__enter__()
+        self.current_context.session = self
+        return self
 
-class _NURESTSessionContext (object):
-
-    session = None
-
-    @classmethod
-    @contextmanager
-    def new(self, session):
-        with _NURESTSessionCurrentContext.new() as context:
-            context.session = session
-            session._authenticate()
-            yield session
+    def __exit__ (self, exc_type, exc_value, traceback):
+        self.current_context.__exit__(None, None, None)
+        self.reset()
 
 
 class _NURESTSessionCurrentContext (context.Service):

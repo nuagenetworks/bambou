@@ -25,6 +25,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import unicode_literals
+from builtins import str
 import hashlib
 
 
@@ -35,4 +37,7 @@ class Sha1(object):
     def encrypt(self, message):
         """ Encrypt the given message """
 
-        return hashlib.sha1(message).hexdigest()
+        if not isinstance(message, (bytes, str)):
+            raise TypeError
+        
+        return hashlib.sha1(message.encode('utf-8')).hexdigest()
