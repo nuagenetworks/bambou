@@ -4,7 +4,7 @@ from unittest import TestCase
 from mock import patch
 
 from tests import start_session
-from tests.models import User
+from tests.models import User, NURESTTestSession
 from tests.utils import MockUtils
 
 
@@ -24,6 +24,9 @@ class Impersonate(TestCase):
         """
         session = start_session()
 
+        with patch.object(NURESTTestSession, "_authenticate", return_value=True):
+            session.start()
+
         session.impersonate(username='johndoe', enterprise='enterprise')
 
         mock = MockUtils.create_mock_response(status_code=200, data=[])
@@ -34,6 +37,7 @@ class Impersonate(TestCase):
             user.enterprises.fetch()
 
         headers = MockUtils.get_mock_parameter(mock=mock, name='headers')
+        print(headers)
 
         self.assertIn('X-Nuage-ProxyUser', headers)
         self.assertEquals(headers['X-Nuage-ProxyUser'], 'johndoe@enterprise')

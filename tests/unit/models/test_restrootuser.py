@@ -3,7 +3,8 @@
 from unittest import TestCase
 
 from tests import start_session
-from tests.models import User, Enterprise
+from tests.models import User, Enterprise, NURESTTestSession
+from mock import patch
 
 
 class GetUserTests(TestCase):
@@ -16,6 +17,9 @@ class GetUserTests(TestCase):
     def test_get_rest_name(self):
         """ Get user REST name """
         session = start_session(username="user", password="password", enterprise="Alcatel", api_url="https://example.com", version="3.0", api_prefix="api")
+        
+        with patch.object(NURESTTestSession, "_authenticate", return_value=True):
+            session.start()
 
         user = User()
         self.assertEquals(user.rest_name, 'me')
