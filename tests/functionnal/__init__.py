@@ -3,8 +3,7 @@
 import logging
 
 from bambou import bambou_logger
-from bambou.nurest_session import _NURESTSessionCurrentContext
-
+from bambou.nurest_session import NURESTSession
 from tests.models import User, Enterprise, Group, NURESTTestSession
 
 bambou_logger.setLevel(logging.ERROR)
@@ -27,9 +26,7 @@ def start_session(username="user", password="password", enterprise="enterprise",
 
     # Set API KEY
     session._login_controller.api_key = user.api_key
-
-    # Activate session
-    _NURESTSessionCurrentContext.session = session
+    session.start()
 
     return user
 
