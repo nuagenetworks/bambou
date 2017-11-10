@@ -32,7 +32,7 @@ setup(
     version='2.1.4',
     author='Christophe Serafin, Antoine Mercadal',
     author_email='christophe.serafin@nuagenetworks.net, antoine@nuagenetworks.net',
-    packages=['bambou', 'bambou.utils', 'bambou.contextual'],
+    packages=['bambou', 'bambou.utils'],
     description='REST Library for Nuage Networks',
     long_description=open('README.md').read(),
     install_requires=[line for line in open('requirements.txt')],
