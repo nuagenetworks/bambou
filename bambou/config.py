@@ -28,6 +28,7 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
+import sys
 try:
     import configparser
 except ImportError:
@@ -143,7 +144,12 @@ class BambouConfig(object):
         if not cls._config_parser.has_option(class_name, property_name):
             return None
 
-        if attr_type in (int, int):
+        if sys.version_info < (3,):
+            integer_types = (int, long,)
+        else:
+            integer_types = (int,)
+
+        if isinstance(attr_type, integer_types):
             return cls._config_parser.getint(class_name, property_name)
         elif attr_type is bool:
             return cls._config_parser.getboolean(class_name, property_name)
