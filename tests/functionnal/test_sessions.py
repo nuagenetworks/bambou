@@ -80,7 +80,6 @@ class SessionTests(TestCase):
         """
         with patch.object(NURESTTestSession, "_authenticate", return_value=True):
             session1 = start_session(username="user1", password="password1", enterprise="enterprise1", api_url="https://vsd:8443", version="3.2")
-            print('after start_session, before calling start')
             session1.start()
             self.assertSessionEquals(session1, NURESTTestSession.get_current_session())
 

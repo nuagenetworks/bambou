@@ -159,10 +159,8 @@ class NURESTSession(object):
             Starting the session will actually get the API key of the current user
         """
 
-        print('start')
         if NURESTSession.session_stack:
             # TODO: put this in a logger
-            print('Trying to start a new session inside a context. This is not an allowed configuration. Exiting to prevent bad things from happening...')
             sys.exit(-1)
 
         if NURESTSession.current_session is not None:
@@ -225,17 +223,12 @@ class NURESTSession(object):
         return current_session and self.equals(current_session)
 
     def __enter__(self):
-        print('__enter__')
-        print('__enter__: session stack length = ' + str(len(NURESTSession.session_stack)))
         NURESTSession.session_stack.append(self)
         # self._authenticate()
-        print('__enter__: session stack length = ' + str(len(NURESTSession.session_stack)))
         return self
 
     def __exit__ (self, exc_type, exc_value, traceback):
         self.reset()
 
         # Pop our session from the context stack
-        print('__exit__: session stack length = ' + str(len(NURESTSession.session_stack)))
         NURESTSession.session_stack.pop(-1)
-        print('__exit__: session stack length = ' + str(len(NURESTSession.session_stack)))
