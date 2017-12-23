@@ -37,7 +37,6 @@ class Impersonate(TestCase):
             user.enterprises.fetch()
 
         headers = MockUtils.get_mock_parameter(mock=mock, name='headers')
-        print(headers)
 
         self.assertIn('X-Nuage-ProxyUser', headers)
         self.assertEquals(headers['X-Nuage-ProxyUser'], 'johndoe@enterprise')
