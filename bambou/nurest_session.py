@@ -160,11 +160,8 @@ class NURESTSession(object):
         """
 
         if NURESTSession.session_stack:
-            # TODO: put this in a logger
+            bambou_logger.critical("VSPK currently does not support starting a session using start() inside a with statement. Please open all sessions outside the outermost with statement. Exiting for safety")
             sys.exit(-1)
-
-        if NURESTSession.current_session is not None:
-            NURESTSession.current_session.reset()
 
         NURESTSession.current_session = self
 
@@ -224,11 +221,7 @@ class NURESTSession(object):
 
     def __enter__(self):
         NURESTSession.session_stack.append(self)
-        # self._authenticate()
         return self
 
     def __exit__ (self, exc_type, exc_value, traceback):
-        self.reset()
-
-        # Pop our session from the context stack
         NURESTSession.session_stack.pop(-1)
