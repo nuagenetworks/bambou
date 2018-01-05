@@ -339,9 +339,6 @@ class NURESTConnection(object):
     def _make_request(self, session=None):
         """ Make a synchronous request """
 
-        ### from .nurest_session import NURESTSession
-        ### _NURESTSessionCurrentContext.session = session
-
         if session is None:
             session = NURESTSession.get_current_session()
 
