@@ -160,8 +160,8 @@ class NURESTSession(object):
         """
 
         if NURESTSession.session_stack:
-            bambou_logger.critical("VSPK currently does not support starting a session using start() inside a with statement. Please open all sessions outside the outermost with statement. Exiting for safety")
-            sys.exit(-1)
+            bambou_logger.critical("Starting a session inside a with statement is not supported.")
+            raise Exception("Starting a session inside a with statement is not supported.")
 
         NURESTSession.current_session = self
 
