@@ -29,9 +29,9 @@ from setuptools import setup
 
 setup(
     name='bambou',
-    version='2.1.4',
-    author='Christophe Serafin, Antoine Mercadal',
-    author_email='christophe.serafin@nuagenetworks.net, antoine@nuagenetworks.net',
+    version='3.0.0',
+    author='Nuage Networks',
+    author_email='opensource@nuagenetworks.net',
     packages=['bambou', 'bambou.utils'],
     description='REST Library for Nuage Networks',
     long_description=open('README.md').read(),
