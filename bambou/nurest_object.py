@@ -124,7 +124,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
                 kwargs: a list of arguments
         """
 
-        for name, remote_attribute in list(self._attributes.items()):
+        for name, remote_attribute in self._attributes.items():
             default_value = BambouConfig.get_default_attribute_value(self.__class__, name, remote_attribute.attribute_type)
             setattr(self, name, default_value)
 
