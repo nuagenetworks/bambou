@@ -26,7 +26,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from builtins import str
+import sys
 from builtins import next
 from builtins import object
 import weakref
@@ -354,7 +354,8 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
                 continue  # without error
 
             if type(value) != attribute.attribute_type:
-                if attribute.attribute_type != str or type(value) != str:
+                # On python 2, we accept unicode input when attribute_type is set to str
+                if not (sys.version_info < (3,) and attribute.attribute_type == str and type(value) == unicode):
                     self._attribute_errors[local_name] = {'title': 'Wrong type',
                                                           'description': 'Attribute %s type should be %s but is %s' % (attribute.remote_name, attribute.attribute_type, type(value)),
                                                           'remote_name': attribute.remote_name}
