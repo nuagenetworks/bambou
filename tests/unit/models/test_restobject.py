@@ -89,7 +89,7 @@ class CompressionTests(TestCase):
         to_dict = enterprise.to_dict()
 
 
-        self.assertEquals(sorted(to_dict.keys()), sorted(['groups', 'token', 'lastUpdatedDate', 'allowedForwardingClasses', 'name', 'ceo', 'parentType', 'parentID', 'owner', 'creationDate', 'ID', 'description']))
+        self.assertEquals(sorted(to_dict.keys()), sorted(['groups', 'token', 'lastUpdatedDate', 'allowedForwardingClasses', 'name', 'ceo', 'parentType', 'parentID', 'owner', 'creationDate', 'ID', 'description', 'floatingIPsQuota']))
         self.assertEquals(to_dict['name'], 'NewEnterprise')
         self.assertEquals(to_dict['ID'], 3)
         #self.assertEquals(to_dict['externalID'], None)
@@ -179,7 +179,7 @@ class AttributeTests(TestCase):
 
         attributes = enterprise.get_attributes()
 
-        self.assertEqual(len(attributes), 12)
+        self.assertEqual(len(attributes), 13)
 
     def test_local_id(self):
         """
@@ -192,7 +192,19 @@ class AttributeTests(TestCase):
 
         enterprise = Enterprise()
         enterprise.name = "Test Enterprise"
-        enterprise.allowed_forwarding_classes = 'A'
+        enterprise.allowed_forwarding_classes = ['A', 'B']
+
+        is_valid = enterprise.validate()
+
+        self.assertEqual(is_valid, True)
+        self.assertEqual(len(enterprise.errors), 0)
+
+    def test_validate_integer(self):
+        """ Get validate with integer value """
+
+        enterprise = Enterprise()
+        enterprise.name = "Test Enterprise"
+        enterprise.floating_ips_quota = 0
 
         is_valid = enterprise.validate()
 
@@ -223,11 +235,11 @@ class AttributeTests(TestCase):
         self.assertIn("description", enterprise.errors)
 
     def test_validate_with_attribute_choices(self):
-        """ Get validate with too long attribute """
+        """ Get validate with a value that is not a valid choice """
 
         enterprise = Enterprise()
         enterprise.name = "Enterprise"
-        enterprise.allowed_forwarding_classes = 'NOT_AN_OPTION_FROM_CHOICES'
+        enterprise.allowed_forwarding_classes = ['A', 'NOT_AN_OPTION_FROM_CHOICES']
         is_valid = enterprise.validate()
 
         self.assertEqual(is_valid, False)
@@ -258,7 +270,7 @@ class AttributeTests(TestCase):
         self.assertIn("token", enterprise.errors)
 
     def test_validate_too_short(self):
-        """ Get validate with too long attribute """
+        """ Get validate with too short attribute """
 
         enterprise = Enterprise()
         enterprise.name = "ent1"
@@ -268,6 +280,32 @@ class AttributeTests(TestCase):
         self.assertEqual(is_valid, False)
         self.assertEqual(len(enterprise.errors), 1)
         self.assertIn("token", enterprise.errors)
+
+    def test_validate_too_low(self):
+        """ Get validate with integer value too low """
+
+        enterprise = Enterprise()
+        enterprise.name = "Test Enterprise"
+        enterprise.floating_ips_quota = -1
+
+        is_valid = enterprise.validate()
+
+        self.assertEqual(is_valid, False)
+        self.assertEqual(len(enterprise.errors), 1)
+        self.assertIn("floating_ips_quota", enterprise.errors)
+
+    def test_validate_too_high(self):
+        """ Get validate with integer value too high """
+
+        enterprise = Enterprise()
+        enterprise.name = "Test Enterprise"
+        enterprise.floating_ips_quota = 250001
+
+        is_valid = enterprise.validate()
+
+        self.assertEqual(is_valid, False)
+        self.assertEqual(len(enterprise.errors), 1)
+        self.assertIn("floating_ips_quota", enterprise.errors)
 
     def test_get_attribute_infos(self):
         """ Get validate with too long attribute """
