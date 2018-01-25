@@ -361,25 +361,53 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
                                                           'remote_name': attribute.remote_name}
                     continue
 
-            if attribute.min_length and len(value) < attribute.min_length:
-                self._attribute_errors[local_name] = {'title': 'Invalid lenght',
-                                                      'description': 'Attribute %s minimum size should be %s but is %s' % (attribute.remote_name, attribute.min_length, len(value)),
+            if attribute.min_length is not None and len(value) < attribute.min_length:
+                self._attribute_errors[local_name] = {'title': 'Invalid length',
+                                                      'description': 'Attribute %s minimum length should be %s but is %s' % (attribute.remote_name, attribute.min_length, len(value)),
                                                       'remote_name': attribute.remote_name}
                 continue
 
-            if attribute.max_length and len(value) > attribute.max_length:
-                self._attribute_errors[local_name] = {'title': 'Invalid lenght',
-                                                      'description': 'Attribute %s maximum size should be %s but is %s' % (attribute.remote_name, attribute.max_length, len(value)),
+            if attribute.max_length is not None and len(value) > attribute.max_length:
+                self._attribute_errors[local_name] = {'title': 'Invalid length',
+                                                      'description': 'Attribute %s maximum length should be %s but is %s' % (attribute.remote_name, attribute.max_length, len(value)),
                                                       'remote_name': attribute.remote_name}
                 continue
 
-            if attribute.choices and value not in attribute.choices:
-                self._attribute_errors[local_name] = {'title': 'Invalid input',
-                                                      'description': 'Invalid input',
-                                                      'remote_name': attribute.remote_name}
-                continue
+            if attribute.attribute_type == list:
+                valid = True
+                for item in value:
+                    if valid is True:
+                        valid = self._validate_value(local_name, attribute, item)
+            else:
+                self._validate_value(local_name, attribute, value)
 
         return self.is_valid()
+
+    def _validate_value(self, local_name, attribute, value):
+
+        if attribute.min_value is not None and value < attribute.min_value:
+            self._attribute_errors[local_name] = {'title': 'Invalid value',
+                                                  'description':
+                                                      'Attribute %s minimum value should be %s but is %s' %
+                                                      (attribute.remote_name, attribute.min_value, value),
+                                                  'remote_name': attribute.remote_name}
+            return False
+
+        if attribute.max_value is not None and value > attribute.max_value:
+            self._attribute_errors[local_name] = {'title': 'Invalid value',
+                                                  'description':
+                                                      'Attribute %s maximum value should be %s but is %s' %
+                                                      (attribute.remote_name, attribute.max_value, value),
+                                                  'remote_name': attribute.remote_name}
+            return False
+
+        if attribute.choices and value not in attribute.choices:
+            self._attribute_errors[local_name] = {'title': 'Invalid input',
+                                                  'description': 'Value %s not a valid choice' % value,
+                                                  'remote_name': attribute.remote_name}
+            return False
+
+        return True
 
     def is_valid(self):
         """
@@ -392,7 +420,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
         """
         return self._attribute_errors
 
-    def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False):
+    def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False, min_value=None, max_value=None):
         """ Expose local_name as remote_name
 
             An exposed attribute `local_name` will be sent within the HTTP request as
@@ -420,6 +448,8 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
         attribute.is_password = is_password
         attribute.can_order = can_order
         attribute.can_search = can_search
+        attribute.min_value = min_value
+        attribute.max_value = max_value
 
         self._attributes[local_name] = attribute
 
