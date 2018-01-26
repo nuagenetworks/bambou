@@ -257,6 +257,18 @@ class AttributeTests(TestCase):
         self.assertEqual(len(enterprise.errors), 1)
         self.assertIn("name", enterprise.errors)
 
+    def test_validate_with_wrong_subtype(self):
+        """ Get validate with wrong subtype """
+
+        enterprise = Enterprise()
+        enterprise.name = "Enterprise"
+        enterprise.allowed_forwarding_classes = ['B', True]
+        is_valid = enterprise.validate()
+
+        self.assertEqual(is_valid, False)
+        self.assertEqual(len(enterprise.errors), 1)
+        self.assertIn("allowed_forwarding_classes", enterprise.errors)
+
     def test_validate_too_long(self):
         """ Get validate with too long attribute """
 
