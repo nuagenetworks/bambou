@@ -353,13 +353,8 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
             if value is None:
                 continue  # without error
 
-            if type(value) != attribute.attribute_type:
-                # On python 2, we accept unicode input when attribute_type is set to str
-                if not (sys.version_info < (3,) and attribute.attribute_type == str and type(value) == unicode):
-                    self._attribute_errors[local_name] = {'title': 'Wrong type',
-                                                          'description': 'Attribute %s type should be %s but is %s' % (attribute.remote_name, attribute.attribute_type, type(value)),
-                                                          'remote_name': attribute.remote_name}
-                    continue
+            if not self._validate_type(local_name, attribute.remote_name, value, attribute.attribute_type):
+                continue
 
             if attribute.min_length is not None and len(value) < attribute.min_length:
                 self._attribute_errors[local_name] = {'title': 'Invalid length',
@@ -383,7 +378,21 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
 
         return self.is_valid()
 
+    def _validate_type(self, local_name, remote_name, value, validate_type):
+        if type(value) != validate_type:
+            # On python 2, we accept unicode input when attribute_type is set to str
+            if not (sys.version_info < (3,) and validate_type == str and type(value) == unicode):
+                self._attribute_errors[local_name] = {'title': 'Wrong type',
+                                                      'description': 'Attribute %s type should be %s but is %s' % (remote_name, validate_type, type(value)),
+                                                      'remote_name': remote_name}
+                return False
+
+        return True
+
     def _validate_value(self, local_name, attribute, value):
+
+        if attribute.subtype is not None and not self._validate_type(local_name, attribute.remote_name, value, attribute.subtype):
+            return False
 
         if attribute.min_value is not None and value < attribute.min_value:
             self._attribute_errors[local_name] = {'title': 'Invalid value',
@@ -420,7 +429,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
         """
         return self._attribute_errors
 
-    def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False, min_value=None, max_value=None):
+    def expose_attribute(self, local_name, attribute_type, remote_name=None, display_name=None, is_required=False, is_readonly=False, max_length=None, min_length=None, is_identifier=False, choices=None, is_unique=False, is_email=False, is_login=False, is_editable=True, is_password=False, can_order=False, can_search=False, subtype=None, min_value=None, max_value=None):
         """ Expose local_name as remote_name
 
             An exposed attribute `local_name` will be sent within the HTTP request as
@@ -448,6 +457,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
         attribute.is_password = is_password
         attribute.can_order = can_order
         attribute.can_search = can_search
+        attribute.subtype = subtype
         attribute.min_value = min_value
         attribute.max_value = max_value
 

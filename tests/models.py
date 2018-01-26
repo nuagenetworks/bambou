@@ -31,7 +31,7 @@ class Enterprise(NURESTObject):
 
         self.expose_attribute(local_name='name', attribute_type=str, is_required=True)
         self.expose_attribute(local_name='description', attribute_type=str, max_length=255)
-        self.expose_attribute(local_name=u"allowed_forwarding_classes", remote_name=u"allowedForwardingClasses", attribute_type=list, choices=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'NONE'])
+        self.expose_attribute(local_name=u"allowed_forwarding_classes", remote_name=u"allowedForwardingClasses", attribute_type=list, subtype=str, choices=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'NONE'])
         self.expose_attribute(local_name='groups', remote_name='groups', attribute_type=list)
         self.expose_attribute(local_name='ceo', remote_name='ceo', attribute_type=object)
 
