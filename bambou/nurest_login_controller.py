@@ -200,7 +200,7 @@ class NURESTLoginController(object):
         self._url = url
 
     @property
-    def async(self):
+    def isasync(self):
         """ Is asynchronous controller
 
             Returns:
@@ -209,14 +209,14 @@ class NURESTLoginController(object):
 
         return self._async
 
-    @async.setter
-    def async(self, async):
+    @isasync.setter
+    def isasync(self, xasync):
         """ Set asynchronous controller
 
             Args:
                 async: Boolean to say whether or not the controller is async.
         """
-        self._async = async
+        self._async = xasync
 
     # Methods
 

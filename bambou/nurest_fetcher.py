@@ -253,7 +253,7 @@ class NURESTFetcher(list):
 
         return self.parent_object.get_resource_url_for_child_type(self.__class__.managed_class())
 
-    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, async=False, callback=None):
+    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, isasync=False, callback=None):
         """ Fetch objects according to given filter and page.
 
             Note:
@@ -284,8 +284,8 @@ class NURESTFetcher(list):
 
         self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
 
-        if async:
-            return self.parent_object.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit': commit})
+        if isasync:
+            return self.parent_object.send_request(request=request, isasync=isasync, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit': commit})
 
         connection = self.parent_object.send_request(request=request, user_info={'commit': commit})
         return self._did_fetch(connection=connection)
@@ -350,7 +350,7 @@ class NURESTFetcher(list):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def get(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, async=False, callback=None):
+    def get(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, isasync=False, callback=None):
         """ Fetch object and directly return them
 
             Note:
@@ -377,7 +377,7 @@ class NURESTFetcher(list):
         """
         return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, commit=commit)[2]
 
-    def get_first(self, filter=None, order_by=None, group_by=[], query_parameters=None, commit=False, async=False, callback=None):
+    def get_first(self, filter=None, order_by=None, group_by=[], query_parameters=None, commit=False, isasync=False, callback=None):
         """ Fetch object and directly return the first one
 
             Note:
@@ -405,7 +405,7 @@ class NURESTFetcher(list):
         objects = self.get(filter=filter, order_by=order_by, group_by=group_by, page=0, page_size=1, query_parameters=query_parameters, commit=commit)
         return objects[0] if len(objects) else None
 
-    def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, async=False, callback=None):
+    def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, isasync=False, callback=None):
         """ Get the total count of objects that can be fetched according to filter
 
             This method can be asynchronous and trigger the callback method
@@ -428,8 +428,8 @@ class NURESTFetcher(list):
 
         self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
 
-        if async:
-            return self.parent_object.send_request(request=request, async=async, local_callback=self._did_count, remote_callback=callback)
+        if isasync:
+            return self.parent_object.send_request(request=request, isasync=isasync, local_callback=self._did_count, remote_callback=callback)
 
         else:
             connection = self.parent_object.send_request(request=request)
@@ -449,7 +449,7 @@ class NURESTFetcher(list):
                 Returns the number of objects found
 
         """
-        return self.count(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, async=False)[2]
+        return self.count(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, isasync=False)[2]
 
     def _did_count(self, connection):
         """ Called when count if finished """
@@ -465,7 +465,7 @@ class NURESTFetcher(list):
         if 'remote' in connection.callbacks:
             callback = connection.callbacks['remote']
 
-        if connection.async:
+        if connection.isasync:
             if callback:
                 callback(self, self.parent_object, count)
 
@@ -483,7 +483,7 @@ class NURESTFetcher(list):
 
         if connection:
 
-            if connection.async:
+            if connection.isasync:
                 callback = connection.callbacks['remote']
 
                 if callback:
