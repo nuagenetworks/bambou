@@ -377,8 +377,6 @@ class NURESTFetcher(list):
                 >>> print entity.children.get()
                 [<NUChildren at xxx>, <NUChildren at yyyy>, <NUChildren at zzz>]
         """
-        if 'async' in kwargs.keys() and not as_async:
-            as_async = kwargs['async']
         return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, commit=commit)[2]
 
     def get_first(self, filter=None, order_by=None, group_by=[], query_parameters=None, commit=False, as_async=False, callback=None, **kwargs):
@@ -406,8 +404,6 @@ class NURESTFetcher(list):
                 >>> print entity.children.get_first(filter="name == 'My Entity'")
                 <NUChildren at xxx>
         """
-        if 'async' in kwargs.keys() and not as_async:
-            as_async = kwargs['async']
         objects = self.get(filter=filter, order_by=order_by, group_by=group_by, page=0, page_size=1, query_parameters=query_parameters, commit=commit)
         return objects[0] if len(objects) else None
 
