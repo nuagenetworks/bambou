@@ -730,7 +730,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
 
     # HTTP Calls
 
-    def delete(self, response_choice=1, as_async=False, callback=None):
+    def delete(self, response_choice=1, as_async=False, callback=None, **kwargs):
         """ Delete object and call given callback in case of call.
 
             Args:
@@ -741,9 +741,11 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
             Example:
                 >>> entity.delete() # will delete the enterprise from the server
         """
+        if 'async' in kwargs.keys() and not as_async:
+            as_async = kwargs['async']
         return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_DELETE, as_async=as_async, callback=callback, response_choice=response_choice)
 
-    def save(self, response_choice=None, as_async=False, callback=None):
+    def save(self, response_choice=None, as_async=False, callback=None, **kwargs):
         """ Update object and call given callback in case of as_async call
 
             Args:
@@ -754,9 +756,11 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
                 >>> entity.name = "My Super Object"
                 >>> entity.save() # will save the new name in the server
         """
+        if 'async' in kwargs.keys() and not as_async:
+            as_async = kwargs['async']
         return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_PUT, as_async=as_async, callback=callback, response_choice=response_choice)
 
-    def fetch(self, as_async=False, callback=None):
+    def fetch(self, as_async=False, callback=None, **kwargs):
         """ Fetch all information about the current object
 
             Args:
@@ -772,6 +776,8 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
                 >>> print entity.name
                 "My Entity"
         """
+        if 'async' in kwargs.keys() and not as_async:
+            as_async = kwargs['async']
 
         if self.id is None:
             raise InternalConsitencyError("Cannot fetch an object that does not have an ID")
@@ -908,7 +914,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
 
     # Advanced REST Operations
 
-    def create_child(self, nurest_object, response_choice=None, as_async=False, callback=None, commit=True):
+    def create_child(self, nurest_object, response_choice=None, as_async=False, callback=None, commit=True, **kwargs):
         """ Add given nurest_object to the current object
 
             For example, to add a child into a parent, you can call
@@ -927,6 +933,8 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
                 >>> entity = NUEntity(name="Super Entity")
                 >>> parent_entity.create_child(entity) # the new entity as been created in the parent_entity
         """
+        if 'async' in kwargs.keys() and not as_async:
+            as_async = kwargs['async']
 
         # if nurest_object.id:
         #     raise InternalConsitencyError("Cannot create a child that already has an ID: %s." % nurest_object)
@@ -939,7 +947,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
                                          response_choice=response_choice,
                                          commit=commit)
 
-    def instantiate_child(self, nurest_object, from_template, response_choice=None, as_async=False, callback=None, commit=True):
+    def instantiate_child(self, nurest_object, from_template, response_choice=None, as_async=False, callback=None, commit=True, **kwargs):
         """ Instantiate an nurest_object from a template object
 
             Args:
@@ -957,6 +965,8 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
                 >>>
                 >>> parent_entity.instantiate_child(other_entity_instance, other_entity_template) # instatiate the new domain in the server
         """
+        if 'async' in kwargs.keys() and not as_async:
+            as_async = kwargs['async']
 
         # if nurest_object.id:
         #     raise InternalConsitencyError("Cannot instantiate a child that already has an ID: %s." % nurest_object)
@@ -984,7 +994,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
 
         return self._did_perform_standard_operation(connection)
 
-    def assign(self, objects, nurest_object_type, as_async=False, callback=None, commit=True):
+    def assign(self, objects, nurest_object_type, as_async=False, callback=None, commit=True, **kwargs):
         """ Reference a list of objects into the current resource
 
             Args:
@@ -998,6 +1008,8 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
             Example:
                 >>> entity.assign([entity1, entity2, entity3], NUEntity) # entity1, entity2 and entity3 are now part of the entity
         """
+        if 'async' in kwargs.keys() and not as_async:
+            as_async = kwargs['async']
 
         ids = list()
 
