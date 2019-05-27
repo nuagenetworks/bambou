@@ -221,8 +221,8 @@ class NURESTPushCenter(object):
 
         request = NURESTRequest(method='GET', url=events_url)
 
-        # Force async to False so the push center will have only 1 thread running
-        connection = NURESTConnection(request=request, async=True, callback=self._did_receive_event, root_object=self._root_object)
+        # Force as_async to False so the push center will have only 1 thread running
+        connection = NURESTConnection(request=request, as_async=True, callback=self._did_receive_event, root_object=self._root_object)
 
         if self._timeout:
             if int(time()) - self._start_time >= self._timeout:
