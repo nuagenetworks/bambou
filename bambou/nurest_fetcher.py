@@ -253,7 +253,7 @@ class NURESTFetcher(list):
 
         return self.parent_object.get_resource_url_for_child_type(self.__class__.managed_class())
 
-    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, async=False, callback=None):
+    def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, as_async=False, callback=None):
         """ Fetch objects according to given filter and page.
 
             Note:
@@ -270,7 +270,7 @@ class NURESTFetcher(list):
                 page (int): number of the page to load
                 page_size (int): number of results per page
                 commit (bool): boolean to update current object
-                callback (function): Callback that should be called in case of a async request
+                callback (function): Callback that should be called in case of a as_async request
 
             Returns:
                 tuple: Returns a tuple of information (fetcher, served object, fetched objects, connection)
@@ -284,8 +284,8 @@ class NURESTFetcher(list):
 
         self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
 
-        if async:
-            return self.parent_object.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit': commit})
+        if as_async:
+            return self.parent_object.send_request(request=request, as_async=as_async, local_callback=self._did_fetch, remote_callback=callback, user_info={'commit': commit})
 
         connection = self.parent_object.send_request(request=request, user_info={'commit': commit})
         return self._did_fetch(connection=connection)
@@ -350,7 +350,7 @@ class NURESTFetcher(list):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
-    def get(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, async=False, callback=None):
+    def get(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, as_async=False, callback=None):
         """ Fetch object and directly return them
 
             Note:
@@ -366,7 +366,7 @@ class NURESTFetcher(list):
                 page (int): number of the page to load
                 page_size (int): number of results per page
                 commit (bool): boolean to update current object
-                callback (function): Callback that should be called in case of a async request
+                callback (function): Callback that should be called in case of a as_async request
 
             Returns:
                 list: list of vsdk.NURESTObject if any
@@ -377,7 +377,7 @@ class NURESTFetcher(list):
         """
         return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, commit=commit)[2]
 
-    def get_first(self, filter=None, order_by=None, group_by=[], query_parameters=None, commit=False, async=False, callback=None):
+    def get_first(self, filter=None, order_by=None, group_by=[], query_parameters=None, commit=False, as_async=False, callback=None, **kwargs):
         """ Fetch object and directly return the first one
 
             Note:
@@ -393,7 +393,7 @@ class NURESTFetcher(list):
                 page (int): number of the page to load
                 page_size (int): number of results per page
                 commit (bool): boolean to update current object
-                callback (function): Callback that should be called in case of a async request
+                callback (function): Callback that should be called in case of a as_async request
 
             Returns:
                 vsdk.NURESTObject: the first object if any, or None
@@ -405,7 +405,7 @@ class NURESTFetcher(list):
         objects = self.get(filter=filter, order_by=order_by, group_by=group_by, page=0, page_size=1, query_parameters=query_parameters, commit=commit)
         return objects[0] if len(objects) else None
 
-    def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, async=False, callback=None):
+    def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, as_async=False, callback=None):
         """ Get the total count of objects that can be fetched according to filter
 
             This method can be asynchronous and trigger the callback method
@@ -428,8 +428,8 @@ class NURESTFetcher(list):
 
         self._prepare_headers(request=request, filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size)
 
-        if async:
-            return self.parent_object.send_request(request=request, async=async, local_callback=self._did_count, remote_callback=callback)
+        if as_async:
+            return self.parent_object.send_request(request=request, as_async=as_async, local_callback=self._did_count, remote_callback=callback)
 
         else:
             connection = self.parent_object.send_request(request=request)
@@ -449,7 +449,7 @@ class NURESTFetcher(list):
                 Returns the number of objects found
 
         """
-        return self.count(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, async=False)[2]
+        return self.count(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, as_async=False)[2]
 
     def _did_count(self, connection):
         """ Called when count if finished """
@@ -465,7 +465,7 @@ class NURESTFetcher(list):
         if 'remote' in connection.callbacks:
             callback = connection.callbacks['remote']
 
-        if connection.async:
+        if connection.as_async:
             if callback:
                 callback(self, self.parent_object, count)
 
@@ -483,7 +483,7 @@ class NURESTFetcher(list):
 
         if connection:
 
-            if connection.async:
+            if connection.as_async:
                 callback = connection.callbacks['remote']
 
                 if callback:

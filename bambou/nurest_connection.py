@@ -67,7 +67,7 @@ HTTP_METHOD_DELETE = 'DELETE'
 class NURESTConnection(object):
     """ Connection that enable HTTP requests """
 
-    def __init__(self, request, async, callback=None, callbacks=dict(), root_object=None):
+    def __init__(self, request, as_async, callback=None, callbacks=dict(), root_object=None):
         """ Intializes a new connection for a given request
 
             NURESTConnection object is in charge of the HTTP call. It relies on request library
@@ -88,7 +88,7 @@ class NURESTConnection(object):
         self._transaction_id = uuid.uuid4().hex
 
         self._request = request
-        self._async = async
+        self._async = as_async
         self._callback = callback
         self._callbacks = callbacks
         self._user_info = None
@@ -219,8 +219,8 @@ class NURESTConnection(object):
         return self._has_timeouted
 
     @property
-    def async(self):
-        """ Get async
+    def as_async(self):
+        """ Get as_async
 
             Returns:
                 Returns True if the request is asynchronous
@@ -331,7 +331,7 @@ class NURESTConnection(object):
         bambou_logger.debug('Bambou %s on %s has timeout (timeout=%ss)..' % (self._request.method, self._request.url, self.timeout))
         self._has_timeouted = True
 
-        if self.async:
+        if self.as_async:
             self._callback(self)
         else:
             return self
@@ -431,7 +431,7 @@ class NURESTConnection(object):
         from .nurest_session import NURESTSession
         session = NURESTSession.get_current_session()
 
-        if self.async:
+        if self.as_async:
             thread = threading.Thread(target=self._make_request, kwargs={'session': session})
             thread.is_daemon = False
             thread.start()

@@ -128,7 +128,7 @@ class NURESTRootObject(NURESTObject):
 
         self._new_password = new_password
 
-    def save(self, async=False, callback=None, encrypted=True):
+    def save(self, as_async=False, callback=None, encrypted=True):
         """ Updates the user and perform the callback method """
 
         if self._new_password and encrypted:
@@ -141,8 +141,8 @@ class NURESTRootObject(NURESTObject):
         data = json.dumps(self.to_dict())
         request = NURESTRequest(method=HTTP_METHOD_PUT, url=self.get_resource_url(), data=data)
 
-        if async:
-            return self.send_request(request=request, async=async, local_callback=self._did_save, remote_callback=callback)
+        if as_async:
+            return self.send_request(request=request, as_async=as_async, local_callback=self._did_save, remote_callback=callback)
         else:
             connection = self.send_request(request=request)
             return self._did_save(connection)
@@ -156,7 +156,7 @@ class NURESTRootObject(NURESTObject):
         controller.password = None
         controller.api_key = self.api_key
 
-        if connection.async:
+        if connection.as_async:
             callback = connection.callbacks['remote']
 
             if connection.user_info:
@@ -166,11 +166,11 @@ class NURESTRootObject(NURESTObject):
         else:
             return (self, connection)
 
-    def fetch(self, async=False, callback=None):
+    def fetch(self, as_async=False, callback=None):
         """ Fetch all information about the current object
 
             Args:
-                async (bool): Boolean to make an asynchronous call. Default is False
+                as_async (bool): Boolean to make an asynchronous call. Default is False
                 callback (function): Callback method that will be triggered in case of asynchronous call
 
             Returns:
@@ -184,8 +184,8 @@ class NURESTRootObject(NURESTObject):
         """
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
-        if async:
-            return self.send_request(request=request, async=async, local_callback=self._did_fetch, remote_callback=callback)
+        if as_async:
+            return self.send_request(request=request, as_async=as_async, local_callback=self._did_fetch, remote_callback=callback)
         else:
             connection = self.send_request(request=request)
             return self._did_retrieve(connection)
