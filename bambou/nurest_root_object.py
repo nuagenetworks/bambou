@@ -128,10 +128,8 @@ class NURESTRootObject(NURESTObject):
 
         self._new_password = new_password
 
-    def save(self, as_async=False, callback=None, encrypted=True, **kwargs):
+    def save(self, as_async=False, callback=None, encrypted=True):
         """ Updates the user and perform the callback method """
-        if 'async' in kwargs.keys() and not as_async:
-            as_async = kwargs['async']
 
         if self._new_password and encrypted:
             self.password = Sha1.encrypt(self._new_password)
@@ -168,7 +166,7 @@ class NURESTRootObject(NURESTObject):
         else:
             return (self, connection)
 
-    def fetch(self, as_async=False, callback=None, **kwargs):
+    def fetch(self, as_async=False, callback=None):
         """ Fetch all information about the current object
 
             Args:
@@ -184,8 +182,6 @@ class NURESTRootObject(NURESTObject):
                 >>> print entity.name
                 "My Entity"
         """
-        if 'async' in kwargs.keys() and not as_async:
-            as_async = kwargs['async']
         request = NURESTRequest(method=HTTP_METHOD_GET, url=self.get_resource_url())
 
         if as_async:
