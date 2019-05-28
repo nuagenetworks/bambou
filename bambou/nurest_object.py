@@ -797,7 +797,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
             Args:
                 request: The request to send
                 local_callback: local method that will be triggered in case of as_async call
-                remote_callback: remote moethd that will be triggered in case of as_async call
+                remote_callback: remote method that will be triggered in case of as_async call
                 user_info: contains additionnal information to carry during the request
 
             Returns:
