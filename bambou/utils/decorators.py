@@ -30,6 +30,6 @@ def backwards_compatible_async(function):
         if not 'as_async' in kwargs:
             if 'async' in kwargs:
                 kwargs['as_async'] = kwargs.pop('async')
-        function(*args, **kwargs)
+        return function(*args, **kwargs)
 
     return wrapped_function
