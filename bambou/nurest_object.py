@@ -40,6 +40,7 @@ from .nurest_connection import NURESTConnection, HTTP_METHOD_DELETE, HTTP_METHOD
 from .nurest_request import NURESTRequest
 from .nurest_session import NURESTSession
 from .utils import NURemoteAttribute
+from .utils.decorators import backwards_compatible_async
 from .config import BambouConfig
 from future.utils import with_metaclass
 
@@ -730,6 +731,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
 
     # HTTP Calls
 
+    @backwards_compatible_async
     def delete(self, response_choice=1, as_async=False, callback=None):
         """ Delete object and call given callback in case of call.
 
@@ -743,6 +745,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
         """
         return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_DELETE, as_async=as_async, callback=callback, response_choice=response_choice)
 
+    @backwards_compatible_async
     def save(self, response_choice=None, as_async=False, callback=None):
         """ Update object and call given callback in case of as_async call
 
@@ -756,6 +759,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
         """
         return self._manage_child_object(nurest_object=self, method=HTTP_METHOD_PUT, as_async=as_async, callback=callback, response_choice=response_choice)
 
+    @backwards_compatible_async
     def fetch(self, as_async=False, callback=None):
         """ Fetch all information about the current object
 
@@ -786,6 +790,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
 
     # REST HTTP Calls
 
+    @backwards_compatible_async
     def send_request(self, request, as_async=False, local_callback=None, remote_callback=None, user_info=None):
         """ Sends a request, calls the local callback, then the remote callback in case of as_async call
 
@@ -908,6 +913,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
 
     # Advanced REST Operations
 
+    @backwards_compatible_async
     def create_child(self, nurest_object, response_choice=None, as_async=False, callback=None, commit=True):
         """ Add given nurest_object to the current object
 
@@ -939,6 +945,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
                                          response_choice=response_choice,
                                          commit=commit)
 
+    @backwards_compatible_async
     def instantiate_child(self, nurest_object, from_template, response_choice=None, as_async=False, callback=None, commit=True):
         """ Instantiate an nurest_object from a template object
 
@@ -984,6 +991,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
 
         return self._did_perform_standard_operation(connection)
 
+    @backwards_compatible_async
     def assign(self, objects, nurest_object_type, as_async=False, callback=None, commit=True):
         """ Reference a list of objects into the current resource
 

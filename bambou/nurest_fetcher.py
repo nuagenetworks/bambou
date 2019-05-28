@@ -31,6 +31,7 @@ import weakref
 from .exceptions import BambouHTTPError, InternalConsitencyError
 from .nurest_request import NURESTRequest
 from .nurest_connection import HTTP_METHOD_GET, HTTP_METHOD_HEAD
+from .utils.decorators import backwards_compatible_async
 
 from bambou.config import BambouConfig
 
@@ -253,6 +254,7 @@ class NURESTFetcher(list):
 
         return self.parent_object.get_resource_url_for_child_type(self.__class__.managed_class())
 
+    @backwards_compatible_async
     def fetch(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, as_async=False, callback=None):
         """ Fetch objects according to given filter and page.
 
@@ -350,6 +352,7 @@ class NURESTFetcher(list):
 
         return self._send_content(content=fetched_objects, connection=connection)
 
+    @backwards_compatible_async
     def get(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, as_async=False, callback=None):
         """ Fetch object and directly return them
 
@@ -377,6 +380,7 @@ class NURESTFetcher(list):
         """
         return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, commit=commit)[2]
 
+    @backwards_compatible_async
     def get_first(self, filter=None, order_by=None, group_by=[], query_parameters=None, commit=False, as_async=False, callback=None):
         """ Fetch object and directly return the first one
 
@@ -405,6 +409,7 @@ class NURESTFetcher(list):
         objects = self.get(filter=filter, order_by=order_by, group_by=group_by, page=0, page_size=1, query_parameters=query_parameters, commit=commit)
         return objects[0] if len(objects) else None
 
+    @backwards_compatible_async
     def count(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, as_async=False, callback=None):
         """ Get the total count of objects that can be fetched according to filter
 
