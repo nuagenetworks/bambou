@@ -852,6 +852,58 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
             connection = self.send_request(request=request, user_info=user_info)
             return handler(connection)
 
+    def _manage_children_objects(self, nurest_objects, method=HTTP_METHOD_GET, as_async=False, callback=None, handler=None, response_choice=None, commit=False):
+        """ Low level bulk child management. Send given HTTP method with given nurest_objects to given ressource of current object
+
+            Args:
+                nurest_objects: the list of NURESTObject objects to manage
+                method: the HTTP method to use (GET, POST, PUT, DELETE)
+                callback: the callback to call at the end
+                handler: a custom handler to call when complete, before calling the callback
+                commit: True to auto commit changes in the current object
+
+            Returns:
+                Returns the object and connection (object, connection)
+        """
+        url = None
+
+        if type(nurest_objects) is not list or not nurest_objects:
+            raise TypeError('This method expects a list of objects, with at least a single object provided.')
+
+        if method in [HTTP_METHOD_POST, HTTP_METHOD_PUT, HTTP_METHOD_DELETE]:
+            # HTTP_METHOD_PUT & HTTP_METHOD_DELETE should only come in from nurest_root_object,
+            # in which case the get_resource_url_for_child_type will provide the root path URL, not the parent based one.
+            url = self.get_resource_url_for_child_type(nurest_objects[0].__class__)
+        else:
+            # Backup in case other methods are ever used for bulk operations, unlikely
+            url = self.get_resource_url()
+
+        if response_choice is not None:
+            url += '?responseChoice=%s' % response_choice
+        
+        if method == HTTP_METHOD_DELETE:
+            for nurest_object in nurest_objects:
+                if nurest_object.id:
+                    if '?' not in url:
+                        url += '?id={0:s}'.format(nurest_object.id)
+                    else:
+                        url += '&id={0:s}'.format(nurest_object.id)
+
+        data_object = list()
+        for nurest_object in nurest_objects:
+            data_object.append(nurest_object.to_dict())
+        request = NURESTRequest(method=method, url=url, data=data_object)
+        user_info = {'nurest_objects': nurest_objects, 'commit': commit}
+
+        if not handler:
+            handler = self._did_perform_bulk_operation
+
+        if as_async:
+            return self.send_request(request=request, as_async=as_async, local_callback=handler, remote_callback=callback, user_info=user_info)
+        else:
+            connection = self.send_request(request=request, user_info=user_info)
+            return handler(connection)
+
     # REST Operation handlers
 
     def _did_receive_response(self, connection):
@@ -911,6 +963,59 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
 
             return (self, connection)
 
+    def _did_perform_bulk_operation(self, connection, errors=None):
+        """ Performs bulk opertions """
+
+        if not errors:
+            response = connection.response
+            errors = list()
+            try:
+                obj_index = 0
+                for nurest_object in connection.user_info['nurest_objects']:
+                    if len(response.data) > obj_index and 'status' in response.data[obj_index] and response.data[obj_index]['status'] >= 400:
+                        errors.append({
+                            "object": nurest_object,
+                            "index": obj_index,
+                            "status": response.data[obj_index]['status'],
+                            "error": response.data[obj_index]['data'] if 'data' in response.data[obj_index] else {}
+                        })
+                    elif len(response.data) <= obj_index:
+                        errors.append({
+                            "object": nurest_object,
+                            "index": obj_index,
+                            "status": None,
+                            "error": {
+                                "errors": "No return data presented for object, unhandled"
+                            }
+                        })
+                    obj_index += 1
+            except Exception:
+                pass
+        
+            if not errors:
+                errors = None
+
+        if connection.as_async:
+            callback = connection.callbacks['remote']
+
+            if connection.user_info and 'nurest_objects' in connection.user_info:
+                callback(connection.user_info['nurest_objects'], connection, errors)
+            else:
+                callback(self, connection, errors)
+        else:
+            if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
+                raise BambouHTTPError(connection=connection)
+
+            if connection.user_info and 'nurest_objects' in connection.user_info:
+
+                if connection.user_info['commit']:
+                    for nurest_object in connection.user_info['nurest_objects']:
+                        if nurest_object.id:
+                            self.add_child(nurest_object)
+                return (connection.user_info['nurest_objects'], connection, errors)
+
+            return (self, connection, errors)
+
     # Advanced REST Operations
 
     @backwards_compatible_async
@@ -944,6 +1049,38 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
                                          handler=self._did_create_child,
                                          response_choice=response_choice,
                                          commit=commit)
+
+    @backwards_compatible_async
+    def create_children(self, nurest_objects, response_choice=None, as_async=False, callback=None, commit=True):
+        """ Add a list of nurest_objects to the current object
+
+            For example, to add multiple children of the same type into a parent, you can call
+            parent.create_children(nurest_objects=[child_a, child_b, child_c])
+
+            Args:
+                nurest_objects ([bambou2.NURESTObject]): the list of NURESTObject objects to add
+                response_choice (int): Automatically send a response choice when confirmation is needed
+                as_async (bool): should the request be done asynchronously or not
+                callback (function): callback containing the object and the connection
+
+            Returns:
+                Returns the object and connection (object, connection)
+
+            Example:
+                >>> entity = NUEntity(name="Super Entity")
+                >>> parent_entity.create_child(entity) # the new entity as been created in the parent_entity
+        """
+
+        if not nurest_objects:
+            raise InternalConsitencyError("One or more objects have to be provided.")
+
+        return self._manage_children_objects(nurest_objects=nurest_objects,
+                                             as_async=as_async,
+                                             method=HTTP_METHOD_POST,
+                                             callback=callback,
+                                             handler=self._did_create_children,
+                                             response_choice=response_choice,
+                                             commit=commit)
 
     @backwards_compatible_async
     def instantiate_child(self, nurest_object, from_template, response_choice=None, as_async=False, callback=None, commit=True):
@@ -990,6 +1127,25 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
             pass
 
         return self._did_perform_standard_operation(connection)
+
+    def _did_create_children(self, connection):
+        """ Callback called after adding a new children nurest_objects """
+
+        response = connection.response
+        errors = list()
+        try:
+            obj_index = 0
+            for nurest_object in connection.user_info['nurest_objects']:
+                if len(response.data) > obj_index and 'status' in response.data[obj_index] and response.data[obj_index]['status'] < 300 and 'data' in response.data[obj_index]:
+                    nurest_object.from_dict(response.data[obj_index]['data'])
+                obj_index += 1
+        except Exception:
+            pass
+        
+        if not errors:
+            errors = None
+
+        return self._did_perform_bulk_operation(connection, errors)
 
     @backwards_compatible_async
     def assign(self, objects, nurest_object_type, as_async=False, callback=None, commit=True):
