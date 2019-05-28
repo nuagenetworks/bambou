@@ -34,6 +34,7 @@ from .nurest_object import NURESTObject
 from .nurest_session import NURESTSession
 
 from .utils import Sha1
+from .utils.decorators import backwards_compatible_async
 
 
 class NURESTRootObject(NURESTObject):
@@ -128,6 +129,7 @@ class NURESTRootObject(NURESTObject):
 
         self._new_password = new_password
 
+    @backwards_compatible_async
     def save(self, as_async=False, callback=None, encrypted=True):
         """ Updates the user and perform the callback method """
 
@@ -166,6 +168,7 @@ class NURESTRootObject(NURESTObject):
         else:
             return (self, connection)
 
+    @backwards_compatible_async
     def fetch(self, as_async=False, callback=None):
         """ Fetch all information about the current object
 
