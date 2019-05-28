@@ -28,7 +28,7 @@
 
 import json
 
-from .nurest_connection import HTTP_METHOD_PUT, HTTP_METHOD_GET
+from .nurest_connection import HTTP_METHOD_PUT, HTTP_METHOD_GET, HTTP_METHOD_DELETE
 from .nurest_request import NURESTRequest
 from .nurest_object import NURESTObject
 from .nurest_session import NURESTSession
@@ -192,3 +192,35 @@ class NURESTRootObject(NURESTObject):
         else:
             connection = self.send_request(request=request)
             return self._did_retrieve(connection)
+
+    @backwards_compatible_async
+    def bulk_delete(self, nurest_objects, response_choice=1, as_async=False, callback=None):
+        """ Delete a list of objects and call given callback in case of as_async call.
+
+            Args:
+                nurest_objects ([bambou2.NURESTObject]): the list of NURESTObject objects to add
+                response_choice (int): Automatically send a response choice when confirmation is needed
+                as_async (bool): Boolean to make an asynchronous call. Default is False
+                callback (function): Callback method that will be triggered in case of asynchronous call
+
+            Example:
+                >>> root.bulk_delete([obj1, obj2]) # will delete the enterprise from the server
+        """
+        return self._manage_children_objects(nurest_objects=nurest_objects, method=HTTP_METHOD_DELETE, as_async=as_async, callback=callback, response_choice=response_choice)
+
+    @backwards_compatible_async
+    def bulk_save(self, nurest_objects, response_choice=None, as_async=False, callback=None):
+        """ Update a list of objects and call given callback in case of as_async call
+
+            Args:
+                nurest_objects ([bambou2.NURESTObject]): the list of NURESTObject objects to add
+                response_choice (int): Automatically send a response choice when confirmation is needed
+                as_async (bool): Boolean to make an asynchronous call. Default is False
+                callback (function): Callback method that will be triggered in case of asynchronous call
+
+            Example:
+                >>> obj1.name = "My Super Object"
+                >>> obj2.name = "My Second Supert Object"
+                >>> root.bulk_save([obj1, obj2]) # will save the new name in the server
+        """
+        return self._manage_children_objects(nurest_objects=nurest_objects, method=HTTP_METHOD_PUT, as_async=as_async, callback=callback, response_choice=response_choice)
