@@ -966,20 +966,26 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
     def _did_perform_bulk_operation(self, connection, errors=None):
         """ Performs bulk opertions """
 
+        response = connection.response
+        response_data = None
+        response_metadata = None
+        if type(response.data) is dict and "response" in response.data.keys():
+            response_data = response.data['response']
+        if type(response.data) is dict and "responseMetadata" in response.data.keys():
+            response_metadata = response.data['responseMetadata']
         if not errors:
-            response = connection.response
             errors = list()
             try:
                 obj_index = 0
                 for nurest_object in connection.user_info['nurest_objects']:
-                    if len(response.data) > obj_index and 'status' in response.data[obj_index] and response.data[obj_index]['status'] >= 400:
+                    if response_data and len(response_data) > obj_index and 'status' in response_data[obj_index] and response_data[obj_index]['status'] >= 400:
                         errors.append({
                             "object": nurest_object,
                             "index": obj_index,
-                            "status": response.data[obj_index]['status'],
-                            "error": response.data[obj_index]['data'] if 'data' in response.data[obj_index] else {}
+                            "status": response_data[obj_index]['status'],
+                            "error": response_data[obj_index]['data'] if 'data' in response_data[obj_index] else {}
                         })
-                    elif len(response.data) <= obj_index:
+                    elif response_data and len(response_data) <= obj_index:
                         errors.append({
                             "object": nurest_object,
                             "index": obj_index,
@@ -999,9 +1005,9 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
             callback = connection.callbacks['remote']
 
             if connection.user_info and 'nurest_objects' in connection.user_info:
-                callback(connection.user_info['nurest_objects'], connection, errors)
+                callback(connection.user_info['nurest_objects'], connection, response_metadata, errors)
             else:
-                callback(self, connection, errors)
+                callback(self, connection, response_metadata, errors)
         else:
             if connection.response.status_code >= 400 and BambouConfig._should_raise_bambou_http_error:
                 raise BambouHTTPError(connection=connection)
@@ -1012,7 +1018,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
                     for nurest_object in connection.user_info['nurest_objects']:
                         if nurest_object.id:
                             self.add_child(nurest_object)
-                return (connection.user_info['nurest_objects'], connection, errors)
+                return (connection.user_info['nurest_objects'], connection, response_metadata, errors)
 
             return (self, connection, errors)
 
@@ -1132,20 +1138,19 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
         """ Callback called after adding a new children nurest_objects """
 
         response = connection.response
-        errors = list()
+        response_data = None
+        if type(response.data) is dict and "response" in response.data.keys():
+            response_data = response.data['response']
         try:
             obj_index = 0
             for nurest_object in connection.user_info['nurest_objects']:
-                if len(response.data) > obj_index and 'status' in response.data[obj_index] and response.data[obj_index]['status'] < 300 and 'data' in response.data[obj_index]:
-                    nurest_object.from_dict(response.data[obj_index]['data'])
+                if response_data and len(response_data) > obj_index and 'status' in response_data[obj_index] and response_data[obj_index]['status'] < 300 and 'data' in response_data[obj_index]:
+                    nurest_object.from_dict(response_data[obj_index]['data'])
                 obj_index += 1
         except Exception:
             pass
         
-        if not errors:
-            errors = None
-
-        return self._did_perform_bulk_operation(connection, errors)
+        return self._did_perform_bulk_operation(connection)
 
     @backwards_compatible_async
     def assign(self, objects, nurest_object_type, as_async=False, callback=None, commit=True):
