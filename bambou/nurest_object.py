@@ -933,7 +933,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
         return self._did_perform_standard_operation(connection)
 
     def _did_perform_standard_operation(self, connection):
-        """ Performs standard opertions """
+        """ Performs standard operations """
 
         if connection.as_async:
             callback = connection.callbacks['remote']

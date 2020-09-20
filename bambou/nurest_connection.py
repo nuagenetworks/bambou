@@ -278,23 +278,21 @@ class NURESTConnection(object):
             return True
 
         if status_code == HTTP_CODE_MULTIPLE_CHOICES:
+            if not should_post:
+                return True
             return False
 
         if status_code in [HTTP_CODE_PERMISSION_DENIED, HTTP_CODE_UNAUTHORIZED]:
-
             if not should_post:
                 return True
-
             return False
 
         if status_code in [HTTP_CODE_CONFLICT, HTTP_CODE_NOT_FOUND, HTTP_CODE_BAD_REQUEST, HTTP_CODE_METHOD_NOT_ALLOWED, HTTP_CODE_PRECONDITION_FAILED, HTTP_CODE_SERVICE_UNAVAILABLE]:
             if not should_post:
                 return True
-
             return False
 
         if status_code == HTTP_CODE_INTERNAL_SERVER_ERROR:
-
             return False
 
         if status_code == HTTP_CODE_ZERO:
@@ -375,8 +373,11 @@ class NURESTConnection(object):
 
         retry_request = False
 
-        if response.status_code == HTTP_CODE_MULTIPLE_CHOICES:
-            self._request.url += '?responseChoice=1'
+        if response.status_code == HTTP_CODE_MULTIPLE_CHOICES and 'responseChoice' not in self._request.url:
+            if '?' in self._request.url:
+                self._request.url += '&responseChoice=1'
+            else:
+                self._request.url += '?responseChoice=1'
             bambou_logger.debug('Bambou got [%s] response. Trying to force response choice' % HTTP_CODE_MULTIPLE_CHOICES)
             retry_request = True
 
@@ -387,6 +388,9 @@ class NURESTConnection(object):
             retry_request = True
 
         if retry_request:
+            bambou_logger.info('> %s %s %s' % (self._request.method, self._request.url, self._request.params if self._request.params else ""))
+            bambou_logger.debug('> headers: %s' % headers)
+            bambou_logger.debug('> data:\n  %s' % json.dumps(self._request.data, indent=4))
             response = self.__make_request(requests_session=session.requests_session, method=self._request.method, url=self._request.url, params=self._request.params, data=data, headers=headers, certificate=certificate)
 
         return self._did_receive_response(response)
