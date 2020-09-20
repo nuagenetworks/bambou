@@ -35,7 +35,6 @@ import uuid
 import logging
 
 from .nurest_response import NURESTResponse
-
 from bambou import bambou_logger
 
 
@@ -43,6 +42,7 @@ HTTP_CODE_ZERO = 0
 HTTP_CODE_SUCCESS = 200
 HTTP_CODE_CREATED = 201
 HTTP_CODE_EMPTY = 204
+HTTP_CODE_MULTI_STATUS = 207
 HTTP_CODE_MULTIPLE_CHOICES = 300
 HTTP_CODE_BAD_REQUEST = 400
 HTTP_CODE_UNAUTHORIZED = 401
@@ -240,7 +240,7 @@ class NURESTConnection(object):
         """
         status_code = self._response.status_code
 
-        if status_code in [HTTP_CODE_ZERO, HTTP_CODE_SUCCESS, HTTP_CODE_CREATED, HTTP_CODE_EMPTY, HTTP_CODE_MULTIPLE_CHOICES]:
+        if status_code in [HTTP_CODE_ZERO, HTTP_CODE_SUCCESS, HTTP_CODE_CREATED, HTTP_CODE_EMPTY, HTTP_CODE_MULTIPLE_CHOICES, HTTP_CODE_MULTI_STATUS]:
             return True
 
         if status_code in [HTTP_CODE_BAD_REQUEST, HTTP_CODE_UNAUTHORIZED, HTTP_CODE_PERMISSION_DENIED, HTTP_CODE_NOT_FOUND, HTTP_CODE_METHOD_NOT_ALLOWED, HTTP_CODE_CONNECTION_TIMEOUT, HTTP_CODE_CONFLICT, HTTP_CODE_PRECONDITION_FAILED, HTTP_CODE_INTERNAL_SERVER_ERROR, HTTP_CODE_SERVICE_UNAVAILABLE]:
@@ -274,7 +274,7 @@ class NURESTConnection(object):
         if data and 'errors' in data:
             self._response.errors = data['errors']
 
-        if status_code in [HTTP_CODE_SUCCESS, HTTP_CODE_CREATED, HTTP_CODE_EMPTY]:
+        if status_code in [HTTP_CODE_SUCCESS, HTTP_CODE_CREATED, HTTP_CODE_EMPTY, HTTP_CODE_MULTI_STATUS]:
             return True
 
         if status_code == HTTP_CODE_MULTIPLE_CHOICES:
