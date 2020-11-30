@@ -1159,6 +1159,7 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
             Args:
                 objects (list): list of NURESTObject to link
                 nurest_object_type (type): Type of the object to link
+                as_async (bool): Execute asynchronously
                 callback (function): Callback method that should be fired at the end
 
             Returns:
@@ -1189,8 +1190,54 @@ class NURESTObject(with_metaclass(NUMetaRESTObject, object)):
 
             return self._did_perform_standard_operation(connection)
 
-    # Comparison
+    @backwards_compatible_async
+    def add_members(self, objects, nurest_object_type, as_async=False, callback=None, commit=True):
+        """ Add a list of members to link. This adds one or more objects to an
+            existing list of the member relationship type.
 
+            Args:
+                objects (list): list of NURESTObject to link
+                nurest_object_type (type): Type of the object to link
+                as_async (bool): Execute asynchronously
+                callback (function): Callback method that should be fired at the end
+
+            Returns:
+                Returns the current object and the connection (object, connection)
+
+            Example:
+                >>> entity.add_members([entity1, entity2, entity3], NUEntity) # entity1, entity2 and entity3 are now part of the entity
+        """
+        member_fetcher = self.fetcher_for_rest_name(nurest_object_type.rest_name)
+        members = member_fetcher.get_all()
+        members.extend(objects)
+        return self.assign(objects=members, nurest_object_type=nurest_object_type, as_async=as_async, callback=callback, commit=commit)
+
+    def remove_members(self, objects, nurest_object_type, as_async=False, callback=None, commit=True):
+        """ Remove a list of members to link. This adds one or more objects
+            from an existing list of the member relationship type.
+
+            Args:
+                objects (list): list of NURESTObject to remove
+                nurest_object_type (type): Type of the object to link
+                as_async (bool): Execute asynchronously
+                callback (function): Callback method that should be fired at the end
+
+            Returns:
+                Returns the current object and the connection (object, connection)
+
+            Example:
+                >>> entity.add_members([entity1, entity2, entity3], NUEntity) # entity1, entity2 and entity3 are now part of the entity
+        """
+        member_fetcher = self.fetcher_for_rest_name(nurest_object_type.rest_name)
+        members = member_fetcher.get_all()
+        for new_member in objects:
+            for member in members:
+                if new_member.id == member.id:
+                    members.remove(member)
+                    break
+        return self.assign(objects=members, nurest_object_type=nurest_object_type, as_async=as_async, callback=callback, commit=commit)
+
+    # Comparison
     def rest_equals(self, rest_object):
         """ Compare objects REST attributes
 
