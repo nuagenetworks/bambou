@@ -28,7 +28,7 @@
 
 from __future__ import unicode_literals
 from builtins import object
-from base64 import urlsafe_b64encode
+from base64 import standard_b64encode
 
 
 class NURESTLoginController(object):
@@ -247,13 +247,13 @@ class NURESTLoginController(object):
             certificate = self._certificate
 
         if certificate:
-            return "XREST %s" % urlsafe_b64encode("{}:".format(user).encode('utf-8')).decode('utf-8')
+            return "XREST %s" % standard_b64encode("{}:".format(user).encode('utf-8')).decode('utf-8')
 
         if api_key:
-            return "XREST %s" % urlsafe_b64encode("{}:{}".format(user, api_key).encode('utf-8')).decode('utf-8')
+            return "XREST %s" % standard_b64encode("{}:{}".format(user, api_key).encode('utf-8')).decode('utf-8')
 
 
-        return "XREST %s" % urlsafe_b64encode("{}:{}".format(user, password).encode('utf-8')).decode('utf-8')
+        return "XREST %s" % standard_b64encode("{}:{}".format(user, password).encode('utf-8')).decode('utf-8')
 
     def reset(self):
         """ Reset controller
