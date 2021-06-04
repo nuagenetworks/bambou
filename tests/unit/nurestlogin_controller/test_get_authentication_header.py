@@ -26,6 +26,16 @@ class GetAuthenticationHeader(TestCase):
 
         self.assertEquals(controller.get_authentication_header() , 'XREST dXNlcm5hbWU6cGFzc3dvcmQ=')
 
+    def test_get_authentication_header_with_tilde(self):
+        """ Get authentication header with tilde """
+
+        controller = NURESTLoginController()
+        controller.user = 'username'
+        controller.password = 'p~ass~wor~d'
+        controller.api_key = None
+
+        self.assertEquals(controller.get_authentication_header() , 'XREST dXNlcm5hbWU6cH5hc3N+d29yfmQ=')
+
     def test_get_authentication_header_with_api_key(self):
         """ Get authentication header with api key """
 
