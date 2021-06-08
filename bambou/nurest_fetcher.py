@@ -356,12 +356,6 @@ class NURESTFetcher(list):
     def get(self, filter=None, order_by=None, group_by=[], page=None, page_size=None, query_parameters=None, commit=True, as_async=False, callback=None):
         """ Fetch object and directly return them
 
-            Note:
-                `get` won't put the fetched objects in the parent's children list.
-                You cannot override this behavior. If you want to commit them in the parent
-                you can use :method:vsdk.NURESTFetcher.fetch or manually add the list with
-                :method:vsdk.NURESTObject.add_child
-
             Args:
                 filter (string): string that represents a predicate filter
                 order_by (string): string that represents an order by clause
@@ -369,6 +363,7 @@ class NURESTFetcher(list):
                 page (int): number of the page to load
                 page_size (int): number of results per page
                 commit (bool): boolean to update current object
+                as_async (bool): Run the request asynchronously
                 callback (function): Callback that should be called in case of a as_async request
 
             Returns:
@@ -379,6 +374,43 @@ class NURESTFetcher(list):
                 [<NUChildren at xxx>, <NUChildren at yyyy>, <NUChildren at zzz>]
         """
         return self.fetch(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, commit=commit)[2]
+
+    def get_all(self, filter=None, order_by=None, group_by=[], page_size=None, query_parameters=None, commit=True):
+        """ Fetch all object and directly return them
+
+            Note: Getting all objects asynchronously is not supported.
+
+            Warning: In case of an actively changing environment, where new
+                objects are being created, update and removed continuously,
+                there is a risk that a change happens while all the objects
+                are being fetched, which might cause an object not to be
+                present, or even be present twice.
+
+            Args:
+                filter (string): string that represents a predicate filter
+                order_by (string): string that represents an order by clause
+                group_by (string): list of names for grouping
+                page (int): number of the page to load
+                page_size (int): number of results per page
+                commit (bool): boolean to update current object
+
+            Returns:
+                list: list of vsdk.NURESTObject if any
+
+            Example:
+                >>> print entity.children.get_all()
+                [<NUChildren at xxx>, <NUChildren at yyyy>, <NUChildren at zzz>]
+        """
+        page = 0
+        count = self.get_count(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=1, query_parameters=query_parameters)
+        objects = self.get(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, commit=commit, as_async=False, callback=None)
+        while objects is not None and len(objects) > 0 and len(objects) < count:
+            page += 1
+            extra_objects = self.get(filter=filter, order_by=order_by, group_by=group_by, page=page, page_size=page_size, query_parameters=query_parameters, commit=commit, as_async=False, callback=None)
+            if extra_objects is None or len(extra_objects) == 0:
+                break
+            objects.extend(extra_objects)
+        return objects if len(objects) else None
 
     @backwards_compatible_async
     def get_first(self, filter=None, order_by=None, group_by=[], query_parameters=None, commit=False, as_async=False, callback=None):

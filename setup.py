@@ -29,7 +29,7 @@ from setuptools import setup
 
 setup(
     name='bambou',
-    version='3.1.3',
+    version='3.2.1',
     author='Nuage Networks',
     author_email='opensource@nuagenetworks.net',
     packages=['bambou', 'bambou.utils'],
